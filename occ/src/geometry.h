@@ -17,6 +17,8 @@ using Size = Vector<int>;
 struct Rectangle
 {
   constexpr Rectangle()
+    : position(),
+      size()
   {
   }
 

@@ -22,8 +22,13 @@ constexpr std::array<int, 12> Game::Player::sprite_walking_right;
 constexpr std::array<int, 12> Game::Player::sprite_walking_left;
 
 Game::Game()
-  : initialized_(false),
+  : player_(),
+    initialized_(false),
     surface_game_(nullptr, SDL_FreeSurface),
+    sprite_manager_(),
+    item_manager_(),
+    level_(),
+    level_loader_(),
     update_tick_(0u),
     draw_debug_(false),
     draw_aabbs_(false),
@@ -502,7 +507,9 @@ void Game::render(SDL_Surface* surface_screen) const
         if (geometry::isColliding(camera, aabb))
         {
           // Adjust the aabb position based on camera and render it
-          draw::rectangle(geometry::Rectangle(aabb.position - camera.position, aabb.size), { 255, 0, 0 }, surface_game_.get());
+          draw::rectangle(geometry::Rectangle(aabb.position - camera.position, aabb.size),
+                          { 255u, 0u, 0u, 0u },
+                          surface_game_.get());
         }
       }
     }
@@ -522,11 +529,11 @@ void Game::render(SDL_Surface* surface_screen) const
     const auto collide_str = std::string("collide: ") + (collide_x_ ? "x " : "_ ") + (collide_y_ ? "y" : "_");
     const auto input_str   = std::string("input: ") + (input_left_ ? "left " : "____ ") + (input_right_ ? "right " : "_____ ") + (input_jump_ ? "jump" : "____");
 
-    draw::text(5,  25, camera_str,  { 255, 0, 0}, surface_screen);
-    draw::text(5,  45, pixel_str,   { 255, 0, 0}, surface_screen);
-    draw::text(5,  65, tiles_str,   { 255, 0, 0}, surface_screen);
-    draw::text(5,  85, collide_str, { 255, 0, 0}, surface_screen);
-    draw::text(5, 105, input_str,   { 255, 0, 0}, surface_screen);
+    draw::text(5,  25, camera_str,  { 255u, 0u, 0u, 0u}, surface_screen);
+    draw::text(5,  45, pixel_str,   { 255u, 0u, 0u, 0u}, surface_screen);
+    draw::text(5,  65, tiles_str,   { 255u, 0u, 0u, 0u}, surface_screen);
+    draw::text(5,  85, collide_str, { 255u, 0u, 0u, 0u}, surface_screen);
+    draw::text(5, 105, input_str,   { 255u, 0u, 0u, 0u}, surface_screen);
 
   }
 }

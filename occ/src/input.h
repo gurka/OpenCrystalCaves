@@ -5,22 +5,22 @@ struct Input
 {
   struct Button
   {
-    bool pressed = false;
+    bool pressed  = false;
     bool repeated = false;
   };
 
-  Button up;
-  Button down;
-  Button left;
-  Button right;
-  Button space;
+  Button up    = Button();
+  Button down  = Button();
+  Button left  = Button();
+  Button right = Button();
+  Button space = Button();
 
-  Button num_1;
-  Button num_2;
-  Button num_3;
-  Button num_4;
+  Button num_1 = Button();
+  Button num_2 = Button();
+  Button num_3 = Button();
+  Button num_4 = Button();
 
-  bool quit  = false;
+  bool quit    = false;
 };
 
 #endif  // INPUT_H_

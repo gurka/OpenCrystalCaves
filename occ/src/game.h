@@ -29,24 +29,24 @@ class Game
 
   struct Player
   {
-    geometry::Position position;
-    Vector<int> velocity;
+    geometry::Position position = geometry::Position();
+    Vector<int> velocity = Vector<int>();
 
     enum class Direction
     {
       right,
       left
-    } direction;
+    } direction = Direction::right;
 
     enum class State
     {
       still,
       walking,
       jumping
-    } state;
+    } state = State::still;
 
-    unsigned animation_tick;
-    unsigned jump_tick;
+    unsigned animation_tick = 0u;
+    unsigned jump_tick = 0u;
 
     static constexpr int sprite_standing_right = 244;
     static constexpr std::array<int, 12> sprite_walking_right =

@@ -52,6 +52,11 @@ class Item
 class ItemManager
 {
  public:
+  ItemManager()
+    : items_()
+  {
+  }
+
   bool load_items(const std::string& filename);
 
   const std::vector<Item>& get_items() const { return items_; }

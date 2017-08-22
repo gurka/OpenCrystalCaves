@@ -196,6 +196,10 @@ void readInput(Input* input)
 
 int main(int argc, char* argv[])
 {
+  // Unused for now
+  (void)argc;
+  (void)argv;
+
   Window window = initSDL();
   if (!window)
   {
@@ -259,7 +263,7 @@ int main(int argc, char* argv[])
 
       // Render FPS
       auto fps_str = "fps: " + std::to_string(fps);
-      draw::text(5, 5, fps_str, { 255u, 255u, 255u }, window_surface);
+      draw::text(5, 5, fps_str, { 255u, 255u, 255u, 0u }, window_surface);
 
       // Update screen
       SDL_UpdateWindowSurface(window.get());

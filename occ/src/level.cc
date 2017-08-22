@@ -5,7 +5,11 @@
 Level::Level()
   : valid_(false),
     width_(0),
-    height_(0)
+    height_(0),
+    tiles_background_(),
+    tiles_middleground_(),
+    tiles_foreground_(),
+    aabbs_()
 {
 }
 
