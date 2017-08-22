@@ -194,12 +194,8 @@ void readInput(Input* input)
   }
 }
 
-int main(int argc, char* argv[])
+int main()
 {
-  // Unused for now
-  (void)argc;
-  (void)argv;
-
   Window window = initSDL();
   if (!window)
   {
