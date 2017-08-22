@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 
 project(occ)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -pedantic")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -Weffc++")
 
 set(INC "/usr/include/SDL2" "lib/json/src")
 set(LIB "SDL2" "SDL2_ttf")
