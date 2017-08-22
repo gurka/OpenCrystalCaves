@@ -27,8 +27,6 @@ set(SRC
   "src/level.cc"
   "src/level.h"
   "src/math.h"
-  "src/menu.cc"
-  "src/menu.h"
   "src/spritemgr.cc"
   "src/spritemgr.h"
   "src/vector.h"
