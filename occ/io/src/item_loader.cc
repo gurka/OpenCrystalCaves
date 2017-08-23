@@ -2,8 +2,8 @@
 
 #include <fstream>
 #include <limits>
+#include <json.hpp>
 
-#include "json.hpp"
 #include "logger.h"
 
 std::vector<Item> ItemLoader::load_items(const std::string& filename)

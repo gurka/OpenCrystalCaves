@@ -3,8 +3,8 @@
 #include <cstdio>
 #include <fstream>
 #include <utility>
+#include <json.hpp>
 
-#include "json.hpp"
 #include "logger.h"
 
 Level LevelLoader::load_level(const std::string& filename)
