@@ -4,8 +4,8 @@
 
 #include <cassert>
 
-#include "../geometry.h"
-#include "../math.h"
+#include "geometry.h"
+#include "math.h"
 
 namespace draw
 {

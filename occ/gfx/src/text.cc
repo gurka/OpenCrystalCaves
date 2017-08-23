@@ -1,10 +1,9 @@
 #include "text.h"
 
+#include <cassert>
 #include <memory>
 
 #include <SDL_ttf.h>
-
-#include "../config.h"
 
 namespace draw
 {
