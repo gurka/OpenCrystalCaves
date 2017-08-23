@@ -5,6 +5,8 @@
 
 #include <SDL_ttf.h>
 
+#include "logger.h"
+
 namespace draw
 {
 
@@ -18,7 +20,7 @@ void text(int x, int y, const std::string& text, const SDL_Color& color, SDL_Sur
     font.reset(TTF_OpenFont("media/DejaVuSans.ttf", 16));
     if (!font)
     {
-      fprintf(stderr, "TTF_OpenFont failed with: %s\n", TTF_GetError());
+      LOG_CRITICAL("TTF_OpenFont failed with: '%s'", TTF_GetError());
       assert(font);
     }
   }

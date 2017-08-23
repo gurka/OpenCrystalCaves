@@ -6,6 +6,7 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 
+#include "logger.h"
 #include "config.h"
 #include "input.h"
 #include "game.h"
@@ -24,14 +25,14 @@ Window initSDL()
   // Init SDL
   if (SDL_Init(SDL_INIT_VIDEO) < 0)
   {
-    fprintf(stderr, "Could not initialize SDL: %s\n", SDL_GetError());
+    LOG_CRITICAL("Could not initialize SDL: %s", SDL_GetError());
     return Window(nullptr, SDL_DestroyWindow);
   }
 
   // Init SDL_ttf
   if (TTF_Init() < 0)
   {
-    fprintf(stderr, "Could not initialize TTF: %s\n", TTF_GetError());
+    LOG_CRITICAL("Could not initialize TTF: %s", TTF_GetError());
     return Window(nullptr, SDL_DestroyWindow);
   }
 
@@ -196,6 +197,8 @@ void readInput(Input* input)
 
 int main()
 {
+  LOG_INFO("Starting!");
+
   Window window = initSDL();
   if (!window)
   {
@@ -206,7 +209,7 @@ int main()
   Game game;
   if (!game.init(window_surface))
   {
-    fprintf(stderr, "Could not initialize Game\n");
+    LOG_CRITICAL("Could not initialize Game");
     return 1;
   }
 

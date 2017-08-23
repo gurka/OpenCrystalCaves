@@ -1,6 +1,8 @@
 #include "spritemgr.h"
 
-#include "config.h"
+#include <cassert>
+
+#include "logger.h"
 
 bool SpriteManager::load_tileset(const std::string& filename)
 {
@@ -14,7 +16,7 @@ bool SpriteManager::load_tileset(const std::string& filename)
   tileset_.reset(SDL_LoadBMP(filename.c_str()));
   if (!tileset_)
   {
-    fprintf(stderr, "Could not load '%s': %s\n", filename.c_str(), SDL_GetError());
+    LOG_CRITICAL("Could not load '%s': '%s'", filename.c_str(), SDL_GetError());
     return false;
   }
   SDL_SetColorKey(tileset_.get(), SDL_TRUE, SDL_MapRGB(tileset_->format, 0, 180, 0));

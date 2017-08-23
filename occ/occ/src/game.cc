@@ -1,6 +1,5 @@
 #include "game.h"
 
-#include <cstdio>
 #include <sstream>
 #include <string>
 
@@ -83,7 +82,6 @@ bool Game::init(const SDL_Surface* windowSurface)
   level_ = LevelLoader::load_level("media/level1.json");
   if (!level_.valid())
   {
-    fprintf(stderr, "Could not load \"Level 1\"\n");
     return false;
   }
 
