@@ -4,9 +4,7 @@ project(occ)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -Weffc++")
 
-set(INC "/usr/include/SDL2" "lib/json/src")
-set(LIB "SDL2" "SDL2_ttf")
-set(SRC
+add_executable(occ
   "src/draw/line.cc"
   "src/draw/line.h"
   "src/draw/text.cc"
@@ -31,6 +29,11 @@ set(SRC
   "src/spritemgr.h"
   "src/vector.h"
 )
-add_executable(occ ${SRC})
-target_include_directories(occ PUBLIC ${INC})
-target_link_libraries(occ ${LIB})
+target_include_directories(occ SYSTEM PUBLIC
+  "/usr/include/SDL2"
+  "lib/json/src"
+)
+target_link_libraries(occ
+  "SDL2"
+  "SDL2_ttf"
+)
