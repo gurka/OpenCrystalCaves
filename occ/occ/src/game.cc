@@ -6,6 +6,8 @@
 
 #include "config.h"
 #include "draw.h"
+#include "item_loader.h"
+#include "level_loader.h"
 
 namespace
 {
@@ -26,9 +28,8 @@ Game::Game()
     initialized_(false),
     surface_game_(nullptr, SDL_FreeSurface),
     sprite_manager_(),
-    item_manager_(),
+    items_(),
     level_(),
-    level_loader_(),
     update_tick_(0u),
     draw_debug_(false),
     draw_aabbs_(false),
@@ -73,17 +74,13 @@ bool Game::init(const SDL_Surface* windowSurface)
     return false;
   }
 
-  if (!item_manager_.load_items("media/items.json"))
+  items_ = ItemLoader::load_items("media/items.json");
+  if (items_.empty())
   {
     return false;
   }
 
-  /////////////////////////////////////////////////////////////////////////////
-  //
-  // Load first level
-  //
-  /////////////////////////////////////////////////////////////////////////////
-  level_ = level_loader_.load_level("media/level1.json");
+  level_ = LevelLoader::load_level("media/level1.json");
   if (!level_.valid())
   {
     fprintf(stderr, "Could not load \"Level 1\"\n");
@@ -367,7 +364,7 @@ void Game::render(SDL_Surface* surface_screen) const
         auto item_id = level_.get_tile_background(tile_x, tile_y);
         if (item_id != Item::invalid)
         {
-          const auto& item = item_manager_.get_item(item_id);
+          const auto& item = items_[item_id];
           const auto sprite_id = [&item, &tile_x, &tile_y]()
           {
             if (item.is_multiple_2x2())
@@ -406,7 +403,7 @@ void Game::render(SDL_Surface* surface_screen) const
         auto item_id = level_.get_tile_middleground(tile_x, tile_y);
         if (item_id != Item::invalid)
         {
-          const auto& item = item_manager_.get_item(item_id);
+          const auto& item = items_[item_id];
           const auto sprite_id = item.get_sprite();
           auto src_rect = sprite_manager_.get_rect_for_tile(sprite_id);
           SDL_Rect dest_rect
@@ -471,7 +468,7 @@ void Game::render(SDL_Surface* surface_screen) const
         auto item_id = level_.get_tile_foreground(tile_x, tile_y);
         if (item_id != Item::invalid)
         {
-          const auto& item = item_manager_.get_item(item_id);
+          const auto& item = items_[item_id];
           const auto sprite_id = [&item](unsigned update_tick)
           {
             if (item.is_animated())

@@ -1,8 +1,7 @@
-#ifndef ITEMMGR_H_
-#define ITEMMGR_H_
+#ifndef ITEM_H_
+#define ITEM_H_
 
 #include <string>
-#include <vector>
 
 class Item
 {
@@ -49,21 +48,4 @@ class Item
   int flags_;
 };
 
-class ItemManager
-{
- public:
-  ItemManager()
-    : items_()
-  {
-  }
-
-  bool load_items(const std::string& filename);
-
-  const std::vector<Item>& get_items() const { return items_; }
-  const Item& get_item(Item::Id id) const { return items_[id]; }
-
- private:
-  std::vector<Item> items_;
-};
-
-#endif  // ITEMMGR_H_
+#endif  // ITEM_H_

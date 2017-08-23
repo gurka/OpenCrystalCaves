@@ -4,6 +4,8 @@
 #include <fstream>
 #include <utility>
 
+#include "json.hpp"
+
 Level LevelLoader::load_level(const std::string& filename)
 {
   // Open and parse JSON file

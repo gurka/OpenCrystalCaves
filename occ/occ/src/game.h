@@ -13,7 +13,6 @@
 #include "spritemgr.h"
 #include "vector.h"
 #include "level.h"
-#include "level_loader.h"
 
 class Game
 {
@@ -64,11 +63,14 @@ class Game
   } player_;
 
   bool initialized_;
+
   std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> surface_game_;
+
   SpriteManager sprite_manager_;
-  ItemManager item_manager_;
+
+  std::vector<Item> items_;
   Level level_;
-  LevelLoader level_loader_;
+
   unsigned update_tick_;
 
   // debug stuff
