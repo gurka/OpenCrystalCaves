@@ -30,6 +30,11 @@ class Logger
 #define LOG_ERROR(...)    Logger::log(__FILE__, __LINE__, Logger::Level::ERROR, __VA_ARGS__)
 #define LOG_CRITICAL(...) Logger::log(__FILE__, __LINE__, Logger::Level::CRITICAL, __VA_ARGS__)
 #define LOG_INFO(...)     Logger::log(__FILE__, __LINE__, Logger::Level::INFO,  __VA_ARGS__)
+
+#ifndef NDEBUG
 #define LOG_DEBUG(...)    Logger::log(__FILE__, __LINE__, Logger::Level::DEBUG, __VA_ARGS__)
+#else
+#define LOG_DEBUG(...)
+#endif
 
 #endif  // LOGGER_H_
