@@ -7,7 +7,6 @@
 #include <SDL_ttf.h>
 
 #include "logger.h"
-#include "config.h"
 #include "input.h"
 #include "game.h"
 #include "draw.h"
@@ -41,8 +40,8 @@ Window initSDL()
   return Window(SDL_CreateWindow("OpenCrystalCaves",
                                  0,
                                  0,
-                                 config::CAMERA_WIDTH * config::SCREEN_SCALE,
-                                 config::CAMERA_HEIGHT * config::SCREEN_SCALE,
+                                 Game::CAMERA_WIDTH * Game::SCREEN_SCALE,
+                                 Game::CAMERA_HEIGHT * Game::SCREEN_SCALE,
                                  SDL_WINDOW_SHOWN),
                 SDL_DestroyWindow);
 }

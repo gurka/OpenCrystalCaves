@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.0)
 project(occ)
 
 add_executable(occ
-  "src/config.h"
   "src/game.cc"
   "src/game.h"
   "src/input.h"

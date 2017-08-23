@@ -6,7 +6,6 @@
 
 #include "SDL.h"
 
-#include "config.h"
 #include "geometry.h"
 #include "input.h"
 #include "item.h"
@@ -24,8 +23,11 @@ class Game
   void update(const Input& input);
   void render(SDL_Surface* dest) const;
 
- private:
+  static constexpr int CAMERA_WIDTH  = 320;
+  static constexpr int CAMERA_HEIGHT = 192;
+  static constexpr int SCREEN_SCALE = 3;
 
+ private:
   struct Player
   {
     geometry::Position position = geometry::Position();

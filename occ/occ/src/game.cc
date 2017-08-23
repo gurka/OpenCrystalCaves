@@ -3,7 +3,6 @@
 #include <sstream>
 #include <string>
 
-#include "config.h"
 #include "draw.h"
 #include "item_loader.h"
 #include "level_loader.h"
@@ -50,8 +49,8 @@ bool Game::init(const SDL_Surface* windowSurface)
   const auto* windowSurfaceFormat = windowSurface->format;
 
   surface_game_.reset(SDL_CreateRGBSurface(0,
-                                           config::CAMERA_WIDTH,
-                                           config::CAMERA_HEIGHT,
+                                           CAMERA_WIDTH,
+                                           CAMERA_HEIGHT,
                                            windowSurfaceFormat->BitsPerPixel,
                                            windowSurfaceFormat->Rmask,
                                            windowSurfaceFormat->Gmask,
@@ -329,17 +328,17 @@ void Game::render(SDL_Surface* surface_screen) const
   // Calculate where the camera is
   const geometry::Position camera_pos(player_.position +  // player position
                                       geometry::Position(8, 8) -  // plus half player size
-                                      geometry::Position(config::CAMERA_WIDTH / 2, config::CAMERA_HEIGHT / 2));  // minus half camera size
+                                      geometry::Position(CAMERA_WIDTH / 2, CAMERA_HEIGHT / 2));  // minus half camera size
 
   // Create a Rectangle that represents the camera and adjust the position so that nothing outside the level is visible
   const geometry::Rectangle camera(math::clamp(camera_pos.getX(),
                                                0,
-                                               (level_.get_tile_width() * 16) - config::CAMERA_WIDTH),
+                                               (level_.get_tile_width() * 16) - CAMERA_WIDTH),
                                    math::clamp(camera_pos.getY(),
                                                0,
-                                               (level_.get_tile_height() * 16) - config::CAMERA_HEIGHT),
-                                   config::CAMERA_WIDTH,
-                                   config::CAMERA_HEIGHT);
+                                               (level_.get_tile_height() * 16) - CAMERA_HEIGHT),
+                                   CAMERA_WIDTH,
+                                   CAMERA_HEIGHT);
 
   // Clear game surface (background now)
   SDL_FillRect(surface_game_.get(), nullptr, SDL_MapRGB(surface_game_->format, 33, 33, 33));
@@ -511,8 +510,8 @@ void Game::render(SDL_Surface* surface_screen) const
   }
 
   // Render game surface to screen surface (scaled)
-  SDL_Rect src_rect = { 0, 0, config::CAMERA_WIDTH, config::CAMERA_HEIGHT };
-  SDL_Rect dest_rect = { 0, 0, config::CAMERA_WIDTH * config::SCREEN_SCALE, config::CAMERA_HEIGHT * config::SCREEN_SCALE };
+  SDL_Rect src_rect = { 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT };
+  SDL_Rect dest_rect = { 0, 0, CAMERA_WIDTH * SCREEN_SCALE, CAMERA_HEIGHT * SCREEN_SCALE };
   SDL_BlitScaled(surface_game_.get(), &src_rect, surface_screen, &dest_rect);
 
   if (draw_debug_)
