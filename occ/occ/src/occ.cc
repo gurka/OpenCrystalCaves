@@ -194,7 +194,12 @@ void read_input(Input* input)
   }
 }
 
-void render_game(const Game& game, const SpriteManager& sprite_manager, SDL_Surface* game_surface, unsigned tick)
+void render_game(const Game& game,
+                 const SpriteManager& sprite_manager,
+                 SDL_Surface* game_surface,
+                 unsigned tick,
+                 geometry::Rectangle* camera_out,
+                 bool draw_aabbs)
 {
   // Get game info
   const auto& player = game.get_player();
@@ -215,6 +220,10 @@ void render_game(const Game& game, const SpriteManager& sprite_manager, SDL_Surf
                                                (level.get_tile_height() * 16) - CAMERA_HEIGHT),
                                    CAMERA_WIDTH,
                                    CAMERA_HEIGHT);
+  if (camera_out)
+  {
+      *camera_out = camera;
+  }
 
   // Clear game surface (background now)
   SDL_FillRect(game_surface, nullptr, SDL_MapRGB(game_surface->format, 33, 33, 33));
@@ -368,39 +377,19 @@ void render_game(const Game& game, const SpriteManager& sprite_manager, SDL_Surf
   }
 
   // Debug
-//  {
-//    if (draw_aabbs_)
-//    {
-//      // Draw aabbs
-//      for (const auto& aabb : level_.get_aabbs())
-//      {
-//        if (geometry::isColliding(camera, aabb))
-//        {
-//          // Adjust the aabb position based on camera and render it
-//          draw::rectangle(geometry::Rectangle(aabb.position - camera.position, aabb.size),
-//                          { 255u, 0u, 0u, 0u },
-//                          surface_game_.get());
-//        }
-//      }
-//    }
-//  }
-//
-//  if (draw_debug_)
-//  {
-//    // Debug info
-//    const auto camera_str  = "camera pixel: (" + std::to_string(camera.position.getX()) + ", " + std::to_string(camera.position.getY()) + ")";
-//    const auto pixel_str   = "player pixel: (" + std::to_string(player.position.getX()) + ", " + std::to_string(player.position.getY()) + ")";
-//    const auto tiles_str   = "player tiles: (" + std::to_string(player.position.getX() / 16) + ", " + std::to_string(player.position.getY() / 16) + ")";
-//    const auto collide_str = std::string("collide: ") + (collide_x_ ? "x " : "_ ") + (collide_y_ ? "y" : "_");
-//    const auto input_str   = std::string("input: ") + (input_left_ ? "left " : "____ ") + (input_right_ ? "right " : "_____ ") + (input_jump_ ? "jump" : "____");
-//
-//    draw::text(5,  25, camera_str,  { 255u, 0u, 0u, 0u}, surface_screen);
-//    draw::text(5,  45, pixel_str,   { 255u, 0u, 0u, 0u}, surface_screen);
-//    draw::text(5,  65, tiles_str,   { 255u, 0u, 0u, 0u}, surface_screen);
-//    draw::text(5,  85, collide_str, { 255u, 0u, 0u, 0u}, surface_screen);
-//    draw::text(5, 105, input_str,   { 255u, 0u, 0u, 0u}, surface_screen);
-//
-//  }
+  if (draw_aabbs)
+  {
+    for (const auto& aabb : game.get_level().get_aabbs())
+    {
+      if (geometry::isColliding(camera, aabb))
+      {
+        // Adjust the aabb position based on camera and render it
+        draw::rectangle(geometry::Rectangle(aabb.position - camera.position, aabb.size),
+                        { 255u, 0u, 0u, 0u },
+                        game_surface);
+      }
+    }
+  }
 }
 
 PlayerInput input_to_player_input(const Input& input)
@@ -473,6 +462,11 @@ int main()
     auto fps_start_time = current_tick;
     auto fps = 0u;
 
+    // Debug information
+    bool debug = false;
+    geometry::Rectangle game_camera;
+    bool draw_aabbs = false;
+
     while (true)
     {
       /////////////////////////////////////////////////////////////////////////
@@ -486,13 +480,27 @@ int main()
       lag += elapsed_ticks;
       while (lag >= ms_per_update)
       {
+        // Read input
         read_input(&input);
+
+        // Handle input
+        if (input.quit)
+        {
+          return EXIT_SUCCESS;  // Quit ASAP
+        }
+        if (input.num_1.pressed && !input.num_1.repeated)
+        {
+          draw_aabbs = !draw_aabbs;
+        }
+        if (input.num_2.pressed && !input.num_2.repeated)
+        {
+          debug = !debug;
+        }
+
+        // Call game loop
         game.update(input_to_player_input(input));
+
         lag -= ms_per_update;
-      }
-      if (input.quit)
-      {
-        break;
       }
 
       /////////////////////////////////////////////////////////////////////////
@@ -500,8 +508,9 @@ int main()
       ///  Render
       ///
       /////////////////////////////////////////////////////////////////////////
+
       // Render game
-      render_game(game, sprite_manager, game_surface.get(), current_tick);
+      render_game(game, sprite_manager, game_surface.get(), current_tick, debug ? &game_camera : nullptr, draw_aabbs);
 
       // Render game surface to window surface (scaled)
       SDL_Rect src_rect = { 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT };
@@ -512,12 +521,27 @@ int main()
       auto fps_str = "fps: " + std::to_string(fps);
       draw::text(5, 5, fps_str, { 255u, 255u, 255u, 0u }, window_surface);
 
+      // Debug
+      if (debug)
+      {
+        // Debug info
+        const auto camera_str  = "camera pixel: (" + std::to_string(game_camera.position.getX()) + ", " + std::to_string(game_camera.position.getY()) + ")";
+        const auto pixel_str   = "player pixel: (" + std::to_string(game.get_player().position.getX()) + ", " + std::to_string(game.get_player().position.getY()) + ")";
+        const auto tiles_str   = "player tiles: (" + std::to_string(game.get_player().position.getX() / 16) + ", " + std::to_string(game.get_player().position.getY() / 16) + ")";
+        const auto collide_str = std::string("collide: ") + (game.player_collide_x() ? "x " : "_ ") + (game.player_collide_y() ? "y" : "_");
+
+        draw::text(5,  25, camera_str,  { 255u, 0u, 0u, 0u}, window_surface);
+        draw::text(5,  45, pixel_str,   { 255u, 0u, 0u, 0u}, window_surface);
+        draw::text(5,  65, tiles_str,   { 255u, 0u, 0u, 0u}, window_surface);
+        draw::text(5,  85, collide_str, { 255u, 0u, 0u, 0u}, window_surface);
+
+      }
+
       // Update screen
       SDL_UpdateWindowSurface(window.get());
 
-      fps_num_renders++;
-
       // Calculate FPS each second
+      fps_num_renders++;
       if (current_tick >= (fps_last_calc + 1000))
       {
         const auto total_time = current_tick - fps_start_time;

@@ -112,9 +112,8 @@ void Game::update(const PlayerInput& player_input)
   //  Move player towards destination and check for collision
   //
   ///////////////////////////////////////////////////////////////////
-  auto collide_on_x = false;
-  auto collide_on_y = false;
-
+  player_collide_x_ = false;
+  player_collide_y_ = false;
   const auto destination = player_.position + player_.velocity;
 
   auto collides = [this](const geometry::Rectangle& player_rect)
@@ -135,7 +134,7 @@ void Game::update(const PlayerInput& player_input)
     const geometry::Rectangle player_rect { player_.position + geometry::Position(step_x, 0), 16, 16 };
     if (collides(player_rect))
     {
-      collide_on_x = true;
+      player_collide_x_ = true;
       break;
     }
     player_.position += geometry::Position(step_x, 0);
@@ -147,7 +146,7 @@ void Game::update(const PlayerInput& player_input)
     const geometry::Rectangle player_rect { player_.position + geometry::Position(0, step_y), 16, 16 };
     if (collides(player_rect))
     {
-      collide_on_y = true;
+      player_collide_y_ = true;
       break;
     }
     player_.position += geometry::Position(0, step_y);
@@ -163,12 +162,12 @@ void Game::update(const PlayerInput& player_input)
   {
     case Player::State::jumping:
     {
-      if (collide_on_y && player_.velocity.getY() > 0)
+      if (player_collide_y_ && player_.velocity.getY() > 0)
       {
         // Player is falling down but hit something (the ground), set new state
         player_.state = player_.velocity.getX() == 0 ? Player::State::still : Player::State::walking;
       }
-      else if (collide_on_y)
+      else if (player_collide_y_)
       {
         // Player hit something while jumping, set jump_tick so that he starts falling
         player_.jump_tick = jump_velocity_fall_index;
@@ -178,7 +177,7 @@ void Game::update(const PlayerInput& player_input)
 
     case Player::State::still:
     {
-      if (player_.velocity.getX() != 0 && !collide_on_x)
+      if (player_.velocity.getX() != 0 && !player_collide_x_)
       {
         // Player started to move, change to state walking
         player_.state = Player::State::walking;
@@ -191,7 +190,7 @@ void Game::update(const PlayerInput& player_input)
 
     case Player::State::walking:
     {
-      if (player_.velocity.getX() == 0 || collide_on_x)
+      if (player_.velocity.getX() == 0 || player_collide_x_)
       {
         // Player was walking and stopped or collided with something
         player_.state = Player::State::still;
@@ -215,7 +214,7 @@ void Game::update(const PlayerInput& player_input)
   }
 
   // Check player jump
-  if (player_input.jump && collide_on_y && player_.state != Player::State::jumping)
+  if (player_input.jump && player_collide_y_ && player_.state != Player::State::jumping)
   {
     // Player wants to jump, change state and set start jump velocity
     player_.state = Player::State::jumping;
