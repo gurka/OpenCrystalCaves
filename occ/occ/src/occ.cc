@@ -6,11 +6,12 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 
-#include "logger.h"
 #include "input.h"
+#include "spritemgr.h"
+#include "logger.h"
 #include "draw.h"
 #include "game.h"
-#include "spritemgr.h"
+#include "player_input.h"
 
 static constexpr int CAMERA_WIDTH  = 320;
 static constexpr int CAMERA_HEIGHT = 192;
@@ -402,6 +403,16 @@ void render_game(const Game& game, const SpriteManager& sprite_manager, SDL_Surf
 //  }
 }
 
+PlayerInput input_to_player_input(const Input& input)
+{
+  PlayerInput pi;
+  pi.left = input.left.pressed;
+  pi.right = input.right.pressed;
+  pi.jump = input.space.pressed;  // TODO should be CTRL
+  pi.shoot = false;  // TODO should be ALT or space (?)
+  return pi;
+}
+
 int main()
 {
   LOG_INFO("Starting!");
@@ -476,7 +487,7 @@ int main()
       while (lag >= ms_per_update)
       {
         read_input(&input);
-        game.update(input);
+        game.update(input_to_player_input(input));
         lag -= ms_per_update;
       }
       if (input.quit)

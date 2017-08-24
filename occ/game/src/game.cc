@@ -27,7 +27,7 @@ bool Game::init()
   return true;
 }
 
-void Game::update(const Input& input)
+void Game::update(const PlayerInput& player_input)
 {
   static constexpr std::array<int, 16> jump_velocity   = { -8, -8, -8, -4, -4, -2, -2, -2, -2, 0, 2, 2, 2, 2, 4, 4 };
   static constexpr std::size_t jump_velocity_fall_index = 10;
@@ -72,7 +72,13 @@ void Game::update(const Input& input)
     case Player::State::walking:
     case Player::State::jumping:
     {
-      if (input.left.pressed)
+      if ((player_input.left && player_input.right) ||
+          (!player_input.left && !player_input.right))
+      {
+        // Set zero x velocity
+        player_.velocity = Vector<int>(0, player_.velocity.getY());
+      }
+      else if (player_input.left)
       {
         // First step is 2 pixels / tick, then 4 pixels / tick
         if (player_.velocity.getX() == -2)
@@ -84,7 +90,7 @@ void Game::update(const Input& input)
           player_.velocity = Vector<int>(-2, player_.velocity.getY());
         }
       }
-      else if (input.right.pressed)
+      else if (player_input.right)
       {
         // Same as above
         if (player_.velocity.getX() == 2)
@@ -95,11 +101,6 @@ void Game::update(const Input& input)
         {
           player_.velocity = Vector<int>(2, player_.velocity.getY());
         }
-      }
-      else
-      {
-        // Set zero x velocity
-        player_.velocity = Vector<int>(0, player_.velocity.getY());
       }
       break;
     }
@@ -214,7 +215,7 @@ void Game::update(const Input& input)
   }
 
   // Check player jump
-  if (input.space.pressed && collide_on_y && player_.state != Player::State::jumping)
+  if (player_input.jump && collide_on_y && player_.state != Player::State::jumping)
   {
     // Player wants to jump, change state and set start jump velocity
     player_.state = Player::State::jumping;

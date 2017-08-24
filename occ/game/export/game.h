@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "input.h"
+#include "player_input.h"
 #include "item.h"
 #include "level.h"
 #include "player.h"
@@ -19,7 +19,7 @@ class Game
   }
 
   bool init();
-  void update(const Input& input);
+  void update(const PlayerInput& player_input);
 
   const Player& get_player() const { return player_; }
   const std::vector<Item>& get_items() const { return items_; }

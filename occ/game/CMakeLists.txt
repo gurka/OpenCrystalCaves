@@ -4,9 +4,9 @@ project(game)
 
 add_library(game
   "export/game.h"
-  "export/input.h"
   "export/item.h"
   "export/level.h"
+  "export/player_input.h"
   "export/player.h"
   "src/game.cc"
   "src/item.cc"
