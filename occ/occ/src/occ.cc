@@ -18,7 +18,7 @@ static constexpr int SCREEN_SCALE = 3;
 
 using Window = std::unique_ptr<SDL_Window,  decltype(&SDL_DestroyWindow)>;
 
-Window initSDL()
+Window init_SDL()
 {
   // Init SDL
   if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -45,7 +45,7 @@ Window initSDL()
                 SDL_DestroyWindow);
 }
 
-void readInput(Input* input)
+void read_input(Input* input)
 {
   assert(input != nullptr);
 
@@ -407,7 +407,7 @@ int main()
   LOG_INFO("Starting!");
 
   // Create Window
-  Window window = initSDL();
+  Window window = init_SDL();
   if (!window)
   {
     return EXIT_FAILURE;
@@ -475,7 +475,7 @@ int main()
       lag += elapsed_ticks;
       while (lag >= ms_per_update)
       {
-        readInput(&input);
+        read_input(&input);
         game.update(input);
         lag -= ms_per_update;
       }
