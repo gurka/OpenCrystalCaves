@@ -19,6 +19,7 @@ add_subdirectory("game")
 target_include_directories(game PUBLIC
   "game/export"
   "utils/export"
+  "io/export"
 )
 
 # io
@@ -43,7 +44,6 @@ add_subdirectory("occ")
 target_include_directories(occ PUBLIC
   "gfx/export"
   "game/export"
-  "io/export"
   "utils/export"
 )
 target_include_directories(occ SYSTEM PUBLIC

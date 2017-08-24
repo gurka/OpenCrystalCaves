@@ -8,14 +8,13 @@
 
 #include "logger.h"
 #include "input.h"
-#include "game.h"
 #include "draw.h"
+#include "game.h"
+#include "spritemgr.h"
 
-/////////////////////////////
-//
-// TODO: Logger class from gurka/gameserver
-//
-/////////////////////////////
+static constexpr int CAMERA_WIDTH  = 320;
+static constexpr int CAMERA_HEIGHT = 192;
+static constexpr int SCREEN_SCALE = 3;
 
 using Window = std::unique_ptr<SDL_Window,  decltype(&SDL_DestroyWindow)>;
 
@@ -40,8 +39,8 @@ Window initSDL()
   return Window(SDL_CreateWindow("OpenCrystalCaves",
                                  0,
                                  0,
-                                 Game::CAMERA_WIDTH * Game::SCREEN_SCALE,
-                                 Game::CAMERA_HEIGHT * Game::SCREEN_SCALE,
+                                 CAMERA_WIDTH * SCREEN_SCALE,
+                                 CAMERA_HEIGHT * SCREEN_SCALE,
                                  SDL_WINDOW_SHOWN),
                 SDL_DestroyWindow);
 }
@@ -194,22 +193,256 @@ void readInput(Input* input)
   }
 }
 
+void render_game(const Game& game, const SpriteManager& sprite_manager, SDL_Surface* game_surface, unsigned tick)
+{
+  // Get game info
+  const auto& player = game.get_player();
+  const auto& items = game.get_items();
+  const auto& level = game.get_level();
+
+  // Calculate where the camera is
+  const geometry::Position camera_pos(player.position +  // player position
+                                      geometry::Position(8, 8) -  // plus half player size
+                                      geometry::Position(CAMERA_WIDTH / 2, CAMERA_HEIGHT / 2));  // minus half camera size
+
+  // Create a Rectangle that represents the camera and adjust the position so that nothing outside the level is visible
+  const geometry::Rectangle camera(math::clamp(camera_pos.getX(),
+                                               0,
+                                               (level.get_tile_width() * 16) - CAMERA_WIDTH),
+                                   math::clamp(camera_pos.getY(),
+                                               0,
+                                               (level.get_tile_height() * 16) - CAMERA_HEIGHT),
+                                   CAMERA_WIDTH,
+                                   CAMERA_HEIGHT);
+
+  // Clear game surface (background now)
+  SDL_FillRect(game_surface, nullptr, SDL_MapRGB(game_surface->format, 33, 33, 33));
+
+  // This is the visible part of the level
+  const auto start_tile_x = camera.position.getX() > 0 ? camera.position.getX() / 16 : 0;
+  const auto start_tile_y = camera.position.getY() > 0 ? camera.position.getY() / 16 : 0;
+  const auto end_tile_x = (camera.position.getX() + camera.size.getX()) / 16;
+  const auto end_tile_y = (camera.position.getY() + camera.size.getY()) / 16;
+
+  // SpriteSheet surface
+  auto sprite_surface = sprite_manager.get_surface();
+
+  // Render all background tiles
+  {
+    for (int tile_y = start_tile_y; tile_y <= end_tile_y; tile_y++)
+    {
+      for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
+      {
+        auto item_id = level.get_tile_background(tile_x, tile_y);
+        if (item_id != Item::invalid)
+        {
+          const auto& item = items[item_id];
+          const auto sprite_id = [&item, &tile_x, &tile_y]()
+          {
+            if (item.is_multiple_2x2())
+            {
+              return item.get_sprite() + ((tile_y % 2) * 4) + (tile_x % 2);
+            }
+            else if (item.is_multiple_4x2())
+            {
+              return item.get_sprite() + ((tile_y % 2) * 4) + (tile_x % 4);
+            }
+            else
+            {
+              return item.get_sprite();
+            }
+          }();
+          auto src_rect = sprite_manager.get_rect_for_tile(sprite_id);
+          SDL_Rect dest_rect
+          {
+            (tile_x * 16) - camera.position.getX(),
+            (tile_y * 16) - camera.position.getY(),
+            16,
+            16
+          };
+          SDL_BlitSurface(sprite_surface, &src_rect, game_surface, &dest_rect);
+        }
+      }
+    }
+  }
+
+  // Render all middleground tiles
+  {
+    for (int tile_y = start_tile_y; tile_y <= end_tile_y; tile_y++)
+    {
+      for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
+      {
+        auto item_id = level.get_tile_middleground(tile_x, tile_y);
+        if (item_id != Item::invalid)
+        {
+          const auto& item = items[item_id];
+          const auto sprite_id = item.get_sprite();
+          auto src_rect = sprite_manager.get_rect_for_tile(sprite_id);
+          SDL_Rect dest_rect
+          {
+            (tile_x * 16) - camera.position.getX(),
+            (tile_y * 16) - camera.position.getY(),
+            16,
+            16
+          };
+          SDL_BlitSurface(sprite_surface, &src_rect, game_surface, &dest_rect);
+        }
+      }
+    }
+  }
+
+  // Render player
+  {
+    SDL_Rect src_rect = [&player, &sprite_manager]()
+    {
+      if (player.direction == Player::Direction::right)
+      {
+        if (player.state == Player::State::still)
+        {
+          return sprite_manager.get_rect_for_tile(player.sprite_standing_right);
+        }
+        else if (player.state == Player::State::walking)
+        {
+          return sprite_manager.get_rect_for_tile(player.sprite_walking_right[player.animation_tick % player.sprite_walking_right.size()]);
+        }
+        else  // player_.state == Player::State::jumping
+        {
+          return sprite_manager.get_rect_for_tile(player.sprite_jumping_right);
+        }
+      }
+      else  // player_.direction == Player::Direction::left
+      {
+        if (player.state == Player::State::still)
+        {
+          return sprite_manager.get_rect_for_tile(player.sprite_standing_left);
+        }
+        else if (player.state == Player::State::walking)
+        {
+          return sprite_manager.get_rect_for_tile(player.sprite_walking_left[player.animation_tick % player.sprite_walking_left.size()]);
+        }
+        else  // player_.state == Player::State::jumping
+        {
+          return sprite_manager.get_rect_for_tile(player.sprite_jumping_left);
+        }
+      }
+    }();
+    auto player_render_pos = player.position - camera.position;
+    SDL_Rect dest_rect { player_render_pos.getX(), player_render_pos.getY(), 16, 16 };
+    SDL_BlitSurface(sprite_surface, &src_rect, game_surface, &dest_rect);
+  }
+
+  // Render all foreground items visible in the level
+  {
+    for (int tile_y = start_tile_y; tile_y <= end_tile_y; tile_y++)
+    {
+      for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
+      {
+        auto item_id = level.get_tile_foreground(tile_x, tile_y);
+        if (item_id != Item::invalid)
+        {
+          const auto& item = items[item_id];
+          const auto sprite_id = [&item](unsigned tick)
+          {
+            if (item.is_animated())
+            {
+              return item.get_sprite() + static_cast<int>((tick / 128u) % item.get_sprite_count());
+            }
+            else
+            {
+              return item.get_sprite();
+            }
+          }(tick);
+          auto src_rect = sprite_manager.get_rect_for_tile(sprite_id);
+          SDL_Rect dest_rect
+          {
+            (tile_x * 16) - camera.position.getX(),
+            (tile_y * 16) - camera.position.getY(),
+            16,
+            16
+          };
+          SDL_BlitSurface(sprite_surface, &src_rect, game_surface, &dest_rect);
+        }
+      }
+    }
+  }
+
+  // Debug
+//  {
+//    if (draw_aabbs_)
+//    {
+//      // Draw aabbs
+//      for (const auto& aabb : level_.get_aabbs())
+//      {
+//        if (geometry::isColliding(camera, aabb))
+//        {
+//          // Adjust the aabb position based on camera and render it
+//          draw::rectangle(geometry::Rectangle(aabb.position - camera.position, aabb.size),
+//                          { 255u, 0u, 0u, 0u },
+//                          surface_game_.get());
+//        }
+//      }
+//    }
+//  }
+//
+//  if (draw_debug_)
+//  {
+//    // Debug info
+//    const auto camera_str  = "camera pixel: (" + std::to_string(camera.position.getX()) + ", " + std::to_string(camera.position.getY()) + ")";
+//    const auto pixel_str   = "player pixel: (" + std::to_string(player.position.getX()) + ", " + std::to_string(player.position.getY()) + ")";
+//    const auto tiles_str   = "player tiles: (" + std::to_string(player.position.getX() / 16) + ", " + std::to_string(player.position.getY() / 16) + ")";
+//    const auto collide_str = std::string("collide: ") + (collide_x_ ? "x " : "_ ") + (collide_y_ ? "y" : "_");
+//    const auto input_str   = std::string("input: ") + (input_left_ ? "left " : "____ ") + (input_right_ ? "right " : "_____ ") + (input_jump_ ? "jump" : "____");
+//
+//    draw::text(5,  25, camera_str,  { 255u, 0u, 0u, 0u}, surface_screen);
+//    draw::text(5,  45, pixel_str,   { 255u, 0u, 0u, 0u}, surface_screen);
+//    draw::text(5,  65, tiles_str,   { 255u, 0u, 0u, 0u}, surface_screen);
+//    draw::text(5,  85, collide_str, { 255u, 0u, 0u, 0u}, surface_screen);
+//    draw::text(5, 105, input_str,   { 255u, 0u, 0u, 0u}, surface_screen);
+//
+//  }
+}
+
 int main()
 {
   LOG_INFO("Starting!");
 
+  // Create Window
   Window window = initSDL();
   if (!window)
   {
-    return 1;
+    return EXIT_FAILURE;
   }
   auto* window_surface = SDL_GetWindowSurface(window.get());
 
+  // Create game surface
+  std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> game_surface(nullptr, SDL_FreeSurface);
+  game_surface.reset(SDL_CreateRGBSurface(0,
+                                          CAMERA_WIDTH,
+                                          CAMERA_HEIGHT,
+                                          window_surface->format->BitsPerPixel,
+                                          window_surface->format->Rmask,
+                                          window_surface->format->Gmask,
+                                          window_surface->format->Bmask,
+                                          window_surface->format->Amask));
+  if (!game_surface)
+  {
+    LOG_CRITICAL("Could not create game surface");
+    return EXIT_FAILURE;
+  }
+  SDL_SetColorKey(game_surface.get(), SDL_TRUE, SDL_MapRGB(game_surface->format, 0, 180, 0));
+
+  SpriteManager sprite_manager;
+  if (!sprite_manager.load_tileset("media/sprites.bmp"))
+  {
+    LOG_CRITICAL("Could not load tileset");
+    return EXIT_FAILURE;
+  }
+
   Game game;
-  if (!game.init(window_surface))
+  if (!game.init())
   {
     LOG_CRITICAL("Could not initialize Game");
-    return 1;
+    return EXIT_FAILURE;
   }
 
   // Game loop
@@ -257,7 +490,12 @@ int main()
       ///
       /////////////////////////////////////////////////////////////////////////
       // Render game
-      game.render(window_surface);
+      render_game(game, sprite_manager, game_surface.get(), current_tick);
+
+      // Render game surface to window surface (scaled)
+      SDL_Rect src_rect = { 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT };
+      SDL_Rect dest_rect = { 0, 0, CAMERA_WIDTH * SCREEN_SCALE, CAMERA_HEIGHT * SCREEN_SCALE };
+      SDL_BlitScaled(game_surface.get(), &src_rect, window_surface, &dest_rect);
 
       // Render FPS
       auto fps_str = "fps: " + std::to_string(fps);
@@ -282,5 +520,5 @@ int main()
     }
   }
 
-  return 0;
+  return EXIT_SUCCESS;
 }
