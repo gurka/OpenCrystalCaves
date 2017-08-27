@@ -20,37 +20,26 @@ if __name__ == '__main__':
         print("Usage: {} FILE".format(sys.argv[0]))
         sys.exit(1)
 
-    # Go through the file once and figure out how many sprites in total there are
-    num_sprites_total = 0
-    with open(sys.argv[1], 'rb') as f:
-        while can_read(f):
-            num_sprites = read_u8(f)
-            width_bytes = read_u8(f)
-            height_pixels = read_u8(f)
+    # CC1.GFX contains 23 tilesets with 50 sprites each: 23 * 50 = 1150 sprites
+    # We want to extract and draw them onto an image with 4 sprites per row
+    # We also want to make sure that each tileset starts on a separate row
+    # Each tileset will result in 4 x 13 = 52 sprites (2 filler sprites), occupying
+    # 64 x 208 pixels
+    # The whole image will be 64 x 4784 pixels and 4 x 13 x 23 = 1196 sprites
+    # (46 filler sprites)
+    IMAGE_WIDTH = 64
+    IMAGE_HEIGHT = 4784
 
-            num_sprites_total += num_sprites
-
-            f.read(num_sprites * width_bytes * height_pixels * 5)
-
-    print("Found a total of {} sprites.".format(num_sprites_total))
-
-    # For Crystal Caves 1 (CC1.GFX) there should be 1150 sprites
-    if num_sprites_total != 1150:
-        print("This script only supports Crystal Caves 1 GFX (CC1.GFX).")
-        sys.exit(1)
-
-    # Let's make the spritesheet 544 x 544 pixels (34 x 34 = 1156 sprites)
-    img = Image.new('RGBA', (544, 544), 'black')
+    img = Image.new('RGBA', (IMAGE_WIDTH, IMAGE_HEIGHT), 'black')
     pixels = img.load()
 
     # Make the image fully transparent at start
-    for y in range(544):
-        for x in range(544):
+    for y in range(IMAGE_HEIGHT):
+        for x in range(IMAGE_WIDTH):
             pixels[x, y] = (0, 0, 0, 0)
 
-    # Open the file again and draw each sprite to 'pixels'
     with open(sys.argv[1], 'rb') as f:
-        # The number of the current sprite we're drawing (0..1150)
+        # The number of the current sprite we're drawing (0..1196)
         # Used to figure out where it should be drawn (x, y)
         sprite_num = 0
 
@@ -61,8 +50,8 @@ if __name__ == '__main__':
 
             for sprite in range(num_sprites):
                 # This is where this sprite should be drawn
-                x_start = (sprite_num % 34) * 16
-                y_start = (sprite_num / 34) * 16
+                x_start = (sprite_num % 4) * 16
+                y_start = (sprite_num / 4) * 16
                 x = x_start
                 y = y_start
 
@@ -103,6 +92,10 @@ if __name__ == '__main__':
                                 x = x_start
 
                 sprite_num += 1
+
+            # Here is where we need to add two filler sprites
+            # (sprite_num % 50 == 0)
+            sprite_num += 2
 
     img.save('sprites.png')
     print("Wrote 'sprites.png'.")
