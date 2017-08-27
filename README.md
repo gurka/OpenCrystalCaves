@@ -1,7 +1,14 @@
 # OpenCrystalCaves
 OCC is an unofficial open source engine reimplementation of the game trilogy [Crystal Caves](https://en.wikipedia.org/wiki/Crystal_Caves).
 
-You can see the current state of OCC [here](occ.webm) (click the Download button and open it in a player that supports WebM).
+Current state of OCC (the colors are currently a little bit off):
+
+![Screenshot 1](/screenshots/screenshot1.png?raw=true "Screenshot 1")
+
+![Screenshot 2](/screenshots/screenshot2.png?raw=true "Screenshot 2")
+
+![Screenshot 3](/screenshots/screenshot3.png?raw=true "Screenshot 3")
+
 Note that the sprites are not available in this repository. You need to own the original Crystal Caves to be able to extract the sprites and use this engine, see below. The original Crystal Caves can be purchased at [Steam](http://store.steampowered.com/app/358260/Crystal_Caves/).
 
 Currently the engine can:
