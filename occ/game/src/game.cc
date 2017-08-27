@@ -14,7 +14,7 @@ bool Game::init()
     return false;
   }
 
-  level_ = LevelLoader::load_level("media/level1.json");
+  level_ = LevelLoader::load_level("media/mainlevel.json");
   if (!level_.valid())
   {
     return false;
