@@ -94,111 +94,33 @@ void read_input(Input* input)
       switch (event.key.keysym.sym)
       {
         case SDLK_UP:
-          if (event.type == SDL_KEYDOWN)
-          {
-            input->up.pressed  = true;
-          }
-          else
-          {
-            input->up.pressed = false;
-            input->up.repeated = false;
-          }
+          input->up.pressed = event.type == SDL_KEYDOWN;
+          if (!input->up.pressed) input->up.repeated = false;
           break;
 
         case SDLK_DOWN:
-          if (event.type == SDL_KEYDOWN)
-          {
-            input->down.pressed  = true;
-          }
-          else
-          {
-            input->down.pressed = false;
-            input->down.repeated = false;
-          }
+          input->down.pressed = event.type == SDL_KEYDOWN;
+          if (!input->down.pressed) input->down.repeated = false;
           break;
 
         case SDLK_LEFT:
-          if (event.type == SDL_KEYDOWN)
-          {
-            input->left.pressed  = true;
-          }
-          else
-          {
-            input->left.pressed = false;
-            input->left.repeated = false;
-          }
+          input->left.pressed = event.type == SDL_KEYDOWN;
+          if (!input->left.pressed) input->left.repeated = false;
           break;
 
         case SDLK_RIGHT:
-          if (event.type == SDL_KEYDOWN)
-          {
-            input->right.pressed  = true;
-          }
-          else
-          {
-            input->right.pressed = false;
-            input->right.repeated = false;
-          }
+          input->right.pressed = event.type == SDL_KEYDOWN;
+          if (!input->right.pressed) input->right.repeated = false;
           break;
 
         case SDLK_SPACE:
-          if (event.type == SDL_KEYDOWN)
-          {
-            input->space.pressed  = true;
-          }
-          else
-          {
-            input->space.pressed = false;
-            input->space.repeated = false;
-          }
+          input->space.pressed = event.type == SDL_KEYDOWN;
+          if (!input->space.pressed) input->space.repeated = false;
           break;
 
         case SDLK_1:
-          if (event.type == SDL_KEYDOWN)
-          {
-            input->num_1.pressed  = true;
-          }
-          else
-          {
-            input->num_1.pressed = false;
-            input->num_1.repeated = false;
-          }
-          break;
-
-        case SDLK_2:
-          if (event.type == SDL_KEYDOWN)
-          {
-            input->num_2.pressed  = true;
-          }
-          else
-          {
-            input->num_2.pressed = false;
-            input->num_2.repeated = false;
-          }
-          break;
-
-        case SDLK_3:
-          if (event.type == SDL_KEYDOWN)
-          {
-            input->num_3.pressed  = true;
-          }
-          else
-          {
-            input->num_3.pressed = false;
-            input->num_3.repeated = false;
-          }
-          break;
-
-        case SDLK_4:
-          if (event.type == SDL_KEYDOWN)
-          {
-            input->num_4.pressed  = true;
-          }
-          else
-          {
-            input->num_4.pressed = false;
-            input->num_4.repeated = false;
-          }
+          input->num_1.pressed = event.type == SDL_KEYDOWN;
+          if (!input->num_1.pressed) input->num_1.repeated = false;
           break;
 
         case SDLK_ESCAPE:
