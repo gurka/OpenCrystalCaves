@@ -11,5 +11,4 @@ add_library(game
   "src/game.cc"
   "src/item.cc"
   "src/level.cc"
-  "src/player.cc"
 )

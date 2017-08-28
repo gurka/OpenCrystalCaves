@@ -199,16 +199,217 @@ void read_input(Input* input)
   }
 }
 
+void render_background(int start_tile_x,
+                       int end_tile_x,
+                       int start_tile_y,
+                       int end_tile_y,
+                       const Game& game,
+                       const SpriteManager& sprite_manager,
+                       const geometry::Rectangle& camera,
+                       SDL_Surface* game_surface)
+{
+  const auto& level = game.get_level();
+  const auto& items = game.get_items();
+
+  for (int tile_y = start_tile_y; tile_y <= end_tile_y; tile_y++)
+  {
+    for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
+    {
+      auto item_id = level.get_tile_background(tile_x, tile_y);
+      if (item_id != Item::invalid)
+      {
+        const auto& item = items[item_id];
+        const auto sprite_id = [&item, &tile_x, &tile_y]()
+        {
+          if (item.is_multiple_2x2())
+          {
+            return item.get_sprite() + ((tile_y % 2) * 4) + (tile_x % 2);
+          }
+          else if (item.is_multiple_4x2())
+          {
+            return item.get_sprite() + ((tile_y % 2) * 4) + (tile_x % 4);
+          }
+          else
+          {
+            return item.get_sprite();
+          }
+        }();
+        auto src_rect = sprite_manager.get_rect_for_tile(sprite_id);
+        SDL_Rect dest_rect
+        {
+          (tile_x * 16) - camera.position.x(),
+          (tile_y * 16) - camera.position.y(),
+          16,
+          16
+        };
+        SDL_BlitSurface(sprite_manager.get_surface(), &src_rect, game_surface, &dest_rect);
+      }
+    }
+  }
+}
+
+void render_middleground(int start_tile_x,
+                         int end_tile_x,
+                         int start_tile_y,
+                         int end_tile_y,
+                         const Game& game,
+                         const SpriteManager& sprite_manager,
+                         const geometry::Rectangle& camera,
+                         SDL_Surface* game_surface)
+{
+  const auto& level = game.get_level();
+  const auto& items = game.get_items();
+
+  for (int tile_y = start_tile_y; tile_y <= end_tile_y; tile_y++)
+  {
+    for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
+    {
+      auto item_id = level.get_tile_middleground(tile_x, tile_y);
+      if (item_id != Item::invalid)
+      {
+        const auto& item = items[item_id];
+        const auto sprite_id = item.get_sprite();
+        auto src_rect = sprite_manager.get_rect_for_tile(sprite_id);
+        SDL_Rect dest_rect
+        {
+          (tile_x * 16) - camera.position.x(),
+          (tile_y * 16) - camera.position.y(),
+          16,
+          16
+        };
+        SDL_BlitSurface(sprite_manager.get_surface(), &src_rect, game_surface, &dest_rect);
+      }
+    }
+  }
+}
+
+void render_player(const Player& player,
+                   const SpriteManager& sprite_manager,
+                   SDL_Surface* game_surface,
+                   const geometry::Rectangle& camera)
+{
+  // Player sprite ids
+  static constexpr int sprite_standing_right = 260;
+  static constexpr std::array<int, 12> sprite_walking_right =
+  {
+      260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271
+  };
+  static constexpr int sprite_jumping_right = 284;
+
+  static constexpr int sprite_standing_left = 272;
+  static constexpr std::array<int, 12> sprite_walking_left =
+  {
+      272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283
+  };
+  static constexpr int sprite_jumping_left = 285;
+
+  SDL_Rect src_rect = [&player, &sprite_manager]()
+  {
+    if (player.direction == Player::Direction::right)
+    {
+      if (player.state == Player::State::still)
+      {
+        return sprite_manager.get_rect_for_tile(sprite_standing_right);
+      }
+      else if (player.state == Player::State::walking)
+      {
+        return sprite_manager.get_rect_for_tile(sprite_walking_right[player.animation_tick % sprite_walking_right.size()]);
+      }
+      else  // player_.state == Player::State::jumping
+      {
+        return sprite_manager.get_rect_for_tile(sprite_jumping_right);
+      }
+    }
+    else  // player_.direction == Player::Direction::left
+    {
+      if (player.state == Player::State::still)
+      {
+        return sprite_manager.get_rect_for_tile(sprite_standing_left);
+      }
+      else if (player.state == Player::State::walking)
+      {
+        return sprite_manager.get_rect_for_tile(sprite_walking_left[player.animation_tick % sprite_walking_left.size()]);
+      }
+      else  // player_.state == Player::State::jumping
+      {
+        return sprite_manager.get_rect_for_tile(sprite_jumping_left);
+      }
+    }
+  }();
+  auto player_render_pos = player.position - camera.position;
+  SDL_Rect dest_rect { player_render_pos.x(), player_render_pos.y(), 16, 16 };
+  SDL_BlitSurface(sprite_manager.get_surface(), &src_rect, game_surface, &dest_rect);
+}
+
+void render_foreground(int start_tile_x,
+                       int end_tile_x,
+                       int start_tile_y,
+                       int end_tile_y,
+                       const Game& game,
+                       const SpriteManager& sprite_manager,
+                       const geometry::Rectangle& camera,
+                       SDL_Surface* game_surface,
+                       unsigned tick)
+{
+  const auto& level = game.get_level();
+  const auto& items = game.get_items();
+
+  for (int tile_y = start_tile_y; tile_y <= end_tile_y; tile_y++)
+  {
+    for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
+    {
+      auto item_id = level.get_tile_foreground(tile_x, tile_y);
+      if (item_id != Item::invalid)
+      {
+        const auto& item = items[item_id];
+        const auto sprite_id = [&item](unsigned tick)
+        {
+          if (item.is_animated())
+          {
+            return item.get_sprite() + static_cast<int>((tick / 128u) % item.get_sprite_count());
+          }
+          else
+          {
+            return item.get_sprite();
+          }
+        }(tick);
+        auto src_rect = sprite_manager.get_rect_for_tile(sprite_id);
+        SDL_Rect dest_rect
+        {
+          (tile_x * 16) - camera.position.x(),
+          (tile_y * 16) - camera.position.y(),
+          16,
+          16
+        };
+        SDL_BlitSurface(sprite_manager.get_surface(), &src_rect, game_surface, &dest_rect);
+      }
+    }
+  }
+}
+
+void render_debug(const Game& game, const geometry::Rectangle& camera, SDL_Surface* game_surface)
+{
+  for (const auto& aabb : game.get_level().get_aabbs())
+  {
+    if (geometry::isColliding(camera, aabb))
+    {
+      // Adjust the aabb position based on camera and render it
+      draw::rectangle(geometry::Rectangle(aabb.position - camera.position, aabb.size),
+                      { 255u, 0u, 0u, 0u },
+                      game_surface);
+    }
+  }
+}
+
 void render_game(const Game& game,
                  const SpriteManager& sprite_manager,
                  SDL_Surface* game_surface,
                  unsigned tick,
                  geometry::Rectangle* camera_out,
-                 bool draw_aabbs)
+                 bool debug)
 {
   // Get game info
   const auto& player = game.get_player();
-  const auto& items = game.get_items();
   const auto& level = game.get_level();
 
   // Calculate where the camera is
@@ -239,161 +440,17 @@ void render_game(const Game& game,
   const auto end_tile_x = (camera.position.x() + camera.size.x()) / 16;
   const auto end_tile_y = (camera.position.y() + camera.size.y()) / 16;
 
-  // SpriteSheet surface
-  auto sprite_surface = sprite_manager.get_surface();
+  render_background(start_tile_x, end_tile_x, start_tile_y, end_tile_y, game, sprite_manager, camera, game_surface);
 
-  // Render all background tiles
-  {
-    for (int tile_y = start_tile_y; tile_y <= end_tile_y; tile_y++)
-    {
-      for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
-      {
-        auto item_id = level.get_tile_background(tile_x, tile_y);
-        if (item_id != Item::invalid)
-        {
-          const auto& item = items[item_id];
-          const auto sprite_id = [&item, &tile_x, &tile_y]()
-          {
-            if (item.is_multiple_2x2())
-            {
-              return item.get_sprite() + ((tile_y % 2) * 4) + (tile_x % 2);
-            }
-            else if (item.is_multiple_4x2())
-            {
-              return item.get_sprite() + ((tile_y % 2) * 4) + (tile_x % 4);
-            }
-            else
-            {
-              return item.get_sprite();
-            }
-          }();
-          auto src_rect = sprite_manager.get_rect_for_tile(sprite_id);
-          SDL_Rect dest_rect
-          {
-            (tile_x * 16) - camera.position.x(),
-            (tile_y * 16) - camera.position.y(),
-            16,
-            16
-          };
-          SDL_BlitSurface(sprite_surface, &src_rect, game_surface, &dest_rect);
-        }
-      }
-    }
-  }
+  render_middleground(start_tile_x, end_tile_x, start_tile_y, end_tile_y, game, sprite_manager, camera, game_surface);
 
-  // Render all middleground tiles
-  {
-    for (int tile_y = start_tile_y; tile_y <= end_tile_y; tile_y++)
-    {
-      for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
-      {
-        auto item_id = level.get_tile_middleground(tile_x, tile_y);
-        if (item_id != Item::invalid)
-        {
-          const auto& item = items[item_id];
-          const auto sprite_id = item.get_sprite();
-          auto src_rect = sprite_manager.get_rect_for_tile(sprite_id);
-          SDL_Rect dest_rect
-          {
-            (tile_x * 16) - camera.position.x(),
-            (tile_y * 16) - camera.position.y(),
-            16,
-            16
-          };
-          SDL_BlitSurface(sprite_surface, &src_rect, game_surface, &dest_rect);
-        }
-      }
-    }
-  }
+  render_player(player, sprite_manager, game_surface, camera);
 
-  // Render player
-  {
-    SDL_Rect src_rect = [&player, &sprite_manager]()
-    {
-      if (player.direction == Player::Direction::right)
-      {
-        if (player.state == Player::State::still)
-        {
-          return sprite_manager.get_rect_for_tile(player.sprite_standing_right);
-        }
-        else if (player.state == Player::State::walking)
-        {
-          return sprite_manager.get_rect_for_tile(player.sprite_walking_right[player.animation_tick % player.sprite_walking_right.size()]);
-        }
-        else  // player_.state == Player::State::jumping
-        {
-          return sprite_manager.get_rect_for_tile(player.sprite_jumping_right);
-        }
-      }
-      else  // player_.direction == Player::Direction::left
-      {
-        if (player.state == Player::State::still)
-        {
-          return sprite_manager.get_rect_for_tile(player.sprite_standing_left);
-        }
-        else if (player.state == Player::State::walking)
-        {
-          return sprite_manager.get_rect_for_tile(player.sprite_walking_left[player.animation_tick % player.sprite_walking_left.size()]);
-        }
-        else  // player_.state == Player::State::jumping
-        {
-          return sprite_manager.get_rect_for_tile(player.sprite_jumping_left);
-        }
-      }
-    }();
-    auto player_render_pos = player.position - camera.position;
-    SDL_Rect dest_rect { player_render_pos.x(), player_render_pos.y(), 16, 16 };
-    SDL_BlitSurface(sprite_surface, &src_rect, game_surface, &dest_rect);
-  }
+  render_foreground(start_tile_x, end_tile_x, start_tile_y, end_tile_y, game, sprite_manager, camera, game_surface, tick);
 
-  // Render all foreground items visible in the level
+  if (debug)
   {
-    for (int tile_y = start_tile_y; tile_y <= end_tile_y; tile_y++)
-    {
-      for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
-      {
-        auto item_id = level.get_tile_foreground(tile_x, tile_y);
-        if (item_id != Item::invalid)
-        {
-          const auto& item = items[item_id];
-          const auto sprite_id = [&item](unsigned tick)
-          {
-            if (item.is_animated())
-            {
-              return item.get_sprite() + static_cast<int>((tick / 128u) % item.get_sprite_count());
-            }
-            else
-            {
-              return item.get_sprite();
-            }
-          }(tick);
-          auto src_rect = sprite_manager.get_rect_for_tile(sprite_id);
-          SDL_Rect dest_rect
-          {
-            (tile_x * 16) - camera.position.x(),
-            (tile_y * 16) - camera.position.y(),
-            16,
-            16
-          };
-          SDL_BlitSurface(sprite_surface, &src_rect, game_surface, &dest_rect);
-        }
-      }
-    }
-  }
-
-  // Debug
-  if (draw_aabbs)
-  {
-    for (const auto& aabb : game.get_level().get_aabbs())
-    {
-      if (geometry::isColliding(camera, aabb))
-      {
-        // Adjust the aabb position based on camera and render it
-        draw::rectangle(geometry::Rectangle(aabb.position - camera.position, aabb.size),
-                        { 255u, 0u, 0u, 0u },
-                        game_surface);
-      }
-    }
+    render_debug(game, camera, game_surface);
   }
 }
 
@@ -470,7 +527,6 @@ int main()
     // Debug information
     bool debug = false;
     geometry::Rectangle game_camera;
-    bool draw_aabbs = false;
 
     while (true)
     {
@@ -495,10 +551,6 @@ int main()
         }
         if (input.num_1.pressed && !input.num_1.repeated)
         {
-          draw_aabbs = !draw_aabbs;
-        }
-        if (input.num_2.pressed && !input.num_2.repeated)
-        {
           debug = !debug;
         }
 
@@ -518,7 +570,7 @@ int main()
       SDL_FillRect(window_surface, nullptr, SDL_MapRGB(window_surface->format, 33, 33, 33));
 
       // Render game
-      render_game(game, sprite_manager, game_surface.get(), current_tick, debug ? &game_camera : nullptr, draw_aabbs);
+      render_game(game, sprite_manager, game_surface.get(), current_tick, debug ? &game_camera : nullptr, debug);
 
       // Render game surface to window surface, centered and scaled
       SDL_Rect src_rect = { 0, 0, CAMERA_SIZE.x(), CAMERA_SIZE.y() };
