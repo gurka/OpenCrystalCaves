@@ -63,92 +63,92 @@ class Vector
   constexpr T getY() const { return y_; }
 
   // Operators
-  Vector operator+(const Vector& other) const
+  constexpr Vector operator+(const Vector& other) const
   {
     return Vector(x_ + other.x_, y_ + other.y_);
   }
 
-  Vector operator-(const Vector& other) const
+  constexpr Vector operator-(const Vector& other) const
   {
     return Vector(x_ - other.x_, y_ - other.y_);
   }
 
-  Vector operator+() const
+  constexpr Vector operator+() const
   {
     return Vector(x_, y_);
   }
 
-  Vector operator-() const
+  constexpr Vector operator-() const
   {
     return Vector(-x_, -y_);
   }
 
-  Vector operator*(const Vector& other) const
+  constexpr Vector operator*(const Vector& other) const
   {
     return Vector(x_ * other.x_, y_ * other.y_);
   }
 
-  Vector operator/(const Vector& other) const
+  constexpr Vector operator/(const Vector& other) const
   {
     return Vector(x_ / other.x_, y_ / other.y_);
   }
 
-  Vector operator*(double d) const
+  constexpr Vector operator*(double d) const
   {
     return Vector(x_ * d, y_ * d);
   }
 
-  Vector operator/(double d) const
+  constexpr Vector operator/(double d) const
   {
     return Vector(x_ / d, y_ / d);
   }
 
-  bool operator==(const Vector& other) const
+  constexpr bool operator==(const Vector& other) const
   {
     return x_ == other.x_ && y_ == other.y_;
   }
 
-  bool operator!=(const Vector& other) const
+  constexpr bool operator!=(const Vector& other) const
   {
     return *this != other;
   }
 
-  Vector& operator+=(const Vector& other)
+  constexpr Vector& operator+=(const Vector& other)
   {
     x_ += other.x_;
     y_ += other.y_;
     return *this;
   }
 
-  Vector& operator-=(const Vector& other)
+  constexpr Vector& operator-=(const Vector& other)
   {
     x_ -= other.x_;
     y_ -= other.y_;
     return *this;
   }
 
-  Vector& operator*=(const Vector& other)
+  constexpr Vector& operator*=(const Vector& other)
   {
     x_ *= other.x_;
     y_ *= other.y_;
     return *this;
   }
 
-  Vector& operator/=(const Vector& other)
+  constexpr Vector& operator/=(const Vector& other)
   {
     x_ /= other.x_;
     y_ /= other.y_;
     return *this;
   }
 
-  Vector& operator*=(double d)
+  constexpr Vector& operator*=(double d)
   {
     x_ *= d;
     y_ *= d;
     return *this;
   }
 
-  Vector& operator/=(double d)
+  constexpr Vector& operator/=(double d)
   {
     x_ /= d;
     y_ /= d;
