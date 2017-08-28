@@ -53,27 +53,27 @@ struct Rectangle
 // Returns true if Rectangle a is inside Rectangle b ("strict" inside, e.g. can't occupy same position)
 constexpr bool isStrictInside(const Rectangle& a, const Rectangle& b)
 {
-  return a.position.getX() > b.position.getX() &&
-         a.position.getY() > b.position.getY() &&
-         a.position.getX() + a.size.getX() < b.position.getX() + b.size.getX() &&
-         a.position.getY() + a.size.getY() < b.position.getY() + b.size.getY();
+  return a.position.x() > b.position.x() &&
+         a.position.y() > b.position.y() &&
+         a.position.x() + a.size.x() < b.position.x() + b.size.x() &&
+         a.position.y() + a.size.y() < b.position.y() + b.size.y();
 }
 
 constexpr bool isInside(const Rectangle& a, const Rectangle& b)
 {
-  return a.position.getX() >= b.position.getX() &&
-         a.position.getY() >= b.position.getY() &&
-         a.position.getX() + a.size.getX() <= b.position.getX() + b.size.getX() &&
-         a.position.getY() + a.size.getY() <= b.position.getY() + b.size.getY();
+  return a.position.x() >= b.position.x() &&
+         a.position.y() >= b.position.y() &&
+         a.position.x() + a.size.x() <= b.position.x() + b.size.x() &&
+         a.position.y() + a.size.y() <= b.position.y() + b.size.y();
 }
 
 // Returns true if Rectangle a and Rectangle b intersect
 constexpr bool isColliding(const Rectangle& a, const Rectangle& b)
 {
-  return a.position.getX() < b.position.getX() + b.size.getX() &&
-         a.position.getY() < b.position.getY() + b.size.getY() &&
-         a.position.getX() + a.size.getX() > b.position.getX() &&
-         a.position.getY() + a.size.getY() > b.position.getY();
+  return a.position.x() < b.position.x() + b.size.x() &&
+         a.position.y() < b.position.y() + b.size.y() &&
+         a.position.x() + a.size.x() > b.position.x() &&
+         a.position.y() + a.size.y() > b.position.y();
 }
 
 }

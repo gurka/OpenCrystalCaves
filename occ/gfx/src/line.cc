@@ -30,37 +30,37 @@ void line(int from_x, int from_y, int to_x, int to_y, const SDL_Color& color, SD
 
 void rectangle(const geometry::Rectangle& rectangle, const SDL_Color& color, SDL_Surface* dest)
 {
-  assert(rectangle.size.getX() > 0 && rectangle.size.getY() > 0);
+  assert(rectangle.size.x() > 0 && rectangle.size.y() > 0);
 
   // top
-  line(rectangle.position.getX(),
-       rectangle.position.getY(),
-       rectangle.position.getX() + rectangle.size.getX(),
-       rectangle.position.getY(),
+  line(rectangle.position.x(),
+       rectangle.position.y(),
+       rectangle.position.x() + rectangle.size.x(),
+       rectangle.position.y(),
        color,
        dest);
 
   // bottom
-  line(rectangle.position.getX(),
-       rectangle.position.getY() + rectangle.size.getY() - 1,
-       rectangle.position.getX() + rectangle.size.getX(),
-       rectangle.position.getY() + rectangle.size.getY() - 1,
+  line(rectangle.position.x(),
+       rectangle.position.y() + rectangle.size.y() - 1,
+       rectangle.position.x() + rectangle.size.x(),
+       rectangle.position.y() + rectangle.size.y() - 1,
        color,
        dest);
 
   // left
-  line(rectangle.position.getX(),
-       rectangle.position.getY(),
-       rectangle.position.getX(),
-       rectangle.position.getY() + rectangle.size.getY(),
+  line(rectangle.position.x(),
+       rectangle.position.y(),
+       rectangle.position.x(),
+       rectangle.position.y() + rectangle.size.y(),
        color,
        dest);
 
   // right
-  line(rectangle.position.getX() + rectangle.size.getX() - 1,
-       rectangle.position.getY(),
-       rectangle.position.getX() + rectangle.size.getX() - 1,
-       rectangle.position.getY() + rectangle.size.getY(),
+  line(rectangle.position.x() + rectangle.size.x() - 1,
+       rectangle.position.y(),
+       rectangle.position.x() + rectangle.size.x() - 1,
+       rectangle.position.y() + rectangle.size.y(),
        color,
        dest);
 }

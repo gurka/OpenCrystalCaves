@@ -45,7 +45,7 @@ void Game::update(const PlayerInput& player_input)
     case Player::State::walking:
     {
       // Just apply gravity
-      player_.velocity = Vector<int>(player_.velocity.getX(), 8);
+      player_.velocity = Vector<int>(player_.velocity.x(), 8);
       break;
     }
 
@@ -53,12 +53,12 @@ void Game::update(const PlayerInput& player_input)
     {
       if (player_.jump_tick < jump_velocity.size())
       {
-        player_.velocity = Vector<int>(player_.velocity.getX(), jump_velocity[player_.jump_tick]);
+        player_.velocity = Vector<int>(player_.velocity.x(), jump_velocity[player_.jump_tick]);
       }
       else
       {
         // Just apply gravity
-        player_.velocity = Vector<int>(player_.velocity.getX(), 8);
+        player_.velocity = Vector<int>(player_.velocity.x(), 8);
       }
       player_.jump_tick += 1;
       break;
@@ -76,30 +76,30 @@ void Game::update(const PlayerInput& player_input)
           (!player_input.left && !player_input.right))
       {
         // Set zero x velocity
-        player_.velocity = Vector<int>(0, player_.velocity.getY());
+        player_.velocity = Vector<int>(0, player_.velocity.y());
       }
       else if (player_input.left)
       {
         // First step is 2 pixels / tick, then 4 pixels / tick
-        if (player_.velocity.getX() == -2)
+        if (player_.velocity.x() == -2)
         {
-          player_.velocity = Vector<int>(-4, player_.velocity.getY());
+          player_.velocity = Vector<int>(-4, player_.velocity.y());
         }
         else
         {
-          player_.velocity = Vector<int>(-2, player_.velocity.getY());
+          player_.velocity = Vector<int>(-2, player_.velocity.y());
         }
       }
       else if (player_input.right)
       {
         // Same as above
-        if (player_.velocity.getX() == 2)
+        if (player_.velocity.x() == 2)
         {
-          player_.velocity = Vector<int>(4, player_.velocity.getY());
+          player_.velocity = Vector<int>(4, player_.velocity.y());
         }
         else
         {
-          player_.velocity = Vector<int>(2, player_.velocity.getY());
+          player_.velocity = Vector<int>(2, player_.velocity.y());
         }
       }
       break;
@@ -128,8 +128,8 @@ void Game::update(const PlayerInput& player_input)
     return false;
   };
 
-  const auto step_x = destination.getX() > player_.position.getX() ? 1 : -1;
-  while (player_.position.getX() != destination.getX())
+  const auto step_x = destination.x() > player_.position.x() ? 1 : -1;
+  while (player_.position.x() != destination.x())
   {
     const geometry::Rectangle player_rect { player_.position + geometry::Position(step_x, 0), 16, 16 };
     if (collides(player_rect))
@@ -140,8 +140,8 @@ void Game::update(const PlayerInput& player_input)
     player_.position += geometry::Position(step_x, 0);
   }
 
-  const auto step_y = destination.getY() > player_.position.getY() ? 1 : -1;
-  while (player_.position.getY() != destination.getY())
+  const auto step_y = destination.y() > player_.position.y() ? 1 : -1;
+  while (player_.position.y() != destination.y())
   {
     const geometry::Rectangle player_rect { player_.position + geometry::Position(0, step_y), 16, 16 };
     if (collides(player_rect))
@@ -162,10 +162,10 @@ void Game::update(const PlayerInput& player_input)
   {
     case Player::State::jumping:
     {
-      if (player_collide_y_ && player_.velocity.getY() > 0)
+      if (player_collide_y_ && player_.velocity.y() > 0)
       {
         // Player is falling down but hit something (the ground), set new state
-        player_.state = player_.velocity.getX() == 0 ? Player::State::still : Player::State::walking;
+        player_.state = player_.velocity.x() == 0 ? Player::State::still : Player::State::walking;
       }
       else if (player_collide_y_)
       {
@@ -177,7 +177,7 @@ void Game::update(const PlayerInput& player_input)
 
     case Player::State::still:
     {
-      if (player_.velocity.getX() != 0 && !player_collide_x_)
+      if (player_.velocity.x() != 0 && !player_collide_x_)
       {
         // Player started to move, change to state walking
         player_.state = Player::State::walking;
@@ -190,7 +190,7 @@ void Game::update(const PlayerInput& player_input)
 
     case Player::State::walking:
     {
-      if (player_.velocity.getX() == 0 || player_collide_x_)
+      if (player_.velocity.x() == 0 || player_collide_x_)
       {
         // Player was walking and stopped or collided with something
         player_.state = Player::State::still;
@@ -204,11 +204,11 @@ void Game::update(const PlayerInput& player_input)
   }
 
   // Set player direction
-  if (player_.velocity.getX() < 0)
+  if (player_.velocity.x() < 0)
   {
     player_.direction = Player::Direction::left;
   }
-  else if (player_.velocity.getX() > 0)
+  else if (player_.velocity.x() > 0)
   {
     player_.direction = Player::Direction::right;
   }

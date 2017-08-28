@@ -45,8 +45,8 @@ Window init_SDL()
   return Window(SDL_CreateWindow("OpenCrystalCaves",
                                  0,
                                  0,
-                                 WINDOW_SIZE.getX(),
-                                 WINDOW_SIZE.getY(),
+                                 WINDOW_SIZE.x(),
+                                 WINDOW_SIZE.y(),
                                  SDL_WINDOW_SHOWN),
                 SDL_DestroyWindow);
 }
@@ -214,17 +214,17 @@ void render_game(const Game& game,
   // Calculate where the camera is
   const geometry::Position camera_pos(player.position +  // player position
                                       geometry::Position(8, 8) -  // plus half player size
-                                      geometry::Position(CAMERA_SIZE.getX() / 2, CAMERA_SIZE.getY() / 2));  // minus half camera size
+                                      geometry::Position(CAMERA_SIZE.x() / 2, CAMERA_SIZE.y() / 2));  // minus half camera size
 
   // Create a Rectangle that represents the camera and adjust the position so that nothing outside the level is visible
-  const geometry::Rectangle camera(math::clamp(camera_pos.getX(),
+  const geometry::Rectangle camera(math::clamp(camera_pos.x(),
                                                0,
-                                               (level.get_tile_width() * 16) - CAMERA_SIZE.getX()),
-                                   math::clamp(camera_pos.getY(),
+                                               (level.get_tile_width() * 16) - CAMERA_SIZE.x()),
+                                   math::clamp(camera_pos.y(),
                                                0,
-                                               (level.get_tile_height() * 16) - CAMERA_SIZE.getY()),
-                                   CAMERA_SIZE.getX(),
-                                   CAMERA_SIZE.getY());
+                                               (level.get_tile_height() * 16) - CAMERA_SIZE.y()),
+                                   CAMERA_SIZE.x(),
+                                   CAMERA_SIZE.y());
   if (camera_out)
   {
       *camera_out = camera;
@@ -234,10 +234,10 @@ void render_game(const Game& game,
   SDL_FillRect(game_surface, nullptr, SDL_MapRGB(game_surface->format, 33, 33, 33));
 
   // This is the visible part of the level
-  const auto start_tile_x = camera.position.getX() > 0 ? camera.position.getX() / 16 : 0;
-  const auto start_tile_y = camera.position.getY() > 0 ? camera.position.getY() / 16 : 0;
-  const auto end_tile_x = (camera.position.getX() + camera.size.getX()) / 16;
-  const auto end_tile_y = (camera.position.getY() + camera.size.getY()) / 16;
+  const auto start_tile_x = camera.position.x() > 0 ? camera.position.x() / 16 : 0;
+  const auto start_tile_y = camera.position.y() > 0 ? camera.position.y() / 16 : 0;
+  const auto end_tile_x = (camera.position.x() + camera.size.x()) / 16;
+  const auto end_tile_y = (camera.position.y() + camera.size.y()) / 16;
 
   // SpriteSheet surface
   auto sprite_surface = sprite_manager.get_surface();
@@ -270,8 +270,8 @@ void render_game(const Game& game,
           auto src_rect = sprite_manager.get_rect_for_tile(sprite_id);
           SDL_Rect dest_rect
           {
-            (tile_x * 16) - camera.position.getX(),
-            (tile_y * 16) - camera.position.getY(),
+            (tile_x * 16) - camera.position.x(),
+            (tile_y * 16) - camera.position.y(),
             16,
             16
           };
@@ -295,8 +295,8 @@ void render_game(const Game& game,
           auto src_rect = sprite_manager.get_rect_for_tile(sprite_id);
           SDL_Rect dest_rect
           {
-            (tile_x * 16) - camera.position.getX(),
-            (tile_y * 16) - camera.position.getY(),
+            (tile_x * 16) - camera.position.x(),
+            (tile_y * 16) - camera.position.y(),
             16,
             16
           };
@@ -342,7 +342,7 @@ void render_game(const Game& game,
       }
     }();
     auto player_render_pos = player.position - camera.position;
-    SDL_Rect dest_rect { player_render_pos.getX(), player_render_pos.getY(), 16, 16 };
+    SDL_Rect dest_rect { player_render_pos.x(), player_render_pos.y(), 16, 16 };
     SDL_BlitSurface(sprite_surface, &src_rect, game_surface, &dest_rect);
   }
 
@@ -370,8 +370,8 @@ void render_game(const Game& game,
           auto src_rect = sprite_manager.get_rect_for_tile(sprite_id);
           SDL_Rect dest_rect
           {
-            (tile_x * 16) - camera.position.getX(),
-            (tile_y * 16) - camera.position.getY(),
+            (tile_x * 16) - camera.position.x(),
+            (tile_y * 16) - camera.position.y(),
             16,
             16
           };
@@ -422,8 +422,8 @@ int main()
   // Create game surface
   std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> game_surface(nullptr, SDL_FreeSurface);
   game_surface.reset(SDL_CreateRGBSurface(0,
-                                          CAMERA_SIZE.getX(),
-                                          CAMERA_SIZE.getY(),
+                                          CAMERA_SIZE.x(),
+                                          CAMERA_SIZE.y(),
                                           window_surface->format->BitsPerPixel,
                                           window_surface->format->Rmask,
                                           window_surface->format->Gmask,
@@ -521,12 +521,12 @@ int main()
       render_game(game, sprite_manager, game_surface.get(), current_tick, debug ? &game_camera : nullptr, draw_aabbs);
 
       // Render game surface to window surface, centered and scaled
-      SDL_Rect src_rect = { 0, 0, CAMERA_SIZE.getX(), CAMERA_SIZE.getY() };
+      SDL_Rect src_rect = { 0, 0, CAMERA_SIZE.x(), CAMERA_SIZE.y() };
       SDL_Rect dest_rect = {
-          (WINDOW_SIZE.getX() - CAMERA_SIZE_SCALED.getX()) / 2,
-          (WINDOW_SIZE.getY() - CAMERA_SIZE_SCALED.getY()) / 2,
-          CAMERA_SIZE_SCALED.getX(),
-          CAMERA_SIZE_SCALED.getY()
+          (WINDOW_SIZE.x() - CAMERA_SIZE_SCALED.x()) / 2,
+          (WINDOW_SIZE.y() - CAMERA_SIZE_SCALED.y()) / 2,
+          CAMERA_SIZE_SCALED.x(),
+          CAMERA_SIZE_SCALED.y()
       };
       SDL_BlitScaled(game_surface.get(), &src_rect, window_surface, &dest_rect);
 
@@ -538,9 +538,9 @@ int main()
       if (debug)
       {
         // Debug info
-        const auto camera_str  = "camera pixel: (" + std::to_string(game_camera.position.getX()) + ", " + std::to_string(game_camera.position.getY()) + ")";
-        const auto pixel_str   = "player pixel: (" + std::to_string(game.get_player().position.getX()) + ", " + std::to_string(game.get_player().position.getY()) + ")";
-        const auto tiles_str   = "player tiles: (" + std::to_string(game.get_player().position.getX() / 16) + ", " + std::to_string(game.get_player().position.getY() / 16) + ")";
+        const auto camera_str  = "camera pixel: (" + std::to_string(game_camera.position.x()) + ", " + std::to_string(game_camera.position.y()) + ")";
+        const auto pixel_str   = "player pixel: (" + std::to_string(game.get_player().position.x()) + ", " + std::to_string(game.get_player().position.y()) + ")";
+        const auto tiles_str   = "player tiles: (" + std::to_string(game.get_player().position.x() / 16) + ", " + std::to_string(game.get_player().position.y() / 16) + ")";
         const auto collide_str = std::string("collide: ") + (game.player_collide_x() ? "x " : "_ ") + (game.player_collide_y() ? "y" : "_");
 
         draw::text(5,  25, camera_str,  { 255u, 0u, 0u, 0u}, window_surface);

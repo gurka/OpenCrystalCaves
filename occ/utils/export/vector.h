@@ -59,8 +59,8 @@ class Vector
     return *this;
   }
 
-  constexpr T getX() const { return x_; }
-  constexpr T getY() const { return y_; }
+  constexpr T x() const { return x_; }
+  constexpr T y() const { return y_; }
 
   // Operators
   constexpr Vector operator+(const Vector& other) const
