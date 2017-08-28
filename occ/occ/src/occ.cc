@@ -13,9 +13,14 @@
 #include "game.h"
 #include "player_input.h"
 
-static constexpr int CAMERA_WIDTH  = 320;
-static constexpr int CAMERA_HEIGHT = 192;
-static constexpr int SCREEN_SCALE = 3;
+// The size of the game camera - not scaled
+static constexpr geometry::Size CAMERA_SIZE = geometry::Size(320, 192);
+
+// The size of the game camera - scaled 3x
+static constexpr geometry::Size CAMERA_SIZE_SCALED = CAMERA_SIZE * 3;
+
+// The size of the game window (camera size scaled + 300 pixels on both axis)
+static constexpr geometry::Size WINDOW_SIZE = CAMERA_SIZE_SCALED + geometry::Size(300, 300);
 
 using Window = std::unique_ptr<SDL_Window,  decltype(&SDL_DestroyWindow)>;
 
@@ -40,8 +45,8 @@ Window init_SDL()
   return Window(SDL_CreateWindow("OpenCrystalCaves",
                                  0,
                                  0,
-                                 CAMERA_WIDTH * SCREEN_SCALE,
-                                 CAMERA_HEIGHT * SCREEN_SCALE,
+                                 WINDOW_SIZE.getX(),
+                                 WINDOW_SIZE.getY(),
                                  SDL_WINDOW_SHOWN),
                 SDL_DestroyWindow);
 }
@@ -209,17 +214,17 @@ void render_game(const Game& game,
   // Calculate where the camera is
   const geometry::Position camera_pos(player.position +  // player position
                                       geometry::Position(8, 8) -  // plus half player size
-                                      geometry::Position(CAMERA_WIDTH / 2, CAMERA_HEIGHT / 2));  // minus half camera size
+                                      geometry::Position(CAMERA_SIZE.getX() / 2, CAMERA_SIZE.getY() / 2));  // minus half camera size
 
   // Create a Rectangle that represents the camera and adjust the position so that nothing outside the level is visible
   const geometry::Rectangle camera(math::clamp(camera_pos.getX(),
                                                0,
-                                               (level.get_tile_width() * 16) - CAMERA_WIDTH),
+                                               (level.get_tile_width() * 16) - CAMERA_SIZE.getX()),
                                    math::clamp(camera_pos.getY(),
                                                0,
-                                               (level.get_tile_height() * 16) - CAMERA_HEIGHT),
-                                   CAMERA_WIDTH,
-                                   CAMERA_HEIGHT);
+                                               (level.get_tile_height() * 16) - CAMERA_SIZE.getY()),
+                                   CAMERA_SIZE.getX(),
+                                   CAMERA_SIZE.getY());
   if (camera_out)
   {
       *camera_out = camera;
@@ -417,8 +422,8 @@ int main()
   // Create game surface
   std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> game_surface(nullptr, SDL_FreeSurface);
   game_surface.reset(SDL_CreateRGBSurface(0,
-                                          CAMERA_WIDTH,
-                                          CAMERA_HEIGHT,
+                                          CAMERA_SIZE.getX(),
+                                          CAMERA_SIZE.getY(),
                                           window_surface->format->BitsPerPixel,
                                           window_surface->format->Rmask,
                                           window_surface->format->Gmask,
@@ -509,12 +514,20 @@ int main()
       ///
       /////////////////////////////////////////////////////////////////////////
 
+      // Clear window surface
+      SDL_FillRect(window_surface, nullptr, SDL_MapRGB(window_surface->format, 33, 33, 33));
+
       // Render game
       render_game(game, sprite_manager, game_surface.get(), current_tick, debug ? &game_camera : nullptr, draw_aabbs);
 
-      // Render game surface to window surface (scaled)
-      SDL_Rect src_rect = { 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT };
-      SDL_Rect dest_rect = { 0, 0, CAMERA_WIDTH * SCREEN_SCALE, CAMERA_HEIGHT * SCREEN_SCALE };
+      // Render game surface to window surface, centered and scaled
+      SDL_Rect src_rect = { 0, 0, CAMERA_SIZE.getX(), CAMERA_SIZE.getY() };
+      SDL_Rect dest_rect = {
+          (WINDOW_SIZE.getX() - CAMERA_SIZE_SCALED.getX()) / 2,
+          (WINDOW_SIZE.getY() - CAMERA_SIZE_SCALED.getY()) / 2,
+          CAMERA_SIZE_SCALED.getX(),
+          CAMERA_SIZE_SCALED.getY()
+      };
       SDL_BlitScaled(game_surface.get(), &src_rect, window_surface, &dest_rect);
 
       // Render FPS
