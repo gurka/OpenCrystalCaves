@@ -81,25 +81,25 @@ void Game::update(const PlayerInput& player_input)
       else if (player_input.left)
       {
         // First step is 2 pixels / tick, then 4 pixels / tick
-        if (player_.velocity.x() == -2)
+        if (player_.velocity.x() == 0)
         {
-          player_.velocity = Vector<int>(-4, player_.velocity.y());
+          player_.velocity = Vector<int>(-2, player_.velocity.y());
         }
         else
         {
-          player_.velocity = Vector<int>(-2, player_.velocity.y());
+          player_.velocity = Vector<int>(-4, player_.velocity.y());
         }
       }
       else if (player_input.right)
       {
         // Same as above
-        if (player_.velocity.x() == 2)
+        if (player_.velocity.x() == 0)
         {
-          player_.velocity = Vector<int>(4, player_.velocity.y());
+          player_.velocity = Vector<int>(2, player_.velocity.y());
         }
         else
         {
-          player_.velocity = Vector<int>(2, player_.velocity.y());
+          player_.velocity = Vector<int>(4, player_.velocity.y());
         }
       }
       break;
@@ -131,7 +131,7 @@ void Game::update(const PlayerInput& player_input)
   const auto step_x = destination.x() > player_.position.x() ? 1 : -1;
   while (player_.position.x() != destination.x())
   {
-    const geometry::Rectangle player_rect { player_.position + geometry::Position(step_x, 0), 16, 16 };
+    const geometry::Rectangle player_rect { player_.position + geometry::Position(step_x, 0), player_.size.x(), player_.size.y() };
     if (collides(player_rect))
     {
       player_collide_x_ = true;
@@ -143,7 +143,7 @@ void Game::update(const PlayerInput& player_input)
   const auto step_y = destination.y() > player_.position.y() ? 1 : -1;
   while (player_.position.y() != destination.y())
   {
-    const geometry::Rectangle player_rect { player_.position + geometry::Position(0, step_y), 16, 16 };
+    const geometry::Rectangle player_rect { player_.position + geometry::Position(0, step_y), player_.size.x(), player_.size.y() };
     if (collides(player_rect))
     {
       player_collide_y_ = true;

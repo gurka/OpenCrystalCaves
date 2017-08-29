@@ -267,7 +267,11 @@ void render_player()
     }
   }();
   auto player_render_pos = player.position - game_camera.position;
-  SDL_Rect dest_rect { player_render_pos.x(), player_render_pos.y(), 16, 16 };
+
+  // Note: player size is 12x16 but the sprite is 16x16 so we need to adjust where
+  // the player is rendered
+  SDL_Rect dest_rect { player_render_pos.x() - 2, player_render_pos.y(), 16, 16 };
+
   SDL_BlitSurface(sprite_manager.get_surface(), &src_rect, game_surface.get(), &dest_rect);
 }
 
@@ -316,6 +320,7 @@ void render_foreground()
 
 void render_debug()
 {
+  // Render a red rectangle around every AABB
   for (const auto& aabb : game.get_level().get_aabbs())
   {
     if (geometry::isColliding(game_camera, aabb))
@@ -326,6 +331,11 @@ void render_debug()
                       game_surface.get());
     }
   }
+
+  // Render a red rectangle around the player
+  draw::rectangle(geometry::Rectangle(game.get_player().position - game_camera.position, game.get_player().size),
+                  { 255u, 0u, 0u, 0u },
+                  game_surface.get());
 }
 
 void render_game()
@@ -490,15 +500,15 @@ int main()
       if (debug)
       {
         // Debug info
-        const auto camera_str  = "camera pixel: (" + std::to_string(game_camera.position.x()) + ", " + std::to_string(game_camera.position.y()) + ")";
-        const auto pixel_str   = "player pixel: (" + std::to_string(game.get_player().position.x()) + ", " + std::to_string(game.get_player().position.y()) + ")";
-        const auto tiles_str   = "player tiles: (" + std::to_string(game.get_player().position.x() / 16) + ", " + std::to_string(game.get_player().position.y() / 16) + ")";
-        const auto collide_str = std::string("collide: ") + (game.player_collide_x() ? "x " : "_ ") + (game.player_collide_y() ? "y" : "_");
+        const auto camera_pos_str = "camera position: (" + std::to_string(game_camera.position.x()) + ", " + std::to_string(game_camera.position.y()) + ")";
+        const auto player_pos_str = "player position: (" + std::to_string(game.get_player().position.x()) + ", " + std::to_string(game.get_player().position.y()) + ")";
+        const auto player_vel_str = "player velocity: (" + std::to_string(game.get_player().velocity.x()) + ", " + std::to_string(game.get_player().velocity.y()) + ")";
+        const auto collide_str    = std::string("collide: ") + (game.player_collide_x() ? "x " : "_ ") + (game.player_collide_y() ? "y" : "_");
 
-        draw::text(5,  25, camera_str,  { 255u, 0u, 0u, 0u}, window_surface);
-        draw::text(5,  45, pixel_str,   { 255u, 0u, 0u, 0u}, window_surface);
-        draw::text(5,  65, tiles_str,   { 255u, 0u, 0u, 0u}, window_surface);
-        draw::text(5,  85, collide_str, { 255u, 0u, 0u, 0u}, window_surface);
+        draw::text(5,  25, camera_pos_str, { 255u, 0u, 0u, 0u}, window_surface);
+        draw::text(5,  45, player_pos_str, { 255u, 0u, 0u, 0u}, window_surface);
+        draw::text(5,  65, player_vel_str, { 255u, 0u, 0u, 0u}, window_surface);
+        draw::text(5,  85, collide_str,    { 255u, 0u, 0u, 0u}, window_surface);
 
       }
 

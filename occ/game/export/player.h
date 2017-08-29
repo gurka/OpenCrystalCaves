@@ -8,6 +8,8 @@
 
 struct Player
 {
+  static constexpr geometry::Size size = geometry::Size(12, 16);
+
   geometry::Position position = geometry::Position();
   Vector<int> velocity = Vector<int>();
 
