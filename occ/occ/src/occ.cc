@@ -77,7 +77,8 @@ void read_input(Input* input)
   input->down.repeated  = input->down.pressed;
   input->left.repeated  = input->left.pressed;
   input->right.repeated = input->right.pressed;
-  input->space.repeated = input->space.pressed;
+  input->lctrl.repeated = input->lctrl.pressed;
+  input->lalt.repeated  = input->lalt.pressed;
   input->num_1.repeated = input->num_1.pressed;
   input->num_2.repeated = input->num_2.pressed;
   input->num_3.repeated = input->num_3.pressed;
@@ -117,9 +118,14 @@ void read_input(Input* input)
           if (!input->right.pressed) input->right.repeated = false;
           break;
 
-        case SDLK_SPACE:
-          input->space.pressed = event.type == SDL_KEYDOWN;
-          if (!input->space.pressed) input->space.repeated = false;
+        case SDLK_LCTRL:
+          input->lctrl.pressed = event.type == SDL_KEYDOWN;
+          if (!input->lctrl.pressed) input->lctrl.repeated = false;
+          break;
+
+        case SDLK_LALT:
+          input->lalt.pressed = event.type == SDL_KEYDOWN;
+          if (!input->lalt.pressed) input->lalt.repeated = false;
           break;
 
         case SDLK_1:
@@ -381,8 +387,8 @@ PlayerInput input_to_player_input(const Input& input)
   PlayerInput pi;
   pi.left = input.left.pressed;
   pi.right = input.right.pressed;
-  pi.jump = input.space.pressed;  // TODO should be CTRL
-  pi.shoot = false;  // TODO should be ALT or space (?)
+  pi.jump = input.lctrl.pressed;
+  pi.shoot = input.lalt.pressed;
   return pi;
 }
 
