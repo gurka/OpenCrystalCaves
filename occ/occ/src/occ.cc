@@ -77,8 +77,8 @@ void read_input(Input* input)
   input->down.repeated  = input->down.pressed;
   input->left.repeated  = input->left.pressed;
   input->right.repeated = input->right.pressed;
-  input->lctrl.repeated = input->lctrl.pressed;
-  input->lalt.repeated  = input->lalt.pressed;
+  input->z.repeated     = input->z.pressed;
+  input->x.repeated     = input->x.pressed;
   input->num_1.repeated = input->num_1.pressed;
   input->num_2.repeated = input->num_2.pressed;
   input->num_3.repeated = input->num_3.pressed;
@@ -118,14 +118,14 @@ void read_input(Input* input)
           if (!input->right.pressed) input->right.repeated = false;
           break;
 
-        case SDLK_LCTRL:
-          input->lctrl.pressed = event.type == SDL_KEYDOWN;
-          if (!input->lctrl.pressed) input->lctrl.repeated = false;
+        case SDLK_z:
+          input->z.pressed = event.type == SDL_KEYDOWN;
+          if (!input->z.pressed) input->z.repeated = false;
           break;
 
-        case SDLK_LALT:
-          input->lalt.pressed = event.type == SDL_KEYDOWN;
-          if (!input->lalt.pressed) input->lalt.repeated = false;
+        case SDLK_x:
+          input->x.pressed = event.type == SDL_KEYDOWN;
+          if (!input->x.pressed) input->x.repeated = false;
           break;
 
         case SDLK_1:
@@ -233,6 +233,7 @@ void render_player()
       260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271
   };
   static constexpr int sprite_jumping_right = 284;
+  static constexpr int sprite_shooting_right = 286;
 
   static constexpr int sprite_standing_left = 272;
   static constexpr std::array<int, 12> sprite_walking_left =
@@ -240,39 +241,54 @@ void render_player()
       272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283
   };
   static constexpr int sprite_jumping_left = 285;
+  static constexpr int sprite_shooting_left = 287;
 
   const auto& player = game.get_player();
 
   SDL_Rect src_rect = [&player]()
   {
+    // Shooting has top priority
+    if (player.shooting)
+    {
+      if (player.direction == Player::Direction::right)
+      {
+        return sprite_manager.get_rect_for_tile(sprite_shooting_right);
+      }
+      else
+      {
+        return sprite_manager.get_rect_for_tile(sprite_shooting_left);
+      }
+    }
+
+    // If not shooting, then based on player state
     if (player.direction == Player::Direction::right)
     {
-      if (player.state == Player::State::still)
-      {
-        return sprite_manager.get_rect_for_tile(sprite_standing_right);
-      }
-      else if (player.state == Player::State::walking)
-      {
-        return sprite_manager.get_rect_for_tile(sprite_walking_right[player.animation_tick % sprite_walking_right.size()]);
-      }
-      else  // player_.state == Player::State::jumping
+      if (player.jumping || player.falling)
       {
         return sprite_manager.get_rect_for_tile(sprite_jumping_right);
+      }
+      else if (player.walking)
+      {
+        return sprite_manager.get_rect_for_tile(sprite_walking_right[player.walk_tick % sprite_walking_right.size()]);
+      }
+      else
+      {
+        return sprite_manager.get_rect_for_tile(sprite_standing_right);
       }
     }
     else  // player_.direction == Player::Direction::left
     {
-      if (player.state == Player::State::still)
-      {
-        return sprite_manager.get_rect_for_tile(sprite_standing_left);
-      }
-      else if (player.state == Player::State::walking)
-      {
-        return sprite_manager.get_rect_for_tile(sprite_walking_left[player.animation_tick % sprite_walking_left.size()]);
-      }
-      else  // player_.state == Player::State::jumping
+      if (player.jumping || player.falling)
       {
         return sprite_manager.get_rect_for_tile(sprite_jumping_left);
+      }
+      else if (player.walking)
+      {
+        return sprite_manager.get_rect_for_tile(sprite_walking_left[player.walk_tick % sprite_walking_left.size()]);
+      }
+      else
+      {
+        return sprite_manager.get_rect_for_tile(sprite_standing_left);
       }
     }
   }();
@@ -387,8 +403,8 @@ PlayerInput input_to_player_input(const Input& input)
   PlayerInput pi;
   pi.left = input.left.pressed;
   pi.right = input.right.pressed;
-  pi.jump = input.lctrl.pressed;
-  pi.shoot = input.lalt.pressed;
+  pi.jump = input.z.pressed;
+  pi.shoot = input.x.pressed;
   return pi;
 }
 
@@ -510,15 +526,23 @@ int main()
       if (debug)
       {
         // Debug info
-        const auto camera_pos_str = "camera position: (" + std::to_string(game_camera.position.x()) + ", " + std::to_string(game_camera.position.y()) + ")";
-        const auto player_pos_str = "player position: (" + std::to_string(game.get_player().position.x()) + ", " + std::to_string(game.get_player().position.y()) + ")";
-        const auto player_vel_str = "player velocity: (" + std::to_string(game.get_player().velocity.x()) + ", " + std::to_string(game.get_player().velocity.y()) + ")";
-        const auto collide_str    = std::string("collide: ") + (game.player_collide_x() ? "x " : "_ ") + (game.player_collide_y() ? "y" : "_");
+        const auto camera_position_str = "camera position: (" + std::to_string(game_camera.position.x()) + ", " + std::to_string(game_camera.position.y()) + ")";
+        const auto player_position_str = "player position: (" + std::to_string(game.get_player().position.x()) + ", " + std::to_string(game.get_player().position.y()) + ")";
+        const auto player_velocity_str = "player velocity: (" + std::to_string(game.get_player().velocity.x()) + ", " + std::to_string(game.get_player().velocity.y()) + ")";
+        const auto player_walking_str  = std::string("player walking: ") + (game.get_player().walking ? "true" : "false");
+        const auto player_jumping_str  = std::string("player jumping: ") + (game.get_player().jumping ? "true" : "false");
+        const auto player_falling_str  = std::string("player falling: ") + (game.get_player().falling ? "true" : "false");
+        const auto player_shooting_str = std::string("player shooting: ") + (game.get_player().shooting ? "true" : "false");
+        const auto collide_str         = std::string("player collide: ")  + (game.player_collide_x() ? "x " : "_ ") + (game.player_collide_y() ? "y" : "_");
 
-        draw::text(5,  25, camera_pos_str, { 255u, 0u, 0u, 0u}, window_surface);
-        draw::text(5,  45, player_pos_str, { 255u, 0u, 0u, 0u}, window_surface);
-        draw::text(5,  65, player_vel_str, { 255u, 0u, 0u, 0u}, window_surface);
-        draw::text(5,  85, collide_str,    { 255u, 0u, 0u, 0u}, window_surface);
+        draw::text(5,  25, camera_position_str, { 255u, 0u, 0u, 0u}, window_surface);
+        draw::text(5,  45, player_position_str, { 255u, 0u, 0u, 0u}, window_surface);
+        draw::text(5,  65, player_velocity_str, { 255u, 0u, 0u, 0u}, window_surface);
+        draw::text(5,  85, player_walking_str,  { 255u, 0u, 0u, 0u}, window_surface);
+        draw::text(5, 105, player_jumping_str,  { 255u, 0u, 0u, 0u}, window_surface);
+        draw::text(5, 125, player_falling_str,  { 255u, 0u, 0u, 0u}, window_surface);
+        draw::text(5, 145, player_shooting_str, { 255u, 0u, 0u, 0u}, window_surface);
+        draw::text(5, 165, collide_str,         { 255u, 0u, 0u, 0u}, window_surface);
 
       }
 

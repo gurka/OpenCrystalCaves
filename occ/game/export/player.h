@@ -19,15 +19,15 @@ struct Player
     left
   } direction = Direction::right;
 
-  enum class State
-  {
-    still,
-    walking,
-    jumping
-  } state = State::still;
+  bool walking = false;
+  unsigned walk_tick = 0u;
 
-  unsigned animation_tick = 0u;
+  bool jumping = false;
   unsigned jump_tick = 0u;
+
+  bool falling = false;
+
+  bool shooting = false;
 };
 
 #endif  // PLAYER_H_

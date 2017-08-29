@@ -20,98 +20,80 @@ bool Game::init()
     return false;
   }
 
-  player_.position = Vector<int>(16, 16);
+  player_.position = geometry::Position(16, 16);
+  player_.velocity = Vector<int>(0, 0);
   player_.direction = Player::Direction::right;
-  player_.state = Player::State::still;
 
   return true;
 }
 
 void Game::update(const PlayerInput& player_input)
 {
-  static constexpr std::array<int, 16> jump_velocity   = { -8, -8, -8, -4, -4, -2, -2, -2, -2, 0, 2, 2, 2, 2, 4, 4 };
-  static constexpr std::size_t jump_velocity_fall_index = 10;
+  static constexpr std::array<int, 15> jump_velocity   = { -8, -8, -4, -4, -2, -2, -2, -2, 0, 2, 2, 2, 2, 4, 4 };
+  static constexpr std::size_t jump_velocity_fall_index = 9;
 
   ///////////////////////////////////////////////////////////////////
   //
-  //  Calculate player velocity based on input and player state
+  //  Calculate and set player velocity (ONLY) based on input and player state
   //
   ///////////////////////////////////////////////////////////////////
 
   // Set y velocity
-  switch (player_.state)
+  if (player_.jumping && player_.jump_tick < jump_velocity.size())
   {
-    case Player::State::still:
-    case Player::State::walking:
-    {
-      // Just apply gravity
-      player_.velocity = Vector<int>(player_.velocity.x(), 8);
-      break;
-    }
-
-    case Player::State::jumping:
-    {
-      if (player_.jump_tick < jump_velocity.size())
-      {
-        player_.velocity = Vector<int>(player_.velocity.x(), jump_velocity[player_.jump_tick]);
-      }
-      else
-      {
-        // Just apply gravity
-        player_.velocity = Vector<int>(player_.velocity.x(), 8);
-      }
-      player_.jump_tick += 1;
-      break;
-    }
+    // Player is jumping or falling after a jump
+    player_.velocity = Vector<int>(player_.velocity.x(), jump_velocity[player_.jump_tick]);
+  }
+  else if (player_input.jump && !player_.jumping && !player_.falling)
+  {
+    // Player starts to jump
+    player_.velocity = Vector<int>(player_.velocity.x(), jump_velocity.front());
+  }
+  else
+  {
+    // Just apply gravity
+    player_.velocity = Vector<int>(player_.velocity.x(), 8);
   }
 
   // Set x velocity
-  switch (player_.state)
+  if ((player_input.left && player_input.right) ||
+      (!player_input.left && !player_input.right))
   {
-    case Player::State::still:
-    case Player::State::walking:
-    case Player::State::jumping:
+    // Set zero x velocity
+    player_.velocity = Vector<int>(0, player_.velocity.y());
+  }
+  else if (player_input.left)
+  {
+    // First step is 2 pixels / tick, then 4 pixels / tick
+    // TODO: Current implementation makes it possible to change direction and keep 4/-4 pixels / tick. OK?
+    if (player_.velocity.x() == 0)
     {
-      if ((player_input.left && player_input.right) ||
-          (!player_input.left && !player_input.right))
-      {
-        // Set zero x velocity
-        player_.velocity = Vector<int>(0, player_.velocity.y());
-      }
-      else if (player_input.left)
-      {
-        // First step is 2 pixels / tick, then 4 pixels / tick
-        if (player_.velocity.x() == 0)
-        {
-          player_.velocity = Vector<int>(-2, player_.velocity.y());
-        }
-        else
-        {
-          player_.velocity = Vector<int>(-4, player_.velocity.y());
-        }
-      }
-      else if (player_input.right)
-      {
-        // Same as above
-        if (player_.velocity.x() == 0)
-        {
-          player_.velocity = Vector<int>(2, player_.velocity.y());
-        }
-        else
-        {
-          player_.velocity = Vector<int>(4, player_.velocity.y());
-        }
-      }
-      break;
+      player_.velocity = Vector<int>(-2, player_.velocity.y());
+    }
+    else
+    {
+      player_.velocity = Vector<int>(-4, player_.velocity.y());
     }
   }
-
+  else if (player_input.right)
+  {
+    // Same as above
+    if (player_.velocity.x() == 0)
+    {
+      player_.velocity = Vector<int>(2, player_.velocity.y());
+    }
+    else
+    {
+      player_.velocity = Vector<int>(4, player_.velocity.y());
+    }
+  }
 
   ///////////////////////////////////////////////////////////////////
   //
   //  Move player towards destination and check for collision
   //
   ///////////////////////////////////////////////////////////////////
+
   player_collide_x_ = false;
   player_collide_y_ = false;
   const auto destination = player_.position + player_.velocity;
@@ -155,55 +137,49 @@ void Game::update(const PlayerInput& player_input)
 
   ///////////////////////////////////////////////////////////////////
   //
-  //  Set player information
+  //  Set new player information based on the movement
   //
   ///////////////////////////////////////////////////////////////////
-  switch (player_.state)
+
+  // Walking
+  bool walking = player_.velocity.x() != 0 && !player_collide_x_;
+  if (!player_.walking && walking)
   {
-    case Player::State::jumping:
-    {
-      if (player_collide_y_ && player_.velocity.y() > 0)
-      {
-        // Player is falling down but hit something (the ground), set new state
-        player_.state = player_.velocity.x() == 0 ? Player::State::still : Player::State::walking;
-      }
-      else if (player_collide_y_)
-      {
-        // Player hit something while jumping, set jump_tick so that he starts falling
-        player_.jump_tick = jump_velocity_fall_index;
-      }
-      break;
-    }
-
-    case Player::State::still:
-    {
-      if (player_.velocity.x() != 0 && !player_collide_x_)
-      {
-        // Player started to move, change to state walking
-        player_.state = Player::State::walking;
-
-        // And reset animation_start_tick
-        player_.animation_tick = 0;
-      }
-      break;
-    }
-
-    case Player::State::walking:
-    {
-      if (player_.velocity.x() == 0 || player_collide_x_)
-      {
-        // Player was walking and stopped or collided with something
-        player_.state = Player::State::still;
-      }
-      else
-      {
-        player_.animation_tick += 1;
-      }
-      break;
-    }
+    // Player started to move
+    player_.walk_tick = 0u;
   }
+  else if (player_.walking && walking)
+  {
+    // Player is still walking
+    player_.walk_tick += 1u;
+  }
+  player_.walking = walking;
 
-  // Set player direction
+  // Falling
+  player_.falling = player_.velocity.y() >= 8 && !player_collide_y_;
+
+  // Jumping
+  bool jumping = player_.velocity.y() < 8 && !player_collide_y_;
+  if (!player_.jumping && jumping)
+  {
+    // Player started to jump
+    player_.jump_tick = 0u;
+  }
+  else if (player_.jumping && jumping)
+  {
+    // Player is still jumping
+    player_.jump_tick += 1;
+  }
+  else if (player_.jumping && !jumping && player_.velocity.y() < 0)
+  {
+    // Player was jumping but hit something on the way up
+    // Continue the jump but skip to falling velocity
+    player_.jump_tick = jump_velocity_fall_index;
+    jumping = true;
+  }
+  player_.jumping = jumping;
+
+  // Direction
   if (player_.velocity.x() < 0)
   {
     player_.direction = Player::Direction::left;
@@ -213,14 +189,18 @@ void Game::update(const PlayerInput& player_input)
     player_.direction = Player::Direction::right;
   }
 
-  // Check player jump
-  if (player_input.jump && player_collide_y_ && player_.state != Player::State::jumping)
+  // Shooting
+  //
+  // NOTES:
+  // If have ammo:
+  //   Cannot fire another shoot if a shoot is currently in the game (not hit something or gone outside the level)
+  //   Shooting sprite stays until player moves (not counting gravity)
+  // If no ammo:
+  //   If standing still or jumping without moving left/right:
+  //     Shooting sprite only shown while holding shoot button
+  //   If walking or jumping while moving left/right
+  //     Shooting sprite never shown
+  if (player_input.shoot)
   {
-    // Player wants to jump, change state and set start jump velocity
-    player_.state = Player::State::jumping;
-    player_.jump_tick = 0;
-
-    // TODO: Current implementation will cause the jump sprite to be set one tick
-    // if the player tries to jump just under a blocking tile
   }
 }

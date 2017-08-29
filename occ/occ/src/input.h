@@ -13,8 +13,8 @@ struct Input
   Button down  = Button();
   Button left  = Button();
   Button right = Button();
-  Button lctrl = Button();
-  Button lalt  = Button();
+  Button z     = Button();
+  Button x     = Button();
 
   Button num_1 = Button();
   Button num_2 = Button();
