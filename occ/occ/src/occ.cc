@@ -247,48 +247,71 @@ void render_player()
 
   SDL_Rect src_rect = [&player]()
   {
-    // Shooting has top priority
-    if (player.shooting)
-    {
-      if (player.direction == Player::Direction::right)
-      {
-        return sprite_manager.get_rect_for_tile(sprite_shooting_right);
-      }
-      else
-      {
-        return sprite_manager.get_rect_for_tile(sprite_shooting_left);
-      }
-    }
+    // Sprite selection priority: (currently 'shooting' means pressing shoot button without ammo)
+    // If walking:
+    //   1. Jumping or falling
+    //   2. Walking
+    // Else:
+    //   1. Shooting
+    //   2. Jumping or falling
+    //   3. Standing still
 
-    // If not shooting, then based on player state
     if (player.direction == Player::Direction::right)
     {
-      if (player.jumping || player.falling)
+      if (player.walking)
       {
-        return sprite_manager.get_rect_for_tile(sprite_jumping_right);
-      }
-      else if (player.walking)
-      {
-        return sprite_manager.get_rect_for_tile(sprite_walking_right[player.walk_tick % sprite_walking_right.size()]);
+        if (player.jumping || player.falling)
+        {
+          return sprite_manager.get_rect_for_tile(sprite_jumping_right);
+        }
+        else
+        {
+          return sprite_manager.get_rect_for_tile(sprite_walking_right[player.walk_tick % sprite_walking_right.size()]);
+        }
       }
       else
       {
-        return sprite_manager.get_rect_for_tile(sprite_standing_right);
+        if (player.shooting)
+        {
+          return sprite_manager.get_rect_for_tile(sprite_shooting_right);
+        }
+        else if (player.jumping || player.falling)
+        {
+          return sprite_manager.get_rect_for_tile(sprite_jumping_right);
+        }
+        else
+        {
+          return sprite_manager.get_rect_for_tile(sprite_standing_right);
+        }
       }
     }
     else  // player_.direction == Player::Direction::left
     {
-      if (player.jumping || player.falling)
+      if (player.walking)
       {
-        return sprite_manager.get_rect_for_tile(sprite_jumping_left);
-      }
-      else if (player.walking)
-      {
-        return sprite_manager.get_rect_for_tile(sprite_walking_left[player.walk_tick % sprite_walking_left.size()]);
+        if (player.jumping || player.falling)
+        {
+          return sprite_manager.get_rect_for_tile(sprite_jumping_left);
+        }
+        else
+        {
+          return sprite_manager.get_rect_for_tile(sprite_walking_left[player.walk_tick % sprite_walking_left.size()]);
+        }
       }
       else
       {
-        return sprite_manager.get_rect_for_tile(sprite_standing_left);
+        if (player.shooting)
+        {
+          return sprite_manager.get_rect_for_tile(sprite_shooting_left);
+        }
+        else if (player.jumping || player.falling)
+        {
+          return sprite_manager.get_rect_for_tile(sprite_jumping_left);
+        }
+        else
+        {
+          return sprite_manager.get_rect_for_tile(sprite_standing_left);
+        }
       }
     }
   }();

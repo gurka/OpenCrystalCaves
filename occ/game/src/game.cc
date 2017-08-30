@@ -201,7 +201,5 @@ void Game::update(const PlayerInput& player_input)
   //     Shooting sprite only shown while holding shoot button
   //   If walking or jumping while moving left/right
   //     Shooting sprite never shown
-  if (player_input.shoot)
-  {
-  }
+  player_.shooting = player_input.shoot;
 }
