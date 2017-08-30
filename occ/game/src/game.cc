@@ -5,6 +5,7 @@
 
 #include "item_loader.h"
 #include "level_loader.h"
+#include "misc.h"
 
 bool Game::init()
 {
@@ -29,12 +30,12 @@ bool Game::init()
 
 void Game::update(const PlayerInput& player_input)
 {
-  static constexpr std::array<int, 15> jump_velocity   = { -8, -8, -4, -4, -2, -2, -2, -2, 0, 2, 2, 2, 2, 4, 4 };
+  static constexpr auto jump_velocity = misc::make_array<int>(-8, -8, -4, -4, -2, -2, -2, -2, 0, 2, 2, 2, 2, 4, 4);
   static constexpr std::size_t jump_velocity_fall_index = 9;
 
   ///////////////////////////////////////////////////////////////////
   //
-  //  Calculate and set player velocity (ONLY) based on input and player state
+  //  Calculate and set player velocity (ONLY velocity) based on input and player state
   //
   ///////////////////////////////////////////////////////////////////
 
