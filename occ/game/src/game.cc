@@ -7,6 +7,10 @@
 #include "level_loader.h"
 #include "misc.h"
 
+static constexpr auto gravity = 8u;
+static constexpr auto jump_velocity = misc::make_array<int>(0, -8, -8, -8, -4, -4, -2, -2, -2, -2, 2, 2, 2, 2, 4, 4);
+static constexpr auto jump_velocity_fall_index = 10u;
+
 bool Game::init()
 {
   items_ = ItemLoader::load_items("media/items.json");
@@ -30,176 +34,200 @@ bool Game::init()
 
 void Game::update(const PlayerInput& player_input)
 {
-  static constexpr auto jump_velocity = misc::make_array<int>(-8, -8, -4, -4, -2, -2, -2, -2, 0, 2, 2, 2, 2, 4, 4);
-  static constexpr std::size_t jump_velocity_fall_index = 9;
+  // Currently the only thing that is alive within the game is the player :-(
+  update_player(player_input);
 
-  ///////////////////////////////////////////////////////////////////
-  //
-  //  Calculate and set player velocity (ONLY velocity) based on input and player state
-  //
-  ///////////////////////////////////////////////////////////////////
+  // But in the future we will have:
+  // update_enemies()
+  // update_objects()
+  // update_xxxxxxx()
+}
 
-  // Set y velocity
-  if (player_.jumping && player_.jump_tick < jump_velocity.size())
-  {
-    // Player is jumping or falling after a jump
-    player_.velocity = Vector<int>(player_.velocity.x(), jump_velocity[player_.jump_tick]);
-  }
-  else if (player_input.jump && !player_.jumping && !player_.falling)
-  {
-    // Player starts to jump
-    player_.velocity = Vector<int>(player_.velocity.x(), jump_velocity.front());
-  }
-  else
-  {
-    // Just apply gravity
-    player_.velocity = Vector<int>(player_.velocity.x(), 8);
-  }
+void Game::update_player(const PlayerInput& player_input)
+{
+  /**
+   * Updating the player is done in these steps:
+   * 1. Update player information based on input
+   * 2. Update player velocity based on player information
+   * 3. Update player position based on player velocity
+   * 4. Update player information based on collision
+   */
 
-  // Set x velocity
+
+  /**
+   * 1. Update player information based on input
+   */
+
+  // Check left / right
   if ((player_input.left && player_input.right) ||
       (!player_input.left && !player_input.right))
   {
-    // Set zero x velocity
-    player_.velocity = Vector<int>(0, player_.velocity.y());
+    player_.walking = false;
   }
-  else if (player_input.left)
+  else if (player_.walking &&
+           ((player_input.right && player_.direction == Player::Direction::right) ||
+            (player_input.left  && player_.direction == Player::Direction::left)))
+  {
+    // Player is still walking in the same direction, just update walk tick
+    player_.walk_tick += 1u;
+  }
+  else if (player_input.left || player_input.right)
+  {
+    // Player started to walk
+    player_.walking = true;
+    player_.walk_tick = 0u;
+
+    // Set direction
+    player_.direction = player_input.right ? Player::Direction::right : Player::Direction::left;
+  }
+
+  // Check jump
+  if (player_input.jump &&
+      !player_.jumping &&
+      !player_.falling &&
+      !collides(geometry::Rectangle(player_.position + geometry::Position(0, -1),
+                                    player_.size)))
+  {
+    // Player wants to jump
+    player_.jumping = true;
+    player_.jump_tick = 0u;
+  }
+  else if (player_.jumping)
+  {
+    // Player still jumping
+    player_.jump_tick += 1u;
+  }
+
+  // Check shooting
+  player_.shooting = player_input.shoot;
+
+  /**
+   * 2. Update player velocity based on player information
+   */
+
+  // Set y velocity
+  if (player_.jumping)
+  {
+    player_.velocity = Vector<int>(player_.velocity.x(), jump_velocity[player_.jump_tick]);
+  }
+  else
+  {
+    player_.velocity = Vector<int>(player_.velocity.x(), gravity);
+  }
+
+  // Set x velocity
+  if (player_.walking)
   {
     // First step is 2 pixels / tick, then 4 pixels / tick
-    // TODO: Current implementation makes it possible to change direction and keep 4/-4 pixels / tick. OK?
-    if (player_.velocity.x() == 0)
+    const auto velocity = player_.walk_tick == 0u ? 2 : 4;
+    if (player_.direction == Player::Direction::right)
     {
-      player_.velocity = Vector<int>(-2, player_.velocity.y());
+      player_.velocity = Vector<int>(velocity, player_.velocity.y());
     }
-    else
+    else  // player_.direction == Player::Direction::left
     {
-      player_.velocity = Vector<int>(-4, player_.velocity.y());
+      player_.velocity = Vector<int>(-velocity, player_.velocity.y());
     }
   }
-  else if (player_input.right)
+  else
   {
-    // Same as above
-    if (player_.velocity.x() == 0)
-    {
-      player_.velocity = Vector<int>(2, player_.velocity.y());
-    }
-    else
-    {
-      player_.velocity = Vector<int>(4, player_.velocity.y());
-    }
+    player_.velocity = Vector<int>(0, player_.velocity.y());
   }
 
-  ///////////////////////////////////////////////////////////////////
-  //
-  //  Move player towards destination and check for collision
-  //
-  ///////////////////////////////////////////////////////////////////
+  /**
+   * 3. Update player position based on player velocity
+   */
 
-  player_collide_x_ = false;
-  player_collide_y_ = false;
+  player_.collide_x = false;
+  player_.collide_y = false;
   const auto destination = player_.position + player_.velocity;
 
-  auto collides = [this](const geometry::Rectangle& player_rect)
-  {
-    for (const auto& aabb : level_.get_aabbs())
-    {
-      if (geometry::isColliding(player_rect, aabb))
-      {
-        return true;
-      }
-    }
-    return false;
-  };
-
+  // Move on x axis
   const auto step_x = destination.x() > player_.position.x() ? 1 : -1;
   while (player_.position.x() != destination.x())
   {
     const geometry::Rectangle player_rect { player_.position + geometry::Position(step_x, 0), player_.size.x(), player_.size.y() };
     if (collides(player_rect))
     {
-      player_collide_x_ = true;
+      player_.collide_x = true;
       break;
     }
     player_.position += geometry::Position(step_x, 0);
   }
 
+  // Move on y axis
   const auto step_y = destination.y() > player_.position.y() ? 1 : -1;
   while (player_.position.y() != destination.y())
   {
     const geometry::Rectangle player_rect { player_.position + geometry::Position(0, step_y), player_.size.x(), player_.size.y() };
     if (collides(player_rect))
     {
-      player_collide_y_ = true;
+      player_.collide_y = true;
       break;
     }
     player_.position += geometry::Position(0, step_y);
   }
 
+  /**
+   * 4. Update player information based on collision
+   */
 
-  ///////////////////////////////////////////////////////////////////
-  //
-  //  Set new player information based on the movement
-  //
-  ///////////////////////////////////////////////////////////////////
-
-  // Walking
-  bool walking = player_.velocity.x() != 0 && !player_collide_x_;
-  if (!player_.walking && walking)
+  // Check if player hit something while walking
+  if (player_.walking && player_.collide_x)
   {
-    // Player started to move
-    player_.walk_tick = 0u;
-  }
-  else if (player_.walking && walking)
-  {
-    // Player is still walking
-    player_.walk_tick += 1u;
-  }
-  player_.walking = walking;
-
-  // Falling
-  player_.falling = player_.velocity.y() >= 8 && !player_collide_y_;
-
-  // Jumping
-  bool jumping = player_.velocity.y() < 8 && !player_collide_y_;
-  if (!player_.jumping && jumping)
-  {
-    // Player started to jump
-    player_.jump_tick = 0u;
-  }
-  else if (player_.jumping && jumping)
-  {
-    // Player is still jumping
-    player_.jump_tick += 1;
-  }
-  else if (player_.jumping && !jumping && player_.velocity.y() < 0)
-  {
-    // Player was jumping but hit something on the way up
-    // Continue the jump but skip to falling velocity
-    player_.jump_tick = jump_velocity_fall_index;
-    jumping = true;
-  }
-  player_.jumping = jumping;
-
-  // Direction
-  if (player_.velocity.x() < 0)
-  {
-    player_.direction = Player::Direction::left;
-  }
-  else if (player_.velocity.x() > 0)
-  {
-    player_.direction = Player::Direction::right;
+    player_.walking = false;
   }
 
-  // Shooting
-  //
-  // NOTES:
-  // If have ammo:
-  //   Cannot fire another shoot if a shoot is currently in the game (not hit something or gone outside the level)
-  //   Shooting sprite stays until player moves (not counting gravity)
-  // If no ammo:
-  //   If standing still or jumping without moving left/right:
-  //     Shooting sprite only shown while holding shoot button
-  //   If walking or jumping while moving left/right
-  //     Shooting sprite never shown
-  player_.shooting = player_input.shoot;
+  // Check if player still jumping
+  if (player_.jumping)
+  {
+    // Check if player hit something while jumping
+    if (player_.collide_y)
+    {
+      if (player_.velocity.y() < 0)
+      {
+        // Player hit something while jumping up
+        // Skip to "falling down" velocity
+        player_.jump_tick = jump_velocity_fall_index;
+      }
+      else  // player_.velocity.y() > 0
+      {
+        // Player landed
+        player_.jumping = false;
+      }
+    }
+    else if (player_.jump_tick == jump_velocity.size() - 1u)
+    {
+      // Player jump ended
+      player_.jumping = false;
+    }
+    else if (player_.jump_tick != 0 &&
+             collides(geometry::Rectangle(player_.position + geometry::Position(0, 1),
+                                          player_.size)))
+    {
+      // Player did not actually collide with the ground, but standing directly above it
+      // and this isn't the first tick in the jump, so we can consider the jump to have
+      // ended here
+      player_.jumping = false;
+    }
+  }
+
+  // Check if player is falling
+  player_.falling = !player_.jumping &&
+                    player_.velocity.y() > 0 &&
+                    !player_.collide_y &&
+                    !collides(geometry::Rectangle(player_.position + geometry::Position(0, 1),
+                                                  player_.size));
+}
+
+bool Game::collides(const geometry::Rectangle& player_rect)
+{
+  for (const auto& aabb : level_.get_aabbs())
+  {
+    if (geometry::isColliding(player_rect, aabb))
+    {
+      return true;
+    }
+  }
+  return false;
 }

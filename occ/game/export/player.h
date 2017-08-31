@@ -10,8 +10,21 @@ struct Player
 {
   static constexpr geometry::Size size = geometry::Size(12, 16);
 
-  geometry::Position position = geometry::Position();
+  /**
+   * Player velocity
+   */
   Vector<int> velocity = Vector<int>();
+
+  /**
+   * Player position
+   */
+  geometry::Position position = geometry::Position();
+
+  /**
+   * Player information
+   */
+  bool collide_x = false;
+  bool collide_y = false;
 
   enum class Direction
   {

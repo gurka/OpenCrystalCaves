@@ -40,6 +40,7 @@ static unsigned game_tick;
 
 // Debug information
 static bool debug(false);
+static bool debug_aabb(false);
 
 Window init_SDL()
 {
@@ -415,7 +416,7 @@ void render_game()
   render_middleground();
   render_player();
   render_foreground();
-  if (debug)
+  if (debug_aabb)
   {
     render_debug();
   }
@@ -512,6 +513,10 @@ int main()
         {
           debug = !debug;
         }
+        if (input.num_2.pressed && !input.num_2.repeated)
+        {
+          debug_aabb = !debug_aabb;
+        }
 
         // Call game loop
         game.update(input_to_player_input(input));
@@ -556,7 +561,7 @@ int main()
         const auto player_jumping_str  = std::string("player jumping: ") + (game.get_player().jumping ? "true" : "false");
         const auto player_falling_str  = std::string("player falling: ") + (game.get_player().falling ? "true" : "false");
         const auto player_shooting_str = std::string("player shooting: ") + (game.get_player().shooting ? "true" : "false");
-        const auto collide_str         = std::string("player collide: ")  + (game.player_collide_x() ? "x " : "_ ") + (game.player_collide_y() ? "y" : "_");
+        const auto collide_str         = std::string("player collide: ")  + (game.get_player().collide_x ? "x " : "_ ") + (game.get_player().collide_y ? "y" : "_");
 
         draw::text(5,  25, camera_position_str, { 255u, 0u, 0u, 0u}, window_surface);
         draw::text(5,  45, player_position_str, { 255u, 0u, 0u, 0u}, window_surface);
