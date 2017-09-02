@@ -7,36 +7,31 @@ Level::Level()
     width_(0),
     height_(0),
     tiles_background_(),
-    tiles_middleground_(),
     tiles_foreground_(),
-    aabbs_()
+    aabbs_(),
+    platforms_()
 {
 }
 
 Level::Level(int width,
              int height,
              std::vector<Item::Id> tiles_background,
-             std::vector<Item::Id> tiles_middleground,
              std::vector<Item::Id> tiles_foreground,
-             std::vector<geometry::Rectangle> aabbs)
+             std::vector<geometry::Rectangle> aabbs,
+             std::vector<geometry::Position> platforms)
   : valid_(true),
     width_(width),
     height_(height),
     tiles_background_(std::move(tiles_background)),
-    tiles_middleground_(std::move(tiles_middleground)),
     tiles_foreground_(std::move(tiles_foreground)),
-    aabbs_(std::move(aabbs))
+    aabbs_(std::move(aabbs)),
+    platforms_(std::move(platforms))
 {
 }
 
 Item::Id Level::get_tile_background(int tile_x, int tile_y) const
 {
   return get_tile(tile_x, tile_y, tiles_background_);
-}
-
-Item::Id Level::get_tile_middleground(int tile_x, int tile_y) const
-{
-  return get_tile(tile_x, tile_y, tiles_middleground_);
 }
 
 Item::Id Level::get_tile_foreground(int tile_x, int tile_y) const

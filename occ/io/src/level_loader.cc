@@ -52,14 +52,6 @@ Level LevelLoader::load_level(const std::string& filename)
   }
   auto items_background = items_json["Background"].get<std::vector<Item::Id>>();
 
-  // Check and get "Middleground"
-  if (items_json.count("Middleground") == 0 || !items_json["Middleground"].is_array())
-  {
-    LOG_CRITICAL("Items is missing \"Middleground\" attribute or wrong type!");
-    return Level();
-  }
-  auto items_middleground = items_json["Middleground"].get<std::vector<Item::Id>>();
-
   // Check and get "Foreground"
   if (items_json.count("Foreground") == 0 || !items_json["Foreground"].is_array())
   {
@@ -110,6 +102,34 @@ Level LevelLoader::load_level(const std::string& filename)
     aabbs.emplace_back(x * 16, y * 16, w * 16, h * 16);
   }
 
+  // Check and get "Platforms"
+  if (level_json.count("Platforms") == 0 || !level_json["Platforms"].is_array())
+  {
+    LOG_CRITICAL("Level is missing \"Platforms\" attribute or wrong type!");
+    return Level();
+  }
+  std::vector<geometry::Position> platforms;
+  for (const auto& aabb_json : level_json["Platforms"])
+  {
+    if (aabb_json.count("X") == 0 || !aabb_json["X"].is_number())
+    {
+      LOG_CRITICAL("AABB is missing \"X\" attribute or wrong type!");
+      return Level();
+    }
+
+    if (aabb_json.count("Y") == 0 || !aabb_json["Y"].is_number())
+    {
+      LOG_CRITICAL("AABB is missing \"Y\" attribute or wrong type!");
+      return Level();
+    }
+
+    auto x = aabb_json["X"].get<int>();
+    auto y = aabb_json["Y"].get<int>();
+
+    // Note that the Platforms are in "tiles" in the file but in pixels in Level
+    platforms.emplace_back(x * 16, y * 16);
+  }
+
   LOG_INFO("Loaded level from '%s'", filename.c_str());
 
   // Debug
@@ -121,7 +141,7 @@ Level LevelLoader::load_level(const std::string& filename)
   return Level(width,
                height,
                std::move(items_background),
-               std::move(items_middleground),
                std::move(items_foreground),
-               std::move(aabbs));
+               std::move(aabbs),
+               std::move(platforms));
 }

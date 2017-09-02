@@ -14,17 +14,17 @@ class Level
   Level(int width,
         int height,
         std::vector<Item::Id> tiles_background,
-        std::vector<Item::Id> tiles_middleground,
         std::vector<Item::Id> tiles_foreground,
-        std::vector<geometry::Rectangle> aabbs);
+        std::vector<geometry::Rectangle> aabbs,
+        std::vector<geometry::Position> platforms);
 
   bool valid() const { return valid_; }
 
   Item::Id get_tile_background(int tile_x, int tile_y) const;
-  Item::Id get_tile_middleground(int tile_x, int tile_y) const;
   Item::Id get_tile_foreground(int tile_x, int tile_y) const;
 
   const std::vector<geometry::Rectangle>& get_aabbs() const { return aabbs_; }
+  const std::vector<geometry::Position>& get_platforms() const { return platforms_; }
 
   int get_tile_width() const { return width_; }
   int get_tile_height() const { return height_; }
@@ -46,11 +46,11 @@ class Level
 
   // Tiles in order (see pos2index)
   std::vector<Item::Id> tiles_background_;
-  std::vector<Item::Id> tiles_middleground_;
   std::vector<Item::Id> tiles_foreground_;
 
   // Bounding boxes for collision
   std::vector<geometry::Rectangle> aabbs_;
+  std::vector<geometry::Position> platforms_;
 };
 
 #endif  // LEVEL_H_

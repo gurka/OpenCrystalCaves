@@ -24,21 +24,19 @@ class Item
   int get_sprite_count() const { return sprite_count_; }
 
   bool is_type_background() const { return type_ == 0; }
-  bool is_type_middleground() const { return type_ == 1; }
-  bool is_type_foreground() const { return type_ == 2; }
+  bool is_type_foreground() const { return type_ == 1; }
 
-  // For background
+  // Background flags
   bool is_multiple_2x2() const { return is_type_background() && (flags_ & 0x01) != 0; }
   bool is_multiple_4x2() const { return is_type_background() && (flags_ & 0x02) != 0; }
 
-  // For middleground
-  bool is_solid()     const { return is_type_middleground() && (flags_ & 0x01) != 0; }
-  bool is_solid_top() const { return is_type_middleground() && (flags_ & 0x02) != 0; }
-  bool is_damage()    const { return is_type_middleground() && (flags_ & 0x04) != 0; }
-  bool is_death()     const { return is_type_middleground() && (flags_ & 0x08) != 0; }
-
-  // For foreground
-  bool is_animated() const { return is_type_foreground() && (flags_ & 0x01) != 0; }
+  // Foreground flags
+  bool is_solid()           const { return is_type_foreground() && (flags_ & 0x01) != 0; }
+  bool is_solid_top()       const { return is_type_foreground() && (flags_ & 0x02) != 0; }
+  bool is_damage()          const { return is_type_foreground() && (flags_ & 0x04) != 0; }
+  bool is_death()           const { return is_type_foreground() && (flags_ & 0x08) != 0; }
+  bool is_animated()        const { return is_type_foreground() && (flags_ & 0x10) != 0; }
+  bool is_render_in_front() const { return is_type_foreground() && (flags_ & 0x20) != 0; }
 
  private:
   std::string name_;

@@ -192,39 +192,6 @@ void render_background()
   }
 }
 
-void render_middleground()
-{
-  const auto& level = game.get_level();
-  const auto& items = game.get_items();
-
-  const auto start_tile_x = game_camera.position.x() > 0 ? game_camera.position.x() / 16 : 0;
-  const auto start_tile_y = game_camera.position.y() > 0 ? game_camera.position.y() / 16 : 0;
-  const auto end_tile_x = (game_camera.position.x() + game_camera.size.x()) / 16;
-  const auto end_tile_y = (game_camera.position.y() + game_camera.size.y()) / 16;
-
-  for (int tile_y = start_tile_y; tile_y <= end_tile_y; tile_y++)
-  {
-    for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
-    {
-      auto item_id = level.get_tile_middleground(tile_x, tile_y);
-      if (item_id != Item::invalid)
-      {
-        const auto& item = items[item_id];
-        const auto sprite_id = item.get_sprite();
-        auto src_rect = sprite_manager.get_rect_for_tile(sprite_id);
-        SDL_Rect dest_rect
-        {
-          (tile_x * 16) - game_camera.position.x(),
-          (tile_y * 16) - game_camera.position.y(),
-          16,
-          16
-        };
-        SDL_BlitSurface(sprite_manager.get_surface(), &src_rect, game_surface.get(), &dest_rect);
-      }
-    }
-  }
-}
-
 void render_player()
 {
   // Player sprite ids
@@ -325,7 +292,7 @@ void render_player()
   SDL_BlitSurface(sprite_manager.get_surface(), &src_rect, game_surface.get(), &dest_rect);
 }
 
-void render_foreground()
+void render_foreground(bool in_front)
 {
   const auto& level = game.get_level();
   const auto& items = game.get_items();
@@ -343,6 +310,13 @@ void render_foreground()
       if (item_id != Item::invalid)
       {
         const auto& item = items[item_id];
+
+        if ((in_front && !item.is_render_in_front()) ||
+            (!in_front && item.is_render_in_front()))
+        {
+          continue;
+        }
+
         const auto sprite_id = [&item]()
         {
           if (item.is_animated())
@@ -413,9 +387,9 @@ void render_game()
   SDL_FillRect(game_surface.get(), nullptr, SDL_MapRGB(game_surface->format, 33, 33, 33));
 
   render_background();
-  render_middleground();
+  render_foreground(false);
   render_player();
-  render_foreground();
+  render_foreground(true);
   if (debug_aabb)
   {
     render_debug();
