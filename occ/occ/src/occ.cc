@@ -384,16 +384,13 @@ void render_game()
   const auto& player = game.get_player();
   const auto& level = game.get_level();
 
-  // Calculate where the camera is
-  const geometry::Position camera_pos(player.position +  // player position
-                                      geometry::Position(8, 8) -  // plus half player size
-                                      geometry::Position(CAMERA_SIZE.x() / 2, CAMERA_SIZE.y() / 2));  // minus half camera size
-
-  // Create a Rectangle that represents the camera and adjust the position so that nothing outside the level is visible
-  game_camera = Camera(math::clamp(camera_pos.x(),
+  // Update game camera
+  // Try to put player in the middle of the camera, but adjust so that nothing outside the level is visible
+  // FIXME: This isn't how Crystal Caves camera work
+  game_camera = Camera(math::clamp(player.position.x() + (player.size.x() / 2) - (CAMERA_SIZE.x() / 2),
                                    0,
                                    (level.get_tile_width() * 16) - CAMERA_SIZE.x()),
-                       math::clamp(camera_pos.y(),
+                       math::clamp(player.position.y() + (player.size.y() / 2) - (CAMERA_SIZE.y() / 2),
                                    0,
                                    (level.get_tile_height() * 16) - CAMERA_SIZE.y()),
                        CAMERA_SIZE.x(),
