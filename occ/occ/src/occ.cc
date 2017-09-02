@@ -380,21 +380,38 @@ void render_debug()
 
 void render_game()
 {
-  // Get game info
-  const auto& player = game.get_player();
-  const auto& level = game.get_level();
-
   // Update game camera
-  // Try to put player in the middle of the camera, but adjust so that nothing outside the level is visible
-  // FIXME: This isn't how Crystal Caves camera work
-  game_camera = Camera(math::clamp(player.position.x() + (player.size.x() / 2) - (CAMERA_SIZE.x() / 2),
-                                   0,
-                                   (level.get_tile_width() * 16) - CAMERA_SIZE.x()),
-                       math::clamp(player.position.y() + (player.size.y() / 2) - (CAMERA_SIZE.y() / 2),
-                                   0,
-                                   (level.get_tile_height() * 16) - CAMERA_SIZE.y()),
-                       CAMERA_SIZE.x(),
-                       CAMERA_SIZE.y());
+  // The magic numbers (-4 and 20) is from the original Crystal Caves (currently only verified for x axis)
+  const geometry::Position player_camera_relative_position {(game.get_player().position + (game.get_player().size / 2)) - (game_camera.position + (game_camera.size / 2))};
+  if (player_camera_relative_position.x() < -4)
+  {
+    game_camera.position = geometry::Position(math::clamp(game_camera.position.x() + player_camera_relative_position.x() + 4,
+                                                          0,
+                                                          (game.get_level().get_tile_width() * 16) - CAMERA_SIZE.x()),
+                                              game_camera.position.y());
+  }
+  else if (player_camera_relative_position.x() > 20)
+  {
+    game_camera.position = geometry::Position(math::clamp(game_camera.position.x() + player_camera_relative_position.x() - 20,
+                                                          0,
+                                                          (game.get_level().get_tile_width() * 16) - CAMERA_SIZE.x()),
+                                              game_camera.position.y());
+  }
+
+  if (player_camera_relative_position.y() < -4)
+  {
+    game_camera.position = geometry::Position(game_camera.position.x(),
+                                              math::clamp(game_camera.position.y() + player_camera_relative_position.y() + 4,
+                                                          0,
+                                                          (game.get_level().get_tile_height() * 16) - CAMERA_SIZE.y()));
+  }
+  else if (player_camera_relative_position.y() > 20)
+  {
+    game_camera.position = geometry::Position(game_camera.position.x(),
+                                              math::clamp(game_camera.position.y() + player_camera_relative_position.y() - 20,
+                                                          0,
+                                                          (game.get_level().get_tile_height() * 16) - CAMERA_SIZE.y()));
+  }
 
   // Clear game surface (background now)
   SDL_FillRect(game_surface.get(), nullptr, SDL_MapRGB(game_surface->format, 33, 33, 33));
@@ -457,6 +474,16 @@ int main()
     LOG_CRITICAL("Could not initialize Game");
     return EXIT_FAILURE;
   }
+
+  // Set initial game camera
+  game_camera = Camera(math::clamp(game.get_player().position.x() + (game.get_player().size.x() / 2) - (CAMERA_SIZE.x() / 2),
+                                   0,
+                                   (game.get_level().get_tile_width() * 16) - CAMERA_SIZE.x()),
+                       math::clamp(game.get_player().position.y() + (game.get_player().size.y() / 2) - (CAMERA_SIZE.y() / 2),
+                                   0,
+                                   (game.get_level().get_tile_height() * 16) - CAMERA_SIZE.y()),
+                       CAMERA_SIZE.x(),
+                       CAMERA_SIZE.y());
 
   // Game loop
   {
