@@ -113,13 +113,13 @@ Level LevelLoader::load_level(const std::string& filename)
   {
     if (aabb_json.count("X") == 0 || !aabb_json["X"].is_number())
     {
-      LOG_CRITICAL("AABB is missing \"X\" attribute or wrong type!");
+      LOG_CRITICAL("Platform is missing \"X\" attribute or wrong type!");
       return Level();
     }
 
     if (aabb_json.count("Y") == 0 || !aabb_json["Y"].is_number())
     {
-      LOG_CRITICAL("AABB is missing \"Y\" attribute or wrong type!");
+      LOG_CRITICAL("Platform is missing \"Y\" attribute or wrong type!");
       return Level();
     }
 
@@ -133,10 +133,11 @@ Level LevelLoader::load_level(const std::string& filename)
   LOG_INFO("Loaded level from '%s'", filename.c_str());
 
   // Debug
-  LOG_DEBUG("Level information: width=%d height=%d no_aabbs=%d",
+  LOG_DEBUG("Level information: width=%d height=%d no_aabbs=%d no_platforms=%d",
             width,
             height,
-            static_cast<int>(aabbs.size()));
+            static_cast<int>(aabbs.size()),
+            static_cast<int>(platforms.size()));
 
   return Level(width,
                height,

@@ -82,8 +82,6 @@ void read_input(Input* input)
   input->x.repeated     = input->x.pressed;
   input->num_1.repeated = input->num_1.pressed;
   input->num_2.repeated = input->num_2.pressed;
-  input->num_3.repeated = input->num_3.pressed;
-  input->num_4.repeated = input->num_4.pressed;
 
   // Read events
   SDL_Event event;
@@ -132,6 +130,11 @@ void read_input(Input* input)
         case SDLK_1:
           input->num_1.pressed = event.type == SDL_KEYDOWN;
           if (!input->num_1.pressed) input->num_1.repeated = false;
+          break;
+
+        case SDLK_2:
+          input->num_2.pressed = event.type == SDL_KEYDOWN;
+          if (!input->num_2.pressed) input->num_2.repeated = false;
           break;
 
         case SDLK_ESCAPE:
@@ -356,9 +359,22 @@ void render_debug()
     }
   }
 
-  // Render a red rectangle around the player
+  // Render a blue rectangle around every Platform
+  for (const auto& platform : game.get_level().get_platforms())
+  {
+    const auto platform_rectangle = geometry::Rectangle(platform, geometry::Size(16, 1));
+    if (geometry::isColliding(game_camera, platform_rectangle))
+    {
+      // Adjust the aabb position based on camera and render it
+      draw::rectangle(geometry::Rectangle(platform_rectangle.position - game_camera.position, platform_rectangle.size),
+                      { 0u, 0u, 255u, 0u },
+                      game_surface.get());
+    }
+  }
+
+  // Render a yellow rectangle around the player
   draw::rectangle(geometry::Rectangle(game.get_player().position - game_camera.position, game.get_player().size),
-                  { 255u, 0u, 0u, 0u },
+                  { 255u, 255u, 0u, 0u },
                   game_surface.get());
 }
 

@@ -18,8 +18,6 @@ struct Input
 
   Button num_1 = Button();
   Button num_2 = Button();
-  Button num_3 = Button();
-  Button num_4 = Button();
 
   bool quit    = false;
 };

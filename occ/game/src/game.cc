@@ -6,6 +6,7 @@
 #include "item_loader.h"
 #include "level_loader.h"
 #include "misc.h"
+#include "logger.h"
 
 static constexpr auto gravity = 8u;
 static constexpr auto jump_velocity = misc::make_array<int>(0, -8, -8, -8, -4, -4, -2, -2, -2, -2, 2, 2, 2, 2, 4, 4);
@@ -159,11 +160,36 @@ void Game::update_player(const PlayerInput& player_input)
   const auto step_y = destination.y() > player_.position.y() ? 1 : -1;
   while (player_.position.y() != destination.y())
   {
-    const geometry::Rectangle player_rect { player_.position + geometry::Position(0, step_y), player_.size.x(), player_.size.y() };
+    const geometry::Rectangle player_rect { player_.position + geometry::Position(0, step_y), player_.size };
     if (collides(player_rect))
     {
       player_.collide_y = true;
       break;
+    }
+
+    // If player is falling down we need to check for collision with platforms
+    if (step_y == 1)
+    {
+      const auto platform_collide = [this, &player_rect]()
+      {
+        for (const auto& platform : level_.get_platforms())
+        {
+          // Collision with platform only occurs if player is falling down (which we check above)
+          // and only for one single pixel on y axis, when the player is exactly on top of the platform
+          if ((player_rect.position.y() + player_rect.size.y() - 1 == platform.y()) &&
+              (player_rect.position.x() < platform.x() + 16) &&
+              (player_rect.position.x() + player_rect.size.x() > platform.x()))
+          {
+            return true;
+          }
+        }
+        return false;
+      }();
+      if (platform_collide)
+      {
+        player_.collide_y = true;
+        break;
+      }
     }
     player_.position += geometry::Position(0, step_y);
   }
