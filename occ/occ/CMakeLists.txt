@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.5)
 
 project(occ)
 
@@ -16,3 +16,5 @@ target_link_libraries(occ
   "SDL2"
   "SDL2_ttf"
 )
+
+set_property(TARGET gfx PROPERTY CXX_STANDARD 14)
