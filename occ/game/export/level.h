@@ -7,6 +7,13 @@
 #include "item.h"
 #include "geometry.h"
 
+struct Object
+{
+  geometry::Position position;
+  geometry::Size size;
+  int sprite_id;
+};
+
 class Level
 {
  public:
@@ -28,6 +35,10 @@ class Level
 
   int get_tile_width() const { return width_; }
   int get_tile_height() const { return height_; }
+
+  // Dynamic things in the level
+  void update();
+  const std::vector<Object>& get_objects() const { return objects_; }
 
  private:
   Item::Id get_tile(int tile_x, int tile_y, const std::vector<Item::Id>& items) const;
@@ -51,6 +62,22 @@ class Level
   // Bounding boxes for collision
   std::vector<geometry::Rectangle> aabbs_;
   std::vector<geometry::Position> platforms_;
+
+  // Dynamic objects
+  std::vector<Object> objects_;
+
+  // TODO: These belong to mainlevel.json only. Move to mainlevel.lua in the future.
+  struct
+  {
+    bool right = true;  // true -> going right, false -> going left
+    geometry::Position position = geometry::Position(0, 0);
+  } earth_;
+
+  struct
+  {
+    bool right = true;  // true -> going right, false -> going left
+    geometry::Position position = geometry::Position(0, 0);
+  } moon_;
 };
 
 #endif  // LEVEL_H_

@@ -345,6 +345,25 @@ void render_foreground(bool in_front)
   }
 }
 
+void render_level_objects()
+{
+  for (const auto& object : game.get_level().get_objects())
+  {
+    if (geometry::isColliding(geometry::Rectangle(object.position, object.size), game_camera))
+    {
+      auto src_rect = sprite_manager.get_rect_for_tile(object.sprite_id);
+      SDL_Rect dest_rect
+      {
+        object.position.x() - game_camera.position.x(),
+        object.position.y() - game_camera.position.y(),
+        object.size.x(),
+        object.size.y()
+      };
+      SDL_BlitSurface(sprite_manager.get_surface(), &src_rect, game_surface.get(), &dest_rect);
+    }
+  }
+}
+
 void render_debug()
 {
   // Render a red rectangle around every AABB
@@ -420,6 +439,7 @@ void render_game()
   render_foreground(false);
   render_player();
   render_foreground(true);
+  render_level_objects();
   if (debug_aabb)
   {
     render_debug();

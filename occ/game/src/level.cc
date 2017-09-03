@@ -1,6 +1,7 @@
 #include <utility>
 
 #include "level.h"
+#include "math.h"
 
 Level::Level()
   : valid_(false),
@@ -9,7 +10,8 @@ Level::Level()
     tiles_background_(),
     tiles_foreground_(),
     aabbs_(),
-    platforms_()
+    platforms_(),
+    objects_()
 {
 }
 
@@ -25,7 +27,8 @@ Level::Level(int width,
     tiles_background_(std::move(tiles_background)),
     tiles_foreground_(std::move(tiles_foreground)),
     aabbs_(std::move(aabbs)),
-    platforms_(std::move(platforms))
+    platforms_(std::move(platforms)),
+    objects_()
 {
 }
 
@@ -48,5 +51,60 @@ Item::Id Level::get_tile(int tile_x, int tile_y, const std::vector<Item::Id>& it
   else
   {
     return Item::invalid;
+  }
+}
+
+void Level::update()
+{
+  // Clear all objects
+  objects_.clear();
+
+  // Update earth
+  if (earth_.right)
+  {
+    earth_.position += geometry::Position(1, 0);
+    if (earth_.position.x() + 16 == width_ * 16)
+    {
+      earth_.right = false;
+    }
+  }
+  else
+  {
+    earth_.position -= geometry::Position(1, 0);
+    if (earth_.position.x() == 0)
+    {
+      earth_.right = true;
+    }
+  }
+
+  objects_.push_back({earth_.position, geometry::Size(16, 16), 632});
+
+  // Update moon
+  if (moon_.right)
+  {
+    moon_.position += geometry::Position(2, 0);
+    if (moon_.position.x() >= earth_.position.x() + 16)
+    {
+      moon_.right = false;
+    }
+  }
+  else
+  {
+    moon_.position -= geometry::Position(1, 0);
+    if (moon_.position.x() <= earth_.position.x() - 16)
+    {
+      moon_.right = true;
+    }
+  }
+
+  const auto moon_earth_distance = math::abs(moon_.position.x() - earth_.position.x());
+
+  if (moon_earth_distance > 8)
+  {
+    objects_.push_back({moon_.position, geometry::Size(16, 16), 634});
+  }
+  else if (moon_.right)
+  {
+    objects_.push_back({moon_.position, geometry::Size(16, 16), 633});
   }
 }

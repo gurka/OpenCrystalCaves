@@ -35,6 +35,9 @@ bool Game::init()
 
 void Game::update(const PlayerInput& player_input)
 {
+  // Update dynamic objects in the level
+  level_.update();
+
   // Currently the only thing that is alive within the game is the player :-(
   update_player(player_input);
 
