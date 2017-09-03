@@ -337,7 +337,7 @@ void render_foreground(bool in_front)
         {
           if (item.is_animated())
           {
-            return item.get_sprite() + static_cast<int>((game_tick / 128u) % item.get_sprite_count());
+            return item.get_sprite() + static_cast<int>((game_tick / 2) % item.get_sprite_count());
           }
           else
           {
@@ -522,17 +522,18 @@ int main()
   {
     Input input;
 
-    game_tick = SDL_GetTicks();
+    auto sdl_tick = SDL_GetTicks();
+    game_tick = 0u;
 
     // Game loop logic
     const auto ms_per_update = 57;  // 17.5~ ticks per second
-    auto tick_last_update = game_tick;
+    auto tick_last_update = sdl_tick;
     auto lag = 0u;
 
     // FPS logic
     auto fps_num_renders = 0u;
-    auto fps_last_calc = game_tick;
-    auto fps_start_time = game_tick;
+    auto fps_last_calc = sdl_tick;
+    auto fps_start_time = sdl_tick;
     auto fps = 0u;
 
     while (true)
@@ -542,9 +543,9 @@ int main()
       ///  Logic
       ///
       /////////////////////////////////////////////////////////////////////////
-      game_tick = SDL_GetTicks();
-      auto elapsed_ticks = game_tick - tick_last_update;
-      tick_last_update = game_tick;
+      sdl_tick = SDL_GetTicks();
+      auto elapsed_ticks = sdl_tick - tick_last_update;
+      tick_last_update = sdl_tick;
       lag += elapsed_ticks;
       while (lag >= ms_per_update)
       {
@@ -572,7 +573,8 @@ int main()
         if (!paused || (paused && input.space.pressed && !input.space.repeated))
         {
           // Call game loop
-          game.update(input_to_player_input(input));
+          game.update(game_tick, input_to_player_input(input));
+          game_tick += 1;
         }
 
         lag -= ms_per_update;
@@ -633,15 +635,15 @@ int main()
 
       // Calculate FPS each second
       fps_num_renders++;
-      if (game_tick >= (fps_last_calc + 1000))
+      if (sdl_tick >= (fps_last_calc + 1000))
       {
-        const auto total_time = game_tick - fps_start_time;
+        const auto total_time = sdl_tick - fps_start_time;
         fps = fps_num_renders / (total_time / 1000);
-        fps_last_calc = game_tick;
+        fps_last_calc = sdl_tick;
 
         // Reset
         fps_num_renders = 0;
-        fps_start_time = game_tick;
+        fps_start_time = sdl_tick;
       }
     }
   }

@@ -19,7 +19,7 @@ class Game
   }
 
   bool init();
-  void update(const PlayerInput& player_input);
+  void update(unsigned game_tick, const PlayerInput& player_input);
 
   const Player& get_player() const { return player_; }
   const std::vector<Item>& get_items() const { return items_; }

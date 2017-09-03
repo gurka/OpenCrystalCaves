@@ -44,16 +44,11 @@ class Level
   int get_tile_height() const { return height_; }
 
   // Dynamic things in the level
-  void update();
+  void update(unsigned game_tick);
   const std::vector<Object>& get_objects() const { return objects_; }
 
  private:
   Item::Id get_tile(int tile_x, int tile_y, const std::vector<Item::Id>& items) const;
-
-  int pos2index(int x, int y) const
-  {
-    return (y * width_) + x;
-  }
 
   // false if Level is default constructed
   bool valid_;
@@ -62,7 +57,7 @@ class Level
   int width_;
   int height_;
 
-  // Tiles in order (see pos2index)
+  // Tiles in order
   std::vector<Item::Id> tiles_background_;
   std::vector<Item::Id> tiles_foreground_;
 
@@ -85,6 +80,25 @@ class Level
     bool right = false;  // true -> going right, false -> going left
     int position_x = 160;  // subpixel: moon.position.x() = position_x / 2;
   } moon_;
+
+  struct
+  {
+    // 4 different sprites (times 2 for left/right)
+    // Changes sprite 27 times (4 + 4 + 4 + 4 + 4 + 4 + 3)
+    // Each sprite visible for 3 ticks
+    // Visible for 27 * 3 = 81 ticks
+    // Visible for 4630ms = 81 ticks
+    // Idle for 12567ms = 220 ticks
+
+    // Sprite ids:
+    // Left  Right
+    //  752   748
+    //  753   749
+    //  754   750
+    //  755   751
+    bool active = false;
+    unsigned tick_start = 0u;  // tick when active changed
+  } volcano_;
 };
 
 #endif  // LEVEL_H_

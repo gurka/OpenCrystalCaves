@@ -2,6 +2,7 @@
 
 #include "level.h"
 #include "math.h"
+#include "logger.h"
 
 Level::Level()
   : valid_(false),
@@ -13,7 +14,8 @@ Level::Level()
     platforms_(),
     objects_(),
     earth_(),
-    moon_()
+    moon_(),
+    volcano_()
 {
 }
 
@@ -32,7 +34,8 @@ Level::Level(int width,
     platforms_(std::move(platforms)),
     objects_(),
     earth_(),
-    moon_()
+    moon_(),
+    volcano_()
 {
 }
 
@@ -50,7 +53,7 @@ Item::Id Level::get_tile(int tile_x, int tile_y, const std::vector<Item::Id>& it
 {
   if (tile_x >= 0 && tile_x < width_ && tile_y >= 0 && tile_y < height_)
   {
-    return items[pos2index(tile_x, tile_y)];
+    return items[(tile_y * width_) + tile_x];
   }
   else
   {
@@ -58,7 +61,7 @@ Item::Id Level::get_tile(int tile_x, int tile_y, const std::vector<Item::Id>& it
   }
 }
 
-void Level::update()
+void Level::update(unsigned game_tick)
 {
   // Clear all objects
   objects_.clear();
@@ -99,6 +102,18 @@ void Level::update()
     }
   }
 
+  // Update volcano
+  if (volcano_.active && game_tick - volcano_.tick_start >= 81u)
+  {
+    volcano_.active = false;
+    volcano_.tick_start = game_tick;
+  }
+  else if (!volcano_.active && game_tick - volcano_.tick_start >= 220u)
+  {
+    volcano_.active = true;
+    volcano_.tick_start = game_tick;
+  }
+
   // Add objects
   if (moon_.right)
   {
@@ -111,5 +126,15 @@ void Level::update()
     // Moon is in front of earth, render earth first
     objects_.emplace_back(geometry::Position(earth_.position_x / 2, 0), geometry::Size(16, 16), 632);
     objects_.emplace_back(geometry::Position(moon_.position_x / 2, 0), geometry::Size(16, 16), 633);
+  }
+  if (volcano_.active)
+  {
+    const auto volcano_sprite_index = ((game_tick - volcano_.tick_start) / 3) % 4;
+    objects_.emplace_back(geometry::Position(29 * 16, 2 * 16),
+                          geometry::Size(16, 16),
+                          752 + volcano_sprite_index);
+    objects_.emplace_back(geometry::Position(30 * 16, 2 * 16),
+                          geometry::Size(16, 16),
+                          748 + volcano_sprite_index);
   }
 }
