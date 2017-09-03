@@ -26,8 +26,8 @@ static constexpr geometry::Size CAMERA_SIZE_STRETCHED = geometry::Size(CAMERA_SI
 // The size of the game camera after scaling - this should be based on the (dynamic) window size in the future
 static constexpr geometry::Size CAMERA_SIZE_SCALED = CAMERA_SIZE_STRETCHED * 3.0f;
 
-// The size of the game window (camera size scaled + 300 pixels on both axis)
-static constexpr geometry::Size WINDOW_SIZE = CAMERA_SIZE_SCALED + geometry::Size(300, 300);
+// The size of the game window
+static constexpr geometry::Size WINDOW_SIZE = CAMERA_SIZE_SCALED;
 
 // Game variables
 static Game game;
@@ -609,7 +609,11 @@ int main()
       // Debug
       if (debug)
       {
-        // Debug info
+        // Put a black box where we're going to the draw the debug text
+        SDL_Rect box = { 0, 24, 225, 165 };
+        SDL_FillRect(window_surface, &box, SDL_MapRGB(window_surface->format, 0u, 0u, 0u));
+
+        // Debug text
         const auto camera_position_str = "camera position: (" + std::to_string(game_camera.position.x()) + ", " + std::to_string(game_camera.position.y()) + ")";
         const auto player_position_str = "player position: (" + std::to_string(game.get_player().position.x()) + ", " + std::to_string(game.get_player().position.y()) + ")";
         const auto player_velocity_str = "player velocity: (" + std::to_string(game.get_player().velocity.x()) + ", " + std::to_string(game.get_player().velocity.y()) + ")";
