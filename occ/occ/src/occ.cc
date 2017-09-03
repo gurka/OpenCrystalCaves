@@ -381,7 +381,7 @@ void render_debug()
 void render_game()
 {
   // Update game camera
-  // The magic numbers (-4 and 20) is from the original Crystal Caves (currently only verified for x axis)
+  // Note: this isn't exactly how the Crystal Caves camera work, but it's good enough
   const geometry::Position player_camera_relative_position {(game.get_player().position + (game.get_player().size / 2)) - (game_camera.position + (game_camera.size / 2))};
   if (player_camera_relative_position.x() < -4)
   {
@@ -398,17 +398,17 @@ void render_game()
                                               game_camera.position.y());
   }
 
-  if (player_camera_relative_position.y() < -4)
+  if (player_camera_relative_position.y() < -10)
   {
     game_camera.position = geometry::Position(game_camera.position.x(),
-                                              math::clamp(game_camera.position.y() + player_camera_relative_position.y() + 4,
+                                              math::clamp(game_camera.position.y() + player_camera_relative_position.y() + 10,
                                                           0,
                                                           (game.get_level().get_tile_height() * 16) - CAMERA_SIZE.y()));
   }
-  else if (player_camera_relative_position.y() > 20)
+  else if (player_camera_relative_position.y() > 32)
   {
     game_camera.position = geometry::Position(game_camera.position.x(),
-                                              math::clamp(game_camera.position.y() + player_camera_relative_position.y() - 20,
+                                              math::clamp(game_camera.position.y() + player_camera_relative_position.y() - 32,
                                                           0,
                                                           (game.get_level().get_tile_height() * 16) - CAMERA_SIZE.y()));
   }
