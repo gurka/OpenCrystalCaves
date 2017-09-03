@@ -9,6 +9,13 @@
 
 struct Object
 {
+  Object(geometry::Position position, geometry::Size size, int sprite_id)
+    : position(position),
+      size(size),
+      sprite_id(sprite_id)
+  {
+  }
+
   geometry::Position position;
   geometry::Size size;
   int sprite_id;
@@ -66,17 +73,17 @@ class Level
   // Dynamic objects
   std::vector<Object> objects_;
 
-  // TODO: These belong to mainlevel.json only. Move to mainlevel.lua in the future.
+  // TODO: These belong to mainlevel.json only. Decide how to fix.
   struct
   {
-    bool right = true;  // true -> going right, false -> going left
-    geometry::Position position = geometry::Position(0, 0);
+    bool right = false;  // true -> going right, false -> going left
+    int position_x = 128;  // subpixel: earth.position.x() = position_x / 2;
   } earth_;
 
   struct
   {
-    bool right = true;  // true -> going right, false -> going left
-    geometry::Position position = geometry::Position(0, 0);
+    bool right = false;  // true -> going right, false -> going left
+    int position_x = 160;  // subpixel: moon.position.x() = position_x / 2;
   } moon_;
 };
 

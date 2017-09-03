@@ -11,7 +11,9 @@ Level::Level()
     tiles_foreground_(),
     aabbs_(),
     platforms_(),
-    objects_()
+    objects_(),
+    earth_(),
+    moon_()
 {
 }
 
@@ -28,7 +30,9 @@ Level::Level(int width,
     tiles_foreground_(std::move(tiles_foreground)),
     aabbs_(std::move(aabbs)),
     platforms_(std::move(platforms)),
-    objects_()
+    objects_(),
+    earth_(),
+    moon_()
 {
 }
 
@@ -62,49 +66,50 @@ void Level::update()
   // Update earth
   if (earth_.right)
   {
-    earth_.position += geometry::Position(1, 0);
-    if (earth_.position.x() + 16 == width_ * 16)
+    earth_.position_x += 1;
+    if ((earth_.position_x / 2) + 16 == width_ * 16)
     {
       earth_.right = false;
     }
   }
   else
   {
-    earth_.position -= geometry::Position(1, 0);
-    if (earth_.position.x() == 0)
+    earth_.position_x -= 1;
+    if (earth_.position_x == 32)
     {
       earth_.right = true;
     }
   }
 
-  objects_.push_back({earth_.position, geometry::Size(16, 16), 632});
-
   // Update moon
   if (moon_.right)
   {
-    moon_.position += geometry::Position(2, 0);
-    if (moon_.position.x() >= earth_.position.x() + 16)
+    moon_.position_x += earth_.right ? 2 : 1;
+    if (moon_.position_x > earth_.position_x + 72 || (moon_.position_x / 2) + 16 == width_ * 16)
     {
       moon_.right = false;
     }
   }
   else
   {
-    moon_.position -= geometry::Position(1, 0);
-    if (moon_.position.x() <= earth_.position.x() - 16)
+    moon_.position_x -= !earth_.right ? 2 : 1;
+    if (moon_.position_x < earth_.position_x - 64 || moon_.position_x == 32)
     {
       moon_.right = true;
     }
   }
 
-  const auto moon_earth_distance = math::abs(moon_.position.x() - earth_.position.x());
-
-  if (moon_earth_distance > 8)
+  // Add objects
+  if (moon_.right)
   {
-    objects_.push_back({moon_.position, geometry::Size(16, 16), 634});
+    // Moon is behind earth, render moon first
+    objects_.emplace_back(geometry::Position(moon_.position_x / 2, 0), geometry::Size(16, 16), 634);
+    objects_.emplace_back(geometry::Position(earth_.position_x / 2, 0), geometry::Size(16, 16), 632);
   }
-  else if (moon_.right)
+  else
   {
-    objects_.push_back({moon_.position, geometry::Size(16, 16), 633});
+    // Moon is in front of earth, render earth first
+    objects_.emplace_back(geometry::Position(earth_.position_x / 2, 0), geometry::Size(16, 16), 632);
+    objects_.emplace_back(geometry::Position(moon_.position_x / 2, 0), geometry::Size(16, 16), 633);
   }
 }

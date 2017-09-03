@@ -26,7 +26,7 @@ bool Game::init()
     return false;
   }
 
-  player_.position = geometry::Position(16, 16);
+  player_.position = geometry::Position(32, 48);
   player_.velocity = Vector<int>(0, 0);
   player_.direction = Player::Direction::right;
 
