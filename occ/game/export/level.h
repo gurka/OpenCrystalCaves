@@ -50,7 +50,7 @@ class Level
   // Dynamic things in the level
   void update(unsigned game_tick);
   const std::vector<Object>& get_objects() const { return objects_; }
-  const std::vector<geometry::Rectangle>& get_moving_platforms() const { return moving_platforms_; }
+  const std::vector<geometry::Position>& get_moving_platforms() const { return moving_platforms_; }
 
  private:
   Item::Id get_tile(int tile_x, int tile_y, const std::vector<Item::Id>& items) const;
@@ -75,7 +75,7 @@ class Level
 
   // Dynamic objects
   std::vector<Object> objects_;  // Used for rendering
-  std::vector<geometry::Rectangle> moving_platforms_;  // Used for collision
+  std::vector<geometry::Position> moving_platforms_;  // Used for collision
 
   // TODO: These belong to mainlevel.json only. Decide how to fix.
   struct

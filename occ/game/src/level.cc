@@ -191,4 +191,8 @@ void Level::update(unsigned game_tick)
   objects_.emplace_back(geometry::Position(horizontal_platform_.position_x, 8 * 16),
                         geometry::Size(16, 16),
                         612 + platform_sprite_index);
+
+  // Add moving platforms collision
+  moving_platforms_.emplace_back(38 * 16, vertical_platform_.position_y);
+  moving_platforms_.emplace_back(horizontal_platform_.position_x, 8 * 16);
 }

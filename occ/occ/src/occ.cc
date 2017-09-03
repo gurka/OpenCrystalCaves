@@ -391,8 +391,8 @@ void render_debug()
     }
   }
 
-  // Render a blue rectangle around every Platform
-  for (const auto& platform : game.get_level().get_platforms())
+  // Render a blue rectangle around every platform (static and moving)
+  auto render_platform = [](const geometry::Position& platform)
   {
     const auto platform_rectangle = geometry::Rectangle(platform, geometry::Size(16, 1));
     if (geometry::isColliding(game_camera, platform_rectangle))
@@ -402,6 +402,14 @@ void render_debug()
                       { 0u, 0u, 255u, 0u },
                       game_surface.get());
     }
+  };
+  for (const auto& platform : game.get_level().get_platforms())
+  {
+    render_platform(platform);
+  }
+  for (const auto& platform : game.get_level().get_moving_platforms())
+  {
+    render_platform(platform);
   }
 
   // Render a yellow rectangle around the player

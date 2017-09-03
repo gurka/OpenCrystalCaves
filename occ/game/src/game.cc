@@ -184,6 +184,17 @@ void Game::update_player(const PlayerInput& player_input)
             return true;
           }
         }
+        for (const auto& platform : level_.get_moving_platforms())
+        {
+          // Collision with platform only occurs if player is falling down (which we check above)
+          // and only for one single pixel on y axis, when the player is exactly on top of the platform
+          if ((player_rect.position.y() + player_rect.size.y() - 1 == platform.y()) &&
+              (player_rect.position.x() < platform.x() + 16) &&
+              (player_rect.position.x() + player_rect.size.x() > platform.x()))
+          {
+            return true;
+          }
+        }
         return false;
       }();
       if (platform_collide)
