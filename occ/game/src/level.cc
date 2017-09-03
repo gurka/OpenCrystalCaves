@@ -79,41 +79,36 @@ void Level::update(unsigned game_tick)
   moving_platforms_.clear();
 
   // Update vertical platform
-  if (vertical_platform_.down)
+  const auto player_on_vertical_platform = (player_.position.y() + player_.size.y() == vertical_platform_.position_y) &&
+                                           (player_.position.x() < (38 * 16) + 16) &&
+                                           (player_.position.x() + player_.size.x() > 38 * 16);
+
+  if (player_on_vertical_platform)
   {
-    vertical_platform_.position_y += 2;
-    if (vertical_platform_.position_y == 22 * 16)
-    {
-      vertical_platform_.down = false;
-    }
+    player_.position += vertical_platform_.down ? geometry::Position(0, 2) : geometry::Position(0, -2);
   }
-  else
+
+  vertical_platform_.position_y += vertical_platform_.down ? 2 : -2;
+  if (vertical_platform_.position_y == (vertical_platform_.down ? (22 * 16) : ((7 * 16) + 4)))
   {
-    vertical_platform_.position_y -= 2;
-    if (vertical_platform_.position_y == (7 * 16) + 4)
-    {
-      vertical_platform_.down = true;
-    }
+    vertical_platform_.down = !vertical_platform_.down;
   }
 
   // Update horizontal platform
   // FIXME: Speed isn't exactly correct. Crystal Caves is a bit slower
   // 1.5 per tick? e.g. +3 px every other tick?
-  if (horizontal_platform_.right)
+  const auto player_on_horizontal_platform = (player_.position.y() + player_.size.y() == 8 * 16) &&
+                                             (player_.position.x() < horizontal_platform_.position_x + 16) &&
+                                             (player_.position.x() + player_.size.x() > horizontal_platform_.position_x);
+  if (player_on_horizontal_platform)
   {
-    horizontal_platform_.position_x += 2;
-    if (horizontal_platform_.position_x == 11 * 16)
-    {
-      horizontal_platform_.right = false;
-    }
+    player_.position += horizontal_platform_.right ? geometry::Position(2, 0) : geometry::Position(-2, 0);
   }
-  else
+
+  horizontal_platform_.position_x += horizontal_platform_.right ? 2 : -2;
+  if (horizontal_platform_.position_x == (horizontal_platform_.right ? (11 * 16) : (7 * 16)))
   {
-    horizontal_platform_.position_x -= 2;
-    if (horizontal_platform_.position_x == 7 * 16)
-    {
-      horizontal_platform_.right = true;
-    }
+    horizontal_platform_.right = !horizontal_platform_.right;
   }
 
   // Update earth
