@@ -8,6 +8,7 @@ Level::Level()
   : valid_(false),
     width_(0),
     height_(0),
+    player_(),
     tiles_background_(),
     tiles_foreground_(),
     aabbs_(),
@@ -31,6 +32,7 @@ Level::Level(int width,
   : valid_(true),
     width_(width),
     height_(height),
+    player_(),
     tiles_background_(std::move(tiles_background)),
     tiles_foreground_(std::move(tiles_foreground)),
     aabbs_(std::move(aabbs)),
@@ -43,6 +45,9 @@ Level::Level(int width,
     moon_(),
     volcano_()
 {
+  player_.position = geometry::Position(32, 48);
+  player_.velocity = Vector<int>(0, 0);
+  player_.direction = Player::Direction::right;
 }
 
 Item::Id Level::get_tile_background(int tile_x, int tile_y) const

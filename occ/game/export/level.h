@@ -6,6 +6,7 @@
 
 #include "item.h"
 #include "geometry.h"
+#include "player.h"
 
 struct Object
 {
@@ -37,6 +38,9 @@ class Level
   int get_tile_width() const { return width_; }
   int get_tile_height() const { return height_; }
 
+  Player& get_player() { return player_; }
+  const Player& get_player() const { return player_; }
+
   Item::Id get_tile_background(int tile_x, int tile_y) const;
   Item::Id get_tile_foreground(int tile_x, int tile_y) const;
 
@@ -57,6 +61,9 @@ class Level
   // Size of level in number of tiles
   int width_;
   int height_;
+
+  // The player
+  Player player_;
 
   // Static tiles, in order
   std::vector<Item::Id> tiles_background_;
