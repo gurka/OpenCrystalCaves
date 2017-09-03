@@ -19,6 +19,9 @@ struct Input
   Button num_1 = Button();
   Button num_2 = Button();
 
+  Button enter = Button();
+  Button space = Button();
+
   bool quit    = false;
 };
 

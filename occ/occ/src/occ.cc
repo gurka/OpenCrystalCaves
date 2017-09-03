@@ -32,6 +32,7 @@ static constexpr geometry::Size WINDOW_SIZE = CAMERA_SIZE_SCALED + geometry::Siz
 // Game variables
 static Game game;
 static SpriteManager sprite_manager;
+static bool paused(false);
 
 // Used by the render_x functions and should be up to date before each call to render_x()
 static std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> game_surface(nullptr, &SDL_FreeSurface);
@@ -82,6 +83,8 @@ void read_input(Input* input)
   input->x.repeated     = input->x.pressed;
   input->num_1.repeated = input->num_1.pressed;
   input->num_2.repeated = input->num_2.pressed;
+  input->enter.repeated = input->enter.pressed;
+  input->space.repeated = input->space.pressed;
 
   // Read events
   SDL_Event event;
@@ -135,6 +138,16 @@ void read_input(Input* input)
         case SDLK_2:
           input->num_2.pressed = event.type == SDL_KEYDOWN;
           if (!input->num_2.pressed) input->num_2.repeated = false;
+          break;
+
+        case SDLK_RETURN:
+          input->enter.pressed = event.type == SDL_KEYDOWN;
+          if (!input->enter.pressed) input->enter.repeated = false;
+          break;
+
+        case SDLK_SPACE:
+          input->space.pressed = event.type == SDL_KEYDOWN;
+          if (!input->space.pressed) input->space.repeated = false;
           break;
 
         case SDLK_ESCAPE:
@@ -551,9 +564,16 @@ int main()
         {
           debug_aabb = !debug_aabb;
         }
+        if (input.enter.pressed && !input.enter.repeated)
+        {
+          paused = !paused;
+        }
 
-        // Call game loop
-        game.update(input_to_player_input(input));
+        if (!paused || (paused && input.space.pressed && !input.space.repeated))
+        {
+          // Call game loop
+          game.update(input_to_player_input(input));
+        }
 
         lag -= ms_per_update;
       }
