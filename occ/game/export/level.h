@@ -34,18 +34,19 @@ class Level
 
   bool valid() const { return valid_; }
 
+  int get_tile_width() const { return width_; }
+  int get_tile_height() const { return height_; }
+
   Item::Id get_tile_background(int tile_x, int tile_y) const;
   Item::Id get_tile_foreground(int tile_x, int tile_y) const;
 
   const std::vector<geometry::Rectangle>& get_aabbs() const { return aabbs_; }
   const std::vector<geometry::Position>& get_platforms() const { return platforms_; }
 
-  int get_tile_width() const { return width_; }
-  int get_tile_height() const { return height_; }
-
   // Dynamic things in the level
   void update(unsigned game_tick);
   const std::vector<Object>& get_objects() const { return objects_; }
+  const std::vector<geometry::Rectangle>& get_moving_platforms() const { return moving_platforms_; }
 
  private:
   Item::Id get_tile(int tile_x, int tile_y, const std::vector<Item::Id>& items) const;
@@ -57,18 +58,31 @@ class Level
   int width_;
   int height_;
 
-  // Tiles in order
+  // Static tiles, in order
   std::vector<Item::Id> tiles_background_;
   std::vector<Item::Id> tiles_foreground_;
 
   // Bounding boxes for collision
   std::vector<geometry::Rectangle> aabbs_;
-  std::vector<geometry::Position> platforms_;
+  std::vector<geometry::Position> platforms_;  // FIXME: Rectangle?
 
   // Dynamic objects
-  std::vector<Object> objects_;
+  std::vector<Object> objects_;  // Used for rendering
+  std::vector<geometry::Rectangle> moving_platforms_;  // Used for collision
 
   // TODO: These belong to mainlevel.json only. Decide how to fix.
+  struct
+  {
+    bool down = true;
+    int position_y = 7 * 16;  // normal pixel
+  } vertical_platform_;
+
+  struct
+  {
+    bool right = true;
+    int position_x = 7 * 16;  // normal pixel
+  } horizontal_platform_;
+
   struct
   {
     bool right = false;  // true -> going right, false -> going left

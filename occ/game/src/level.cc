@@ -13,6 +13,9 @@ Level::Level()
     aabbs_(),
     platforms_(),
     objects_(),
+    moving_platforms_(),
+    vertical_platform_(),
+    horizontal_platform_(),
     earth_(),
     moon_(),
     volcano_()
@@ -33,6 +36,9 @@ Level::Level(int width,
     aabbs_(std::move(aabbs)),
     platforms_(std::move(platforms)),
     objects_(),
+    moving_platforms_(),
+    vertical_platform_(),
+    horizontal_platform_(),
     earth_(),
     moon_(),
     volcano_()
@@ -63,8 +69,47 @@ Item::Id Level::get_tile(int tile_x, int tile_y, const std::vector<Item::Id>& it
 
 void Level::update(unsigned game_tick)
 {
-  // Clear all objects
+  // Clear all objects and moving platforms
   objects_.clear();
+  moving_platforms_.clear();
+
+  // Update vertical platform
+  if (vertical_platform_.down)
+  {
+    vertical_platform_.position_y += 2;
+    if (vertical_platform_.position_y == 22 * 16)
+    {
+      vertical_platform_.down = false;
+    }
+  }
+  else
+  {
+    vertical_platform_.position_y -= 2;
+    if (vertical_platform_.position_y == (7 * 16) + 4)
+    {
+      vertical_platform_.down = true;
+    }
+  }
+
+  // Update horizontal platform
+  // FIXME: Speed isn't exactly correct. Crystal Caves is a bit slower
+  // 1.5 per tick? e.g. +3 px every other tick?
+  if (horizontal_platform_.right)
+  {
+    horizontal_platform_.position_x += 2;
+    if (horizontal_platform_.position_x == 11 * 16)
+    {
+      horizontal_platform_.right = false;
+    }
+  }
+  else
+  {
+    horizontal_platform_.position_x -= 2;
+    if (horizontal_platform_.position_x == 7 * 16)
+    {
+      horizontal_platform_.right = true;
+    }
+  }
 
   // Update earth
   if (earth_.right)
@@ -127,6 +172,7 @@ void Level::update(unsigned game_tick)
     objects_.emplace_back(geometry::Position(earth_.position_x / 2, 0), geometry::Size(16, 16), 632);
     objects_.emplace_back(geometry::Position(moon_.position_x / 2, 0), geometry::Size(16, 16), 633);
   }
+
   if (volcano_.active)
   {
     const auto volcano_sprite_index = ((game_tick - volcano_.tick_start) / 3) % 4;
@@ -137,4 +183,12 @@ void Level::update(unsigned game_tick)
                           geometry::Size(16, 16),
                           748 + volcano_sprite_index);
   }
+
+  const auto platform_sprite_index = game_tick % 4;
+  objects_.emplace_back(geometry::Position(38 * 16, vertical_platform_.position_y),
+                        geometry::Size(16, 16),
+                        616 + platform_sprite_index);
+  objects_.emplace_back(geometry::Position(horizontal_platform_.position_x, 8 * 16),
+                        geometry::Size(16, 16),
+                        612 + platform_sprite_index);
 }
