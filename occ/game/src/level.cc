@@ -85,7 +85,12 @@ void Level::update(unsigned game_tick)
 
   if (player_on_vertical_platform)
   {
-    player_.position += vertical_platform_.down ? geometry::Position(0, 2) : geometry::Position(0, -2);
+    // Only move player if not colliding with any static objects
+    const auto new_player_pos = player_.position + (vertical_platform_.down ? geometry::Position(0, 2) : geometry::Position(0, -2));
+    if (!collides(geometry::Rectangle(new_player_pos, player_.size)))
+    {
+      player_.position = new_player_pos;
+    }
   }
 
   vertical_platform_.position_y += vertical_platform_.down ? 2 : -2;
@@ -102,7 +107,12 @@ void Level::update(unsigned game_tick)
                                              (player_.position.x() + player_.size.x() > horizontal_platform_.position_x);
   if (player_on_horizontal_platform)
   {
-    player_.position += horizontal_platform_.right ? geometry::Position(2, 0) : geometry::Position(-2, 0);
+    // Only move player if not colliding with any static objects
+    const auto new_player_pos = player_.position + (horizontal_platform_.right ? geometry::Position(2, 0) : geometry::Position(-2, 0));
+    if (!collides(geometry::Rectangle(new_player_pos, player_.size)))
+    {
+      player_.position = new_player_pos;
+    }
   }
 
   horizontal_platform_.position_x += horizontal_platform_.right ? 2 : -2;
@@ -195,4 +205,16 @@ void Level::update(unsigned game_tick)
   // Add moving platforms collision
   moving_platforms_.emplace_back(38 * 16, vertical_platform_.position_y);
   moving_platforms_.emplace_back(horizontal_platform_.position_x, 8 * 16);
+}
+
+bool Level::collides(const geometry::Rectangle& rect)
+{
+  for (const auto& aabb : aabbs_)
+  {
+    if (geometry::isColliding(rect, aabb))
+    {
+      return true;
+    }
+  }
+  return false;
 }

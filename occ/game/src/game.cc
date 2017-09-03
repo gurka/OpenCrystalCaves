@@ -87,8 +87,8 @@ void Game::update_player(const PlayerInput& player_input)
   if (player_input.jump &&
       !player.jumping &&
       !player.falling &&
-      !collides(geometry::Rectangle(player.position + geometry::Position(0, -1),
-                                    player.size)))
+      !level_.collides(geometry::Rectangle(player.position + geometry::Position(0, -1),
+                                           player.size)))
   {
     // Player wants to jump
     player.jumping = true;
@@ -149,7 +149,7 @@ void Game::update_player(const PlayerInput& player_input)
   while (player.position.x() != destination.x())
   {
     const geometry::Rectangle player_rect { player.position + geometry::Position(step_x, 0), player.size.x(), player.size.y() };
-    if (collides(player_rect))
+    if (level_.collides(player_rect))
     {
       player.collide_x = true;
       break;
@@ -162,7 +162,7 @@ void Game::update_player(const PlayerInput& player_input)
   while (player.position.y() != destination.y())
   {
     const geometry::Rectangle player_rect { player.position + geometry::Position(0, step_y), player.size };
-    if (collides(player_rect))
+    if (level_.collides(player_rect))
     {
       player.collide_y = true;
       break;
@@ -240,8 +240,8 @@ void Game::update_player(const PlayerInput& player_input)
       player.jumping = false;
     }
     else if (player.jump_tick != 0 &&
-             collides(geometry::Rectangle(player.position + geometry::Position(0, 1),
-                                          player.size)))
+             level_.collides(geometry::Rectangle(player.position + geometry::Position(0, 1),
+                                                 player.size)))
     {
       // Player did not actually collide with the ground, but standing directly above it
       // and this isn't the first tick in the jump, so we can consider the jump to have
@@ -254,18 +254,7 @@ void Game::update_player(const PlayerInput& player_input)
   player.falling = !player.jumping &&
                    player.velocity.y() > 0 &&
                    !player.collide_y &&
-                   !collides(geometry::Rectangle(player.position + geometry::Position(0, 1),
-                                                 player.size));
+                   !level_.collides(geometry::Rectangle(player.position + geometry::Position(0, 1),
+                                                        player.size));
 }
 
-bool Game::collides(const geometry::Rectangle& player_rect)
-{
-  for (const auto& aabb : level_.get_aabbs())
-  {
-    if (geometry::isColliding(player_rect, aabb))
-    {
-      return true;
-    }
-  }
-  return false;
-}

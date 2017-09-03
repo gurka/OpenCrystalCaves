@@ -52,6 +52,9 @@ class Level
   const std::vector<Object>& get_objects() const { return objects_; }
   const std::vector<geometry::Position>& get_moving_platforms() const { return moving_platforms_; }
 
+  // Helpers
+  bool collides(const geometry::Rectangle& rect);
+
  private:
   Item::Id get_tile(int tile_x, int tile_y, const std::vector<Item::Id>& items) const;
 

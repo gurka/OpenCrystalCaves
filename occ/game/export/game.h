@@ -27,8 +27,6 @@ class Game
  private:
   void update_player(const PlayerInput& player_input);
 
-  bool collides(const geometry::Rectangle& player_rect);
-
   std::vector<Item> items_;
   Level level_;
 };
