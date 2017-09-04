@@ -21,4 +21,4 @@ add_library(game
   "src/player.cc"
 )
 
-set_property(TARGET gfx PROPERTY CXX_STANDARD 14)
+set_property(TARGET game PROPERTY CXX_STANDARD 14)

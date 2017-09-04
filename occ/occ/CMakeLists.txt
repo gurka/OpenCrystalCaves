@@ -16,4 +16,4 @@ target_link_libraries(occ
   "SDL2_ttf"
 )
 
-set_property(TARGET gfx PROPERTY CXX_STANDARD 14)
+set_property(TARGET occ PROPERTY CXX_STANDARD 14)

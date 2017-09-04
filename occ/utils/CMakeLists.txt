@@ -11,4 +11,4 @@ add_library(utils
   "src/logger.cc"
 )
 
-set_property(TARGET gfx PROPERTY CXX_STANDARD 14)
+set_property(TARGET utils PROPERTY CXX_STANDARD 14)
