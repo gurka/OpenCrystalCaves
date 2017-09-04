@@ -17,7 +17,7 @@ void text(int x, int y, const std::string& text, const SDL_Color& color, SDL_Sur
   if (!font)
   {
     // TODO: Font size...
-    font.reset(TTF_OpenFont("media/DejaVuSans.ttf", 16));
+    font.reset(TTF_OpenFont("media/DejaVuSansMono.ttf", 12));
     if (!font)
     {
       LOG_CRITICAL("TTF_OpenFont failed with: '%s'", TTF_GetError());

@@ -15,7 +15,8 @@ Currently the engine can:
 
 - Load sprite, item and level data.
 - Render the (one and only) level, including items that are rendered both behind and infront of the player as well as animated items.
-- Move the player around, jumping, colliding with solid items.
+- Move the player around, jumping, colliding with solid items and moving platforms.
+- Render and interact with everything in the main level (the overworld), except spawning fruits randomly and having the player enter doors.
 
 Features that are missing:
 
@@ -43,9 +44,9 @@ make
 The binary will be available at `OpenCrystalCaves/debug/occ/occ`
 
 ## Running OCC
-Two files are required and not available in this repository: `DejaVuSans.ttf` and `sprites.bmp`.
+Two files are required and not available in this repository: `DejaVuSansMono.ttf` and `sprites.bmp`.
 
-`DejaVuSans.ttf` can be downloaded for free [here](https://dejavu-fonts.github.io/), or might already be available in your Linux installation. In Debian 9 the font is available at `/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf`
+`DejaVuSansMono.ttf` can be downloaded for free [here](https://dejavu-fonts.github.io/), or might already be available in your Linux installation. In Debian 9 the font is available at `/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf`
 
 `sprites.bmp` can be generated from the original Crystal Caves (episode 1) game files using the Python script `utils/sprite-extractor.py`. The script takes a path to the `CC1.GFX` file and outputs a PNG file that then should be converted to BMP (using e.g. ImageMagick):
 

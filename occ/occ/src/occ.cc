@@ -618,7 +618,7 @@ int main()
       if (debug)
       {
         // Put a black box where we're going to the draw the debug text
-        SDL_Rect box = { 0, 24, 225, 165 };
+        SDL_Rect box = { 0, 24, 200, 165 };
         SDL_FillRect(window_surface, &box, SDL_MapRGB(window_surface->format, 0u, 0u, 0u));
 
         // Debug text
