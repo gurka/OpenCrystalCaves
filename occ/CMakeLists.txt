@@ -19,17 +19,8 @@ add_subdirectory("game")
 target_include_directories(game PUBLIC
   "game/export"
   "utils/export"
-  "io/export"
 )
-
-# io
-add_subdirectory("io")
-target_include_directories(io PUBLIC
-  "io/export"
-  "utils/export"
-  "game/export"
-)
-target_include_directories(io SYSTEM PUBLIC
+target_include_directories(game SYSTEM PUBLIC
   "external/json/src"
 )
 

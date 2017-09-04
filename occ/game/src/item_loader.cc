@@ -6,7 +6,10 @@
 
 #include "logger.h"
 
-std::vector<Item> ItemLoader::load_items(const std::string& filename)
+namespace ItemLoader
+{
+
+std::vector<Item> load_items(const std::string& filename)
 {
   std::vector<Item> items;
 
@@ -85,4 +88,6 @@ std::vector<Item> ItemLoader::load_items(const std::string& filename)
   LOG_INFO("Loaded %d items", static_cast<int>(items.size()));
 
   return items;
+}
+
 }

@@ -9,8 +9,15 @@ add_library(game
   "export/player_input.h"
   "export/player.h"
   "src/game.cc"
+  "src/item_loader.cc"
+  "src/item_loader.h"
   "src/item.cc"
-  "src/level.cc"
+  "src/level_base.cc"
+  "src/level_base.h"
+  "src/level_loader.cc"
+  "src/level_loader.h"
+  "src/level_mainlevel.cc"
+  "src/level_mainlevel.h"
   "src/player.cc"
 )
 

@@ -21,7 +21,7 @@ bool Game::init()
   }
 
   level_ = LevelLoader::load_level("media/mainlevel.json");
-  if (!level_.valid())
+  if (!level_)
   {
     return false;
   }
@@ -32,7 +32,7 @@ bool Game::init()
 void Game::update(unsigned game_tick, const PlayerInput& player_input)
 {
   // Update dynamic objects in the level
-  level_.update(game_tick);
+  level_->update(game_tick);
 
   // Currently the only thing that is alive within the game is the player :-(
   update_player(player_input);
@@ -45,7 +45,7 @@ void Game::update(unsigned game_tick, const PlayerInput& player_input)
 
 void Game::update_player(const PlayerInput& player_input)
 {
-  auto& player = level_.get_player();
+  auto& player = level_->get_player();
 
   /**
    * Updating the player is done in these steps:
@@ -87,8 +87,8 @@ void Game::update_player(const PlayerInput& player_input)
   if (player_input.jump &&
       !player.jumping &&
       !player.falling &&
-      !level_.collides(geometry::Rectangle(player.position + geometry::Position(0, -1),
-                                           player.size)))
+      !level_->collides(geometry::Rectangle(player.position + geometry::Position(0, -1),
+                                            player.size)))
   {
     // Player wants to jump
     player.jumping = true;
@@ -149,7 +149,7 @@ void Game::update_player(const PlayerInput& player_input)
   while (player.position.x() != destination.x())
   {
     const geometry::Rectangle player_rect { player.position + geometry::Position(step_x, 0), player.size.x(), player.size.y() };
-    if (level_.collides(player_rect))
+    if (level_->collides(player_rect))
     {
       player.collide_x = true;
       break;
@@ -162,7 +162,7 @@ void Game::update_player(const PlayerInput& player_input)
   while (player.position.y() != destination.y())
   {
     const geometry::Rectangle player_rect { player.position + geometry::Position(0, step_y), player.size };
-    if (level_.collides(player_rect))
+    if (level_->collides(player_rect))
     {
       player.collide_y = true;
       break;
@@ -173,7 +173,7 @@ void Game::update_player(const PlayerInput& player_input)
     {
       const auto platform_collide = [this, &player_rect]()
       {
-        for (const auto& platform : level_.get_platforms())
+        for (const auto& platform : level_->get_platforms())
         {
           // Collision with platform only occurs if player is falling down (which we check above)
           // and only for one single pixel on y axis, when the player is exactly on top of the platform
@@ -184,7 +184,7 @@ void Game::update_player(const PlayerInput& player_input)
             return true;
           }
         }
-        for (const auto& platform : level_.get_moving_platforms())
+        for (const auto& platform : level_->get_moving_platforms())
         {
           // Collision with platform only occurs if player is falling down (which we check above)
           // and only for one single pixel on y axis, when the player is exactly on top of the platform
@@ -240,8 +240,8 @@ void Game::update_player(const PlayerInput& player_input)
       player.jumping = false;
     }
     else if (player.jump_tick != 0 &&
-             level_.collides(geometry::Rectangle(player.position + geometry::Position(0, 1),
-                                                 player.size)))
+             level_->collides(geometry::Rectangle(player.position + geometry::Position(0, 1),
+                                                  player.size)))
     {
       // Player did not actually collide with the ground, but standing directly above it
       // and this isn't the first tick in the jump, so we can consider the jump to have
@@ -254,7 +254,7 @@ void Game::update_player(const PlayerInput& player_input)
   player.falling = !player.jumping &&
                    player.velocity.y() > 0 &&
                    !player.collide_y &&
-                   !level_.collides(geometry::Rectangle(player.position + geometry::Position(0, 1),
-                                                        player.size));
+                   !level_->collides(geometry::Rectangle(player.position + geometry::Position(0, 1),
+                                                         player.size));
 }
 

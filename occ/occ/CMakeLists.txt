@@ -9,10 +9,9 @@ add_executable(occ
   "src/spritemgr.h"
 )
 target_link_libraries(occ
-  "game"
-  "gfx"
-  "io"
   "utils"
+  "gfx"
+  "game"
   "SDL2"
   "SDL2_ttf"
 )
