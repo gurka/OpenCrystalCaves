@@ -18,6 +18,8 @@ add_library(game
   "src/level_loader.h"
   "src/level_mainlevel.cc"
   "src/level_mainlevel.h"
+  "src/level_one.cc"
+  "src/level_one.h"
   "src/player.cc"
 )
 

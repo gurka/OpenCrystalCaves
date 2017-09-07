@@ -7,7 +7,9 @@
 
 #include "logger.h"
 #include "level.h"
+
 #include "level_mainlevel.h"
+#include "level_one.h"
 
 namespace LevelLoader
 {
@@ -154,6 +156,15 @@ std::unique_ptr<Level> load_level(const std::string& filename)
                                             std::move(items_foreground),
                                             std::move(aabbs),
                                             std::move(platforms));
+  }
+  else if (filename == "media/level1.json")
+  {
+    return std::make_unique<LevelOne>(width,
+                                      height,
+                                      std::move(items_background),
+                                      std::move(items_foreground),
+                                      std::move(aabbs),
+                                      std::move(platforms));
   }
   else
   {
