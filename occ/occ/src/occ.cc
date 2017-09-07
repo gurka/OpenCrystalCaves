@@ -183,11 +183,11 @@ void render_background()
         {
           if (item.is_multiple_2x2())
           {
-            return item.get_sprite() + ((tile_y % 2) * 4) + (tile_x % 2);
+            return item.get_sprite() + (((tile_y + 1) % 2) * 4) + (tile_x % 2);
           }
           else if (item.is_multiple_4x2())
           {
-            return item.get_sprite() + ((tile_y % 2) * 4) + (tile_x % 4);
+            return item.get_sprite() + (((tile_y + 1) % 2) * 4) + (tile_x % 4);
           }
           else
           {
