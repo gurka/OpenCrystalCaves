@@ -53,5 +53,5 @@ void LevelOne::update(unsigned game_tick)
                         616 + platform_sprite_index);
 
   // Add collision
-  moving_platforms_.emplace_back(38 * 16, platform_.position_y);
+  moving_platforms_.emplace_back(36 * 16, platform_.position_y);
 }
