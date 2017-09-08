@@ -14,6 +14,7 @@
 #include "level.h"
 #include "player.h"
 #include "item.h"
+#include "object.h"
 #include "player_input.h"
 
 using Window = std::unique_ptr<SDL_Window,  decltype(&SDL_DestroyWindow)>;

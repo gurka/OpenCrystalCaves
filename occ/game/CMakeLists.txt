@@ -6,6 +6,7 @@ add_library(game
   "export/game.h"
   "export/item.h"
   "export/level.h"
+  "export/object.h"
   "export/player_input.h"
   "export/player.h"
   "src/game_impl.cc"
@@ -21,6 +22,7 @@ add_library(game
   "src/level_mainlevel.h"
   "src/level_one.cc"
   "src/level_one.h"
+  "src/moving_platform.h"
   "src/player.cc"
 )
 
