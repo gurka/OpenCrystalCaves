@@ -12,8 +12,9 @@ class LevelOne : public LevelBase
            std::vector<Item::Id> tiles_foreground,
            std::vector<geometry::Position> platforms);
 
+  // From LevelBase
   geometry::Position get_player_spawn() const override;
-  void update(unsigned game_tick) override;
+  void update_level(unsigned game_tick) override;
 };
 
 #endif  // LEVEL_ONE_H_

@@ -12,10 +12,9 @@ class LevelMainLevel : public LevelBase
                  std::vector<Item::Id> tiles_foreground,
                  std::vector<geometry::Position> platforms);
 
+  // From LevelBase
   geometry::Position get_player_spawn() const override;
-
-  // Dynamic things in the level
-  void update(unsigned game_tick) override;
+  void update_level(unsigned game_tick) override;
 
  private:
   struct

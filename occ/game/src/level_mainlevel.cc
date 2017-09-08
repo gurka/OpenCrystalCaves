@@ -40,11 +40,8 @@ geometry::Position LevelMainLevel::get_player_spawn() const
   return geometry::Position(32, 48);
 }
 
-void LevelMainLevel::update(unsigned game_tick)
+void LevelMainLevel::update_level(unsigned game_tick)
 {
-  // Clear all objects
-  objects_.clear();
-
   // Update earth
   if (earth_.right)
   {
@@ -97,14 +94,14 @@ void LevelMainLevel::update(unsigned game_tick)
   if (moon_.right)
   {
     // Moon is behind earth, render moon first
-    objects_.emplace_back(geometry::Position(moon_.position_x / 2, 0), geometry::Size(16, 16), 634);
-    objects_.emplace_back(geometry::Position(earth_.position_x / 2, 0), geometry::Size(16, 16), 632);
+    objects_.emplace_back(geometry::Position(moon_.position_x / 2, 0), geometry::Size(16, 16), 634, 1);
+    objects_.emplace_back(geometry::Position(earth_.position_x / 2, 0), geometry::Size(16, 16), 632, 1);
   }
   else
   {
     // Moon is in front of earth, render earth first
-    objects_.emplace_back(geometry::Position(earth_.position_x / 2, 0), geometry::Size(16, 16), 632);
-    objects_.emplace_back(geometry::Position(moon_.position_x / 2, 0), geometry::Size(16, 16), 633);
+    objects_.emplace_back(geometry::Position(earth_.position_x / 2, 0), geometry::Size(16, 16), 632, 1);
+    objects_.emplace_back(geometry::Position(moon_.position_x / 2, 0), geometry::Size(16, 16), 633, 1);
   }
 
   if (volcano_.active)
@@ -112,9 +109,11 @@ void LevelMainLevel::update(unsigned game_tick)
     const auto volcano_sprite_index = ((game_tick - volcano_.tick_start) / 3) % 4;
     objects_.emplace_back(geometry::Position(29 * 16, 2 * 16),
                           geometry::Size(16, 16),
-                          752 + volcano_sprite_index);
+                          752 + volcano_sprite_index,
+                          1);
     objects_.emplace_back(geometry::Position(30 * 16, 2 * 16),
                           geometry::Size(16, 16),
-                          748 + volcano_sprite_index);
+                          748 + volcano_sprite_index,
+                          1);
   }
 }

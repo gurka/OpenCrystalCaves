@@ -41,3 +41,18 @@ Item::Id LevelBase::get_tile(int tile_x, int tile_y, const std::vector<Item::Id>
     return Item::invalid;
   }
 }
+
+void LevelBase::update(unsigned game_tick)
+{
+  // Clear objects
+  objects_.clear();
+
+  // Add MovingPlatform Objects
+  for (const auto& platform : moving_platforms_)
+  {
+    objects_.emplace_back(platform.position, geometry::Size(16, 16), platform.sprite_id, platform.num_sprites);
+  }
+
+  // Call the specific Level's update
+  update_level(game_tick);
+}
