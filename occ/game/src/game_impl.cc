@@ -1,4 +1,4 @@
-#include "game.h"
+#include "game_impl.h"
 
 #include <cstdint>
 #include <array>
@@ -12,7 +12,12 @@ static constexpr auto gravity = 8u;
 static constexpr auto jump_velocity = misc::make_array<int>(0, -8, -8, -8, -4, -4, -2, -2, -2, -2, 2, 2, 2, 2, 4, 4);
 static constexpr auto jump_velocity_fall_index = 10u;
 
-bool Game::init()
+std::unique_ptr<Game> Game::create()
+{
+  return std::make_unique<GameImpl>();
+}
+
+bool GameImpl::init()
 {
   items_ = ItemLoader::load_items("media/items.json");
   if (items_.empty())
@@ -32,7 +37,7 @@ bool Game::init()
   return true;
 }
 
-void Game::update(unsigned game_tick, const PlayerInput& player_input)
+void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
 {
   // Update the level (e.g. moving platforms and other objects)
   update_level(game_tick);
@@ -47,7 +52,7 @@ void Game::update(unsigned game_tick, const PlayerInput& player_input)
   // ...
 }
 
-void Game::update_level(unsigned game_tick)
+void GameImpl::update_level(unsigned game_tick)
 {
   // Update all MovingPlatforms
   for (auto& platform : level_->get_moving_platforms())
@@ -85,7 +90,7 @@ void Game::update_level(unsigned game_tick)
   level_->update(game_tick);
 }
 
-void Game::update_player(const PlayerInput& player_input)
+void GameImpl::update_player(const PlayerInput& player_input)
 {
   /**
    * Updating the player is done in these steps:
@@ -295,7 +300,7 @@ void Game::update_player(const PlayerInput& player_input)
                     !player_collides(player_.position + geometry::Position(0, 1));
 }
 
-bool Game::player_collides(const geometry::Position& position)
+bool GameImpl::player_collides(const geometry::Position& position)
 {
   // Player can cover at maximum 4 tiles
   // Check all 4 tiles, even though we might check the same tile multiple times

@@ -4,37 +4,24 @@
 #include <memory>
 #include <vector>
 
-#include "player_input.h"
-#include "item.h"
-#include "level.h"
-#include "player.h"
+class PlayerInput;
+class Player;
+class Item;
+class Level;
 
 class Game
 {
  public:
-  Game()
-    : player_(),
-      items_(),
-      level_()
-  {
-  }
+  static std::unique_ptr<Game> create();
 
-  bool init();
-  void update(unsigned game_tick, const PlayerInput& player_input);
+  virtual ~Game() = default;
 
-  const Player& get_player() const { return player_; }
-  const std::vector<Item>& get_items() const { return items_; }
-  const Level& get_level() const { return *level_; }
+  virtual bool init() = 0;
+  virtual void update(unsigned game_tick, const PlayerInput& player_input) = 0;
 
- private:
-  void update_level(unsigned game_tick);
-  void update_player(const PlayerInput& player_input);
-
-  bool player_collides(const geometry::Position& position);
-
-  Player player_;
-  std::vector<Item> items_;
-  std::unique_ptr<Level> level_;
+  virtual const Player& get_player() const = 0;
+  virtual const std::vector<Item>& get_items() const = 0;
+  virtual const Level& get_level() const = 0;
 };
 
 #endif  // GAME_H_

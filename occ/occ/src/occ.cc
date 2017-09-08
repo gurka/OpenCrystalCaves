@@ -11,6 +11,9 @@
 #include "logger.h"
 #include "draw.h"
 #include "game.h"
+#include "level.h"
+#include "player.h"
+#include "item.h"
 #include "player_input.h"
 
 using Window = std::unique_ptr<SDL_Window,  decltype(&SDL_DestroyWindow)>;
@@ -30,7 +33,7 @@ static constexpr geometry::Size CAMERA_SIZE_SCALED = CAMERA_SIZE_STRETCHED * 3.0
 static constexpr geometry::Size WINDOW_SIZE = CAMERA_SIZE_SCALED;
 
 // Game variables
-static Game game;
+static std::unique_ptr<Game> game;
 static SpriteManager sprite_manager;
 static bool paused(false);
 
@@ -163,8 +166,8 @@ void read_input(Input* input)
 
 void render_background()
 {
-  const auto& level = game.get_level();
-  const auto& items = game.get_items();
+  const auto& level = game->get_level();
+  const auto& items = game->get_items();
 
   const auto start_tile_x = game_camera.position.x() > 0 ? game_camera.position.x() / 16 : 0;
   const auto start_tile_y = game_camera.position.y() > 0 ? game_camera.position.y() / 16 : 0;
@@ -227,7 +230,7 @@ void render_player()
   static constexpr int sprite_jumping_left = 285;
   static constexpr int sprite_shooting_left = 287;
 
-  const auto& player = game.get_player();
+  const auto& player = game->get_player();
 
   SDL_Rect src_rect = [&player]()
   {
@@ -310,8 +313,8 @@ void render_player()
 
 void render_foreground(bool in_front)
 {
-  const auto& level = game.get_level();
-  const auto& items = game.get_items();
+  const auto& level = game->get_level();
+  const auto& items = game->get_items();
 
   const auto start_tile_x = game_camera.position.x() > 0 ? game_camera.position.x() / 16 : 0;
   const auto start_tile_y = game_camera.position.y() > 0 ? game_camera.position.y() / 16 : 0;
@@ -361,7 +364,7 @@ void render_foreground(bool in_front)
 void render_level_objects()
 {
   // Render moving platforms
-  for (const auto& platform : game.get_level().get_moving_platforms())
+  for (const auto& platform : game->get_level().get_moving_platforms())
   {
     if (geometry::isColliding(geometry::Rectangle(platform.position, geometry::Size(16, 16)), game_camera))
     {
@@ -379,7 +382,7 @@ void render_level_objects()
   }
 
   // Render additional objects
-  for (const auto& object : game.get_level().get_objects())
+  for (const auto& object : game->get_level().get_objects())
   {
     if (geometry::isColliding(geometry::Rectangle(object.position, object.size), game_camera))
     {
@@ -399,8 +402,8 @@ void render_level_objects()
 void render_debug()
 {
   // Render a red rectangle around every solid tile
-  const auto& level = game.get_level();
-  const auto& items = game.get_items();
+  const auto& level = game->get_level();
+  const auto& items = game->get_items();
 
   const auto start_tile_x = game_camera.position.x() > 0 ? game_camera.position.x() / 16 : 0;
   const auto start_tile_y = game_camera.position.y() > 0 ? game_camera.position.y() / 16 : 0;
@@ -451,7 +454,7 @@ void render_debug()
   }
 
   // Render a yellow rectangle around the player
-  draw::rectangle(geometry::Rectangle(game.get_player().position - game_camera.position, game.get_player().size),
+  draw::rectangle(geometry::Rectangle(game->get_player().position - game_camera.position, game->get_player().size),
                   { 255u, 255u, 0u, 0u },
                   game_surface.get());
 }
@@ -460,19 +463,19 @@ void render_game()
 {
   // Update game camera
   // Note: this isn't exactly how the Crystal Caves camera work, but it's good enough
-  const geometry::Position player_camera_relative_position {(game.get_player().position + (game.get_player().size / 2)) - (game_camera.position + (game_camera.size / 2))};
+  const geometry::Position player_camera_relative_position {(game->get_player().position + (game->get_player().size / 2)) - (game_camera.position + (game_camera.size / 2))};
   if (player_camera_relative_position.x() < -4)
   {
     game_camera.position = geometry::Position(math::clamp(game_camera.position.x() + player_camera_relative_position.x() + 4,
                                                           0,
-                                                          (game.get_level().get_tile_width() * 16) - CAMERA_SIZE.x()),
+                                                          (game->get_level().get_tile_width() * 16) - CAMERA_SIZE.x()),
                                               game_camera.position.y());
   }
   else if (player_camera_relative_position.x() > 20)
   {
     game_camera.position = geometry::Position(math::clamp(game_camera.position.x() + player_camera_relative_position.x() - 20,
                                                           0,
-                                                          (game.get_level().get_tile_width() * 16) - CAMERA_SIZE.x()),
+                                                          (game->get_level().get_tile_width() * 16) - CAMERA_SIZE.x()),
                                               game_camera.position.y());
   }
 
@@ -481,14 +484,14 @@ void render_game()
     game_camera.position = geometry::Position(game_camera.position.x(),
                                               math::clamp(game_camera.position.y() + player_camera_relative_position.y() + 10,
                                                           0,
-                                                          (game.get_level().get_tile_height() * 16) - CAMERA_SIZE.y()));
+                                                          (game->get_level().get_tile_height() * 16) - CAMERA_SIZE.y()));
   }
   else if (player_camera_relative_position.y() > 32)
   {
     game_camera.position = geometry::Position(game_camera.position.x(),
                                               math::clamp(game_camera.position.y() + player_camera_relative_position.y() - 32,
                                                           0,
-                                                          (game.get_level().get_tile_height() * 16) - CAMERA_SIZE.y()));
+                                                          (game->get_level().get_tile_height() * 16) - CAMERA_SIZE.y()));
   }
 
   // Clear game surface (background now)
@@ -548,19 +551,20 @@ int main()
     return EXIT_FAILURE;
   }
 
-  if (!game.init())
+  game = Game::create();
+  if (!game || !game->init())
   {
     LOG_CRITICAL("Could not initialize Game");
     return EXIT_FAILURE;
   }
 
   // Set initial game camera
-  game_camera = Camera(math::clamp(game.get_player().position.x() + (game.get_player().size.x() / 2) - (CAMERA_SIZE.x() / 2),
+  game_camera = Camera(math::clamp(game->get_player().position.x() + (game->get_player().size.x() / 2) - (CAMERA_SIZE.x() / 2),
                                    0,
-                                   (game.get_level().get_tile_width() * 16) - CAMERA_SIZE.x()),
-                       math::clamp(game.get_player().position.y() + (game.get_player().size.y() / 2) - (CAMERA_SIZE.y() / 2),
+                                   (game->get_level().get_tile_width() * 16) - CAMERA_SIZE.x()),
+                       math::clamp(game->get_player().position.y() + (game->get_player().size.y() / 2) - (CAMERA_SIZE.y() / 2),
                                    0,
-                                   (game.get_level().get_tile_height() * 16) - CAMERA_SIZE.y()),
+                                   (game->get_level().get_tile_height() * 16) - CAMERA_SIZE.y()),
                        CAMERA_SIZE.x(),
                        CAMERA_SIZE.y());
 
@@ -619,7 +623,7 @@ int main()
         if (!paused || (paused && input.space.pressed && !input.space.repeated))
         {
           // Call game loop
-          game.update(game_tick, input_to_player_input(input));
+          game->update(game_tick, input_to_player_input(input));
           game_tick += 1;
         }
 
@@ -661,13 +665,13 @@ int main()
 
         // Debug text
         const auto camera_position_str = "camera position: (" + std::to_string(game_camera.position.x()) + ", " + std::to_string(game_camera.position.y()) + ")";
-        const auto player_position_str = "player position: (" + std::to_string(game.get_player().position.x()) + ", " + std::to_string(game.get_player().position.y()) + ")";
-        const auto player_velocity_str = "player velocity: (" + std::to_string(game.get_player().velocity.x()) + ", " + std::to_string(game.get_player().velocity.y()) + ")";
-        const auto player_walking_str  = std::string("player walking: ") + (game.get_player().walking ? "true" : "false");
-        const auto player_jumping_str  = std::string("player jumping: ") + (game.get_player().jumping ? "true" : "false");
-        const auto player_falling_str  = std::string("player falling: ") + (game.get_player().falling ? "true" : "false");
-        const auto player_shooting_str = std::string("player shooting: ") + (game.get_player().shooting ? "true" : "false");
-        const auto collide_str         = std::string("player collide: ")  + (game.get_player().collide_x ? "x " : "_ ") + (game.get_player().collide_y ? "y" : "_");
+        const auto player_position_str = "player position: (" + std::to_string(game->get_player().position.x()) + ", " + std::to_string(game->get_player().position.y()) + ")";
+        const auto player_velocity_str = "player velocity: (" + std::to_string(game->get_player().velocity.x()) + ", " + std::to_string(game->get_player().velocity.y()) + ")";
+        const auto player_walking_str  = std::string("player walking: ") + (game->get_player().walking ? "true" : "false");
+        const auto player_jumping_str  = std::string("player jumping: ") + (game->get_player().jumping ? "true" : "false");
+        const auto player_falling_str  = std::string("player falling: ") + (game->get_player().falling ? "true" : "false");
+        const auto player_shooting_str = std::string("player shooting: ") + (game->get_player().shooting ? "true" : "false");
+        const auto collide_str         = std::string("player collide: ")  + (game->get_player().collide_x ? "x " : "_ ") + (game->get_player().collide_y ? "y" : "_");
 
         draw::text(5,  25, camera_position_str, { 255u, 0u, 0u, 0u}, window_surface);
         draw::text(5,  45, player_position_str, { 255u, 0u, 0u, 0u}, window_surface);
