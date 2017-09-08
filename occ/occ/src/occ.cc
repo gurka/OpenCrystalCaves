@@ -398,6 +398,37 @@ void render_level_objects()
 
 void render_debug()
 {
+  // Render a red rectangle around every solid tile
+  const auto& level = game.get_level();
+  const auto& items = game.get_items();
+
+  const auto start_tile_x = game_camera.position.x() > 0 ? game_camera.position.x() / 16 : 0;
+  const auto start_tile_y = game_camera.position.y() > 0 ? game_camera.position.y() / 16 : 0;
+  const auto end_tile_x = (game_camera.position.x() + game_camera.size.x()) / 16;
+  const auto end_tile_y = (game_camera.position.y() + game_camera.size.y()) / 16;
+
+  for (int tile_y = start_tile_y; tile_y <= end_tile_y; tile_y++)
+  {
+    for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
+    {
+      auto item_id = level.get_tile_foreground(tile_x, tile_y);
+      if (item_id != Item::invalid)
+      {
+        const auto& item = items[item_id];
+
+        if (item.is_solid())
+        {
+          draw::rectangle(geometry::Rectangle((tile_x * 16) - game_camera.position.x(),
+                                              (tile_y * 16) - game_camera.position.y(),
+                                              16,
+                                              16),
+                          { 255u, 0u, 0u, 0u },
+                          game_surface.get());
+        }
+      }
+    }
+  }
+
   // Render a blue rectangle around every platform (static and moving)
   auto render_platform = [](const geometry::Position& platform)
   {
@@ -410,11 +441,11 @@ void render_debug()
                       game_surface.get());
     }
   };
-  for (const auto& platform : game.get_level().get_platforms())
+  for (const auto& platform : level.get_platforms())
   {
     render_platform(platform);
   }
-  for (const auto& platform : game.get_level().get_moving_platforms())
+  for (const auto& platform : level.get_moving_platforms())
   {
     render_platform(platform.position);
   }
