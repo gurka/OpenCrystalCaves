@@ -63,10 +63,10 @@ class Level
  public:
   virtual ~Level() = default;
 
-  virtual geometry::Position get_player_spawn() const = 0;
+  // The only functions that need to be declared here
+  // are functions that are used for rendering the level
 
-  virtual void update(unsigned game_tick) = 0;
-
+  // Width and height of the level in tiles
   virtual int get_tile_width() const = 0;
   virtual int get_tile_height() const = 0;
 
@@ -74,12 +74,8 @@ class Level
   virtual Item::Id get_tile_background(int tile_x, int tile_y) const = 0;
   virtual Item::Id get_tile_foreground(int tile_x, int tile_y) const = 0;
 
-  // Dynamic tiles (non-const for updating platforms from Game)
+  // Dynamic tiles
   virtual const std::vector<MovingPlatform>& get_moving_platforms() const = 0;
-  virtual std::vector<MovingPlatform>& get_moving_platforms() = 0;
-
-  // For collision detection
-  virtual const std::vector<geometry::Position>& get_platforms() const = 0;
 
   // Additional objects that should be rendered
   virtual const std::vector<Object>& get_objects() const = 0;

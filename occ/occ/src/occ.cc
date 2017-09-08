@@ -44,7 +44,6 @@ static unsigned game_tick;
 
 // Debug information
 static bool debug(false);
-static bool debug_aabb(false);
 
 Window init_SDL()
 {
@@ -399,66 +398,6 @@ void render_level_objects()
   }
 }
 
-void render_debug()
-{
-  // Render a red rectangle around every solid tile
-  const auto& level = game->get_level();
-  const auto& items = game->get_items();
-
-  const auto start_tile_x = game_camera.position.x() > 0 ? game_camera.position.x() / 16 : 0;
-  const auto start_tile_y = game_camera.position.y() > 0 ? game_camera.position.y() / 16 : 0;
-  const auto end_tile_x = (game_camera.position.x() + game_camera.size.x()) / 16;
-  const auto end_tile_y = (game_camera.position.y() + game_camera.size.y()) / 16;
-
-  for (int tile_y = start_tile_y; tile_y <= end_tile_y; tile_y++)
-  {
-    for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
-    {
-      auto item_id = level.get_tile_foreground(tile_x, tile_y);
-      if (item_id != Item::invalid)
-      {
-        const auto& item = items[item_id];
-
-        if (item.is_solid())
-        {
-          draw::rectangle(geometry::Rectangle((tile_x * 16) - game_camera.position.x(),
-                                              (tile_y * 16) - game_camera.position.y(),
-                                              16,
-                                              16),
-                          { 255u, 0u, 0u, 0u },
-                          game_surface.get());
-        }
-      }
-    }
-  }
-
-  // Render a blue rectangle around every platform (static and moving)
-  auto render_platform = [](const geometry::Position& platform)
-  {
-    const auto platform_rectangle = geometry::Rectangle(platform, geometry::Size(16, 1));
-    if (geometry::isColliding(game_camera, platform_rectangle))
-    {
-      // Adjust the aabb position based on camera and render it
-      draw::rectangle(geometry::Rectangle(platform_rectangle.position - game_camera.position, platform_rectangle.size),
-                      { 0u, 0u, 255u, 0u },
-                      game_surface.get());
-    }
-  };
-  for (const auto& platform : level.get_platforms())
-  {
-    render_platform(platform);
-  }
-  for (const auto& platform : level.get_moving_platforms())
-  {
-    render_platform(platform.position);
-  }
-
-  // Render a yellow rectangle around the player
-  draw::rectangle(geometry::Rectangle(game->get_player().position - game_camera.position, game->get_player().size),
-                  { 255u, 255u, 0u, 0u },
-                  game_surface.get());
-}
-
 void render_game()
 {
   // Update game camera
@@ -502,10 +441,6 @@ void render_game()
   render_player();
   render_foreground(true);
   render_level_objects();
-  if (debug_aabb)
-  {
-    render_debug();
-  }
 }
 
 PlayerInput input_to_player_input(const Input& input)
@@ -610,10 +545,6 @@ int main()
         if (input.num_1.pressed && !input.num_1.repeated)
         {
           debug = !debug;
-        }
-        if (input.num_2.pressed && !input.num_2.repeated)
-        {
-          debug_aabb = !debug_aabb;
         }
         if (input.enter.pressed && !input.enter.repeated)
         {

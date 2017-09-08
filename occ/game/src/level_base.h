@@ -19,21 +19,21 @@ class LevelBase : public Level
 
   virtual ~LevelBase() = default;
 
-  // Can be overriden by specific levels if needed
-  virtual void update(unsigned game_tick) override { (void)game_tick; };
+  // Should be overriden by specific Levels
+  virtual geometry::Position get_player_spawn() const = 0;
+  virtual void update(unsigned game_tick) = 0;
 
+  // From Level
   int get_tile_width() const override { return width_; }
   int get_tile_height() const override { return height_; }
-
   Item::Id get_tile_background(int tile_x, int tile_y) const override;
   Item::Id get_tile_foreground(int tile_x, int tile_y) const override;
-
   const std::vector<MovingPlatform>& get_moving_platforms() const override { return moving_platforms_; }
-  std::vector<MovingPlatform>& get_moving_platforms() override { return moving_platforms_; }
-
-  const std::vector<geometry::Position>& get_platforms() const override { return platforms_; }
-
   const std::vector<Object>& get_objects() const override { return objects_; }
+
+  // Used by Game
+  std::vector<MovingPlatform>& get_moving_platforms() { return moving_platforms_; }
+  const std::vector<geometry::Position>& get_platforms() const { return platforms_; }
 
  protected:
   Item::Id get_tile(int tile_x, int tile_y, const std::vector<Item::Id>& items) const;

@@ -42,8 +42,6 @@ geometry::Position LevelMainLevel::get_player_spawn() const
 
 void LevelMainLevel::update(unsigned game_tick)
 {
-  LevelBase::update(game_tick);
-
   // Clear all objects
   objects_.clear();
 

@@ -27,3 +27,8 @@ geometry::Position LevelOne::get_player_spawn() const
 {
   return geometry::Position(4 * 16, 22 * 16);
 }
+
+void LevelOne::update(unsigned game_tick)
+{
+  (void)game_tick;
+}
