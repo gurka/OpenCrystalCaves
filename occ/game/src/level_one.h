@@ -12,16 +12,6 @@ class LevelOne : public LevelBase
            std::vector<Item::Id> tiles_foreground,
            std::vector<geometry::Rectangle> aabbs,
            std::vector<geometry::Position> platforms);
-
-  // Dynamic things in the level
-  void update(unsigned game_tick) override;
-
- private:
-  struct
-  {
-    bool down = true;
-    int position_y = 7 * 16;  // normal pixel
-  } platform_;
 };
 
 #endif  // LEVEL_ONE_H_

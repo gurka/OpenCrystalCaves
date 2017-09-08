@@ -189,9 +189,9 @@ void Game::update_player(const PlayerInput& player_input)
         {
           // Collision with platform only occurs if player is falling down (which we check above)
           // and only for one single pixel on y axis, when the player is exactly on top of the platform
-          if ((player_rect.position.y() + player_rect.size.y() - 1 == platform.y()) &&
-              (player_rect.position.x() < platform.x() + 16) &&
-              (player_rect.position.x() + player_rect.size.x() > platform.x()))
+          if ((player_rect.position.y() + player_rect.size.y() - 1 == platform.position.y()) &&
+              (player_rect.position.x() < platform.position.x() + 16) &&
+              (player_rect.position.x() + player_rect.size.x() > platform.position.x()))
           {
             return true;
           }

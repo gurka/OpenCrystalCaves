@@ -360,6 +360,25 @@ void render_foreground(bool in_front)
 
 void render_level_objects()
 {
+  // Render moving platforms
+  for (const auto& platform : game.get_level().get_moving_platforms())
+  {
+    if (geometry::isColliding(geometry::Rectangle(platform.position, geometry::Size(16, 16)), game_camera))
+    {
+      const auto sprite_id = platform.sprite_id + (game_tick % platform.num_sprites);
+      auto src_rect = sprite_manager.get_rect_for_tile(sprite_id);
+      SDL_Rect dest_rect
+      {
+        platform.position.x() - game_camera.position.x(),
+        platform.position.y() - game_camera.position.y(),
+        16,
+        16
+      };
+      SDL_BlitSurface(sprite_manager.get_surface(), &src_rect, game_surface.get(), &dest_rect);
+    }
+  }
+
+  // Render additional objects
   for (const auto& object : game.get_level().get_objects())
   {
     if (geometry::isColliding(geometry::Rectangle(object.position, object.size), game_camera))
@@ -409,7 +428,7 @@ void render_debug()
   }
   for (const auto& platform : game.get_level().get_moving_platforms())
   {
-    render_platform(platform);
+    render_platform(platform.position);
   }
 
   // Render a yellow rectangle around the player

@@ -17,19 +17,6 @@ class LevelMainLevel : public LevelBase
   void update(unsigned game_tick) override;
 
  private:
-  // TODO: These belong to mainlevel.json only. Decide how to fix.
-  struct
-  {
-    bool down = true;
-    int position_y = 7 * 16;  // normal pixel
-  } vertical_platform_;
-
-  struct
-  {
-    bool right = true;
-    int position_x = 7 * 16;  // normal pixel
-  } horizontal_platform_;
-
   struct
   {
     bool right = false;  // true -> going right, false -> going left

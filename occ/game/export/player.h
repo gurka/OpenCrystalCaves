@@ -10,27 +10,22 @@ struct Player
 {
   static constexpr geometry::Size size = geometry::Size(12, 16);
 
-  /**
-   * Player velocity
-   */
-  Vector<int> velocity = Vector<int>();
+  Player(geometry::Position position)
+    : position(position)
+  {
+  }
 
-  /**
-   * Player position
-   */
-  geometry::Position position = geometry::Position();
+  geometry::Position position;
 
-  /**
-   * Player information
-   */
-  bool collide_x = false;
-  bool collide_y = false;
-
+  Vector<int> velocity = Vector<int>(0, 0);
   enum class Direction
   {
     right,
     left
   } direction = Direction::right;
+
+  bool collide_x = false;
+  bool collide_y = false;
 
   bool walking = false;
   unsigned walk_tick = 0u;

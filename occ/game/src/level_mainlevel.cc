@@ -8,69 +8,45 @@ LevelMainLevel::LevelMainLevel(int width,
                                std::vector<geometry::Position> platforms)
   : LevelBase(width,
               height,
+              {
+                // Player
+                geometry::Position(32, 48)
+              },
               std::move(tiles_background),
               std::move(tiles_foreground),
               std::move(aabbs),
-              std::move(platforms)),
-     vertical_platform_(),
-     horizontal_platform_(),
+              std::move(platforms),
+              {
+                // MovingPlatforms
+                {
+                  // Vertical
+                  geometry::Position(38 * 16,  7 * 16),
+                  geometry::Position(38 * 16, 22 * 16),
+                  2,
+                  616,
+                  4
+                },
+                {
+                  // Horizontal
+                  geometry::Position(11 * 16,  8 * 16),
+                  geometry::Position( 7 * 16,  8 * 16),
+                  2,
+                  612,
+                  4
+                }
+              }),
      earth_(),
      moon_(),
      volcano_()
 {
-  player_.position = geometry::Position(32, 48);
-  player_.velocity = Vector<int>(0, 0);
-  player_.direction = Player::Direction::right;
 }
 
 void LevelMainLevel::update(unsigned game_tick)
 {
-  // Clear all objects and moving platforms
+  LevelBase::update(game_tick);
+
+  // Clear all objects
   objects_.clear();
-  moving_platforms_.clear();
-
-  // Update vertical platform
-  const auto player_on_vertical_platform = (player_.position.y() + player_.size.y() == vertical_platform_.position_y) &&
-                                           (player_.position.x() < (38 * 16) + 16) &&
-                                           (player_.position.x() + player_.size.x() > 38 * 16);
-
-  if (player_on_vertical_platform)
-  {
-    // Only move player if not colliding with any static objects
-    const auto new_player_pos = player_.position + (vertical_platform_.down ? geometry::Position(0, 2) : geometry::Position(0, -2));
-    if (!collides(geometry::Rectangle(new_player_pos, player_.size)))
-    {
-      player_.position = new_player_pos;
-    }
-  }
-
-  vertical_platform_.position_y += vertical_platform_.down ? 2 : -2;
-  if (vertical_platform_.position_y == (vertical_platform_.down ? (22 * 16) : ((7 * 16) + 4)))
-  {
-    vertical_platform_.down = !vertical_platform_.down;
-  }
-
-  // Update horizontal platform
-  // FIXME: Speed isn't exactly correct. Crystal Caves is a bit slower
-  // 1.5 per tick? e.g. +3 px every other tick?
-  const auto player_on_horizontal_platform = (player_.position.y() + player_.size.y() == 8 * 16) &&
-                                             (player_.position.x() < horizontal_platform_.position_x + 16) &&
-                                             (player_.position.x() + player_.size.x() > horizontal_platform_.position_x);
-  if (player_on_horizontal_platform)
-  {
-    // Only move player if not colliding with any static objects
-    const auto new_player_pos = player_.position + (horizontal_platform_.right ? geometry::Position(2, 0) : geometry::Position(-2, 0));
-    if (!collides(geometry::Rectangle(new_player_pos, player_.size)))
-    {
-      player_.position = new_player_pos;
-    }
-  }
-
-  horizontal_platform_.position_x += horizontal_platform_.right ? 2 : -2;
-  if (horizontal_platform_.position_x == (horizontal_platform_.right ? (11 * 16) : (7 * 16)))
-  {
-    horizontal_platform_.right = !horizontal_platform_.right;
-  }
 
   // Update earth
   if (earth_.right)
@@ -144,16 +120,4 @@ void LevelMainLevel::update(unsigned game_tick)
                           geometry::Size(16, 16),
                           748 + volcano_sprite_index);
   }
-
-  const auto platform_sprite_index = game_tick % 4;
-  objects_.emplace_back(geometry::Position(38 * 16, vertical_platform_.position_y),
-                        geometry::Size(16, 16),
-                        616 + platform_sprite_index);
-  objects_.emplace_back(geometry::Position(horizontal_platform_.position_x, 8 * 16),
-                        geometry::Size(16, 16),
-                        612 + platform_sprite_index);
-
-  // Add moving platforms collision
-  moving_platforms_.emplace_back(38 * 16, vertical_platform_.position_y);
-  moving_platforms_.emplace_back(horizontal_platform_.position_x, 8 * 16);
 }
