@@ -360,7 +360,7 @@ void render_foreground(bool in_front)
   }
 }
 
-void render_level_objects()
+void render_objects()
 {
   // Render additional objects
   for (const auto& object : game->get_level().get_objects())
@@ -421,9 +421,9 @@ void render_game()
 
   render_background();
   render_foreground(false);
+  render_objects();
   render_player();
   render_foreground(true);
-  render_level_objects();
 }
 
 PlayerInput input_to_player_input(const Input& input)
