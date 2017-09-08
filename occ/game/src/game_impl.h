@@ -8,7 +8,7 @@
 
 #include "player_input.h"
 #include "item.h"
-#include "level.h"
+#include "level_base.h"
 #include "player.h"
 
 class GameImpl : public Game
@@ -36,7 +36,7 @@ class GameImpl : public Game
 
   Player player_;
   std::vector<Item> items_;
-  std::unique_ptr<Level> level_;
+  std::unique_ptr<LevelBase> level_;
 };
 
 #endif  // GAME_IMPL_H_

@@ -5,13 +5,13 @@
 #include <memory>
 #include <vector>
 
-class Level;
+class LevelBase;
 class Item;
 
 namespace LevelLoader
 {
 
-std::unique_ptr<Level> load_level(const std::string& filename);
+std::unique_ptr<LevelBase> load_level(const std::string& filename);
 
 }
 
