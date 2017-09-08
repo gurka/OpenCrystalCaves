@@ -9,8 +9,7 @@ class LevelOne : public LevelBase
   LevelOne(int width,
            int height,
            std::vector<Item::Id> tiles_background,
-           std::vector<Item::Id> tiles_foreground,
-           std::vector<geometry::Position> platforms);
+           std::vector<Item::Id> tiles_foreground);
 
   // From LevelBase
   geometry::Position get_player_spawn() const override;

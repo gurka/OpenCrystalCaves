@@ -33,6 +33,7 @@ class GameImpl : public Game
   void update_player(const PlayerInput& player_input);
 
   bool player_collides(const geometry::Position& position);
+  bool player_on_platform(const geometry::Position& position);
 
   Player player_;
   std::vector<Item> items_;

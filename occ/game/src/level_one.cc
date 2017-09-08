@@ -3,13 +3,11 @@
 LevelOne::LevelOne(int width,
                    int height,
                    std::vector<Item::Id> tiles_background,
-                   std::vector<Item::Id> tiles_foreground,
-                   std::vector<geometry::Position> platforms)
+                   std::vector<Item::Id> tiles_foreground)
   : LevelBase(width,
               height,
               std::move(tiles_background),
               std::move(tiles_foreground),
-              std::move(platforms),
               {
                 // MovingPlatforms
                 {

@@ -16,7 +16,6 @@ class LevelBase : public Level
             int height,
             std::vector<Item::Id> tiles_background,
             std::vector<Item::Id> tiles_foreground,
-            std::vector<geometry::Position> platforms,
             std::vector<MovingPlatform> moving_platforms);
 
   virtual ~LevelBase() = default;
@@ -34,9 +33,8 @@ class LevelBase : public Level
   virtual geometry::Position get_player_spawn() const = 0;
   virtual void update_level(unsigned game_tick) = 0;
 
-  // Used by Game
+  // Used by Game to update the moving platforms
   std::vector<MovingPlatform>& get_moving_platforms() { return moving_platforms_; }
-  std::vector<geometry::Position>& get_platforms() { return platforms_; }
 
  protected:
   Item::Id get_tile(int tile_x, int tile_y, const std::vector<Item::Id>& items) const;
@@ -49,8 +47,8 @@ class LevelBase : public Level
   std::vector<Item::Id> tiles_background_;
   std::vector<Item::Id> tiles_foreground_;
 
+  // Moving platforms
   std::vector<MovingPlatform> moving_platforms_;
-  std::vector<geometry::Position> platforms_;  // FIXME: Rectangle?
 
   // Objects
   std::vector<Object> objects_;

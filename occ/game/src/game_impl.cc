@@ -193,11 +193,13 @@ void GameImpl::update_player(const PlayerInput& player_input)
   while (player_.position.x() != destination.x())
   {
     const auto new_player_pos = player_.position + geometry::Position(step_x, 0);
+
     if (player_collides(new_player_pos))
     {
       player_.collide_x = true;
       break;
     }
+
     player_.position = new_player_pos;
   }
 
@@ -206,47 +208,15 @@ void GameImpl::update_player(const PlayerInput& player_input)
   while (player_.position.y() != destination.y())
   {
     const auto new_player_pos = player_.position + geometry::Position(0, step_y);
-    if (player_collides(new_player_pos))
+
+    // If player is falling down (step_y == 1) we need to check for collision with platforms
+    if (player_collides(new_player_pos) ||
+        (step_y == 1 && player_on_platform(new_player_pos)))
     {
       player_.collide_y = true;
       break;
     }
 
-    // If player is falling down we need to check for collision with platforms
-    if (step_y == 1)
-    {
-      const auto platform_collide = [this, &new_player_pos]()
-      {
-        for (const auto& platform : level_->get_platforms())
-        {
-          // Collision with platform only occurs if player is falling down (which we check above)
-          // and only for one single pixel on y axis, when the player is exactly on top of the platform
-          if ((new_player_pos.y() + player_.size.y() - 1 == platform.y()) &&
-              (new_player_pos.x() < platform.x() + 16) &&
-              (new_player_pos.x() + player_.size.x() > platform.x()))
-          {
-            return true;
-          }
-        }
-        for (const auto& platform : level_->get_moving_platforms())
-        {
-          // Collision with platform only occurs if player is falling down (which we check above)
-          // and only for one single pixel on y axis, when the player is exactly on top of the platform
-          if ((new_player_pos.y() + player_.size.y() - 1 == platform.position.y()) &&
-              (new_player_pos.x() < platform.position.x() + 16) &&
-              (new_player_pos.x() + player_.size.x() > platform.position.x()))
-          {
-            return true;
-          }
-        }
-        return false;
-      }();
-      if (platform_collide)
-      {
-        player_.collide_y = true;
-        break;
-      }
-    }
     player_.position = new_player_pos;
   }
 
@@ -308,4 +278,36 @@ bool GameImpl::player_collides(const geometry::Position& position)
          items_[level_->get_tile_foreground((position.x() + player_.size.x() - 1) / 16,  position.y() / 16)                        ].is_solid() ||
          items_[level_->get_tile_foreground( position.x() / 16,                         (position.y() + player_.size.y() - 1) / 16)].is_solid() ||
          items_[level_->get_tile_foreground((position.x() + player_.size.x() - 1) / 16, (position.y() + player_.size.y() - 1) / 16)].is_solid();
+}
+
+bool GameImpl::player_on_platform(const geometry::Position& position)
+{
+  // Need to check both static platforms (e.g. foreground items with SOLID_TOP)
+  // and moving platforms
+
+  // Standing on a static platform requires the player to stand on the edge of a tile
+  if ((position.y() + player_.size.y() - 1) % 16 == 0)
+  {
+    // Player can be on either 1 or 2 tiles, check both (or same...)
+    if (items_[level_->get_tile_foreground( position.x() / 16,                     (position.y() + player_.size.y() - 1) / 16)].is_solid_top() ||
+        items_[level_->get_tile_foreground((position.x() + player_.size.x()) / 16, (position.y() + player_.size.y() - 1) / 16)].is_solid_top())
+    {
+      return true;
+    }
+  }
+
+  // Check moving platforms
+  for (const auto& platform : level_->get_moving_platforms())
+  {
+    // Collision with platform only occurs if player is falling down (which we check above)
+    // and only for one single pixel on y axis, when the player is exactly on top of the platform
+    if ((position.y() + player_.size.y() - 1 == platform.position.y()) &&
+        (position.x() < platform.position.x() + 16) &&
+        (position.x() + player_.size.x() > platform.position.x()))
+    {
+      return true;
+    }
+  }
+
+  return false;
 }

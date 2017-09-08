@@ -66,59 +66,18 @@ std::unique_ptr<LevelBase> load_level(const std::string& filename)
   }
   auto items_foreground = items_json["Foreground"].get<std::vector<Item::Id>>();
 
-  // Check and get "Platforms"
-  if (level_json.count("Platforms") == 0 || !level_json["Platforms"].is_array())
-  {
-    LOG_CRITICAL("Level is missing \"Platforms\" attribute or wrong type!");
-    return std::unique_ptr<LevelBase>();
-  }
-  std::vector<geometry::Position> platforms;
-  for (const auto& aabb_json : level_json["Platforms"])
-  {
-    if (aabb_json.count("X") == 0 || !aabb_json["X"].is_number())
-    {
-      LOG_CRITICAL("Platform is missing \"X\" attribute or wrong type!");
-      return std::unique_ptr<LevelBase>();
-    }
-
-    if (aabb_json.count("Y") == 0 || !aabb_json["Y"].is_number())
-    {
-      LOG_CRITICAL("Platform is missing \"Y\" attribute or wrong type!");
-      return std::unique_ptr<LevelBase>();
-    }
-
-    auto x = aabb_json["X"].get<int>();
-    auto y = aabb_json["Y"].get<int>();
-
-    // Note that the Platforms are in "tiles" in the file but in pixels in Level
-    platforms.emplace_back(x * 16, y * 16);
-  }
-
   LOG_INFO("Loaded level from '%s'", filename.c_str());
-
-  // Debug
-  LOG_DEBUG("Level information: width=%d height=%d no_platforms=%d",
-            width,
-            height,
-            static_cast<int>(platforms.size()));
+  LOG_DEBUG("Level information: width=%d height=%d", width, height);
 
   // TODO: Would be nice if we could verify that the given level is a valid
   // level before we get this far (without having to specify all valid levels in multiple places...)
   if (filename == "media/mainlevel.json")
   {
-    return std::make_unique<LevelMainLevel>(width,
-                                            height,
-                                            std::move(items_background),
-                                            std::move(items_foreground),
-                                            std::move(platforms));
+    return std::make_unique<LevelMainLevel>(width, height, std::move(items_background), std::move(items_foreground));
   }
   else if (filename == "media/level1.json")
   {
-    return std::make_unique<LevelOne>(width,
-                                      height,
-                                      std::move(items_background),
-                                      std::move(items_foreground),
-                                      std::move(platforms));
+    return std::make_unique<LevelOne>(width, height, std::move(items_background), std::move(items_foreground));
   }
   else
   {
