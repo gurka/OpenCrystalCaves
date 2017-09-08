@@ -4,17 +4,11 @@ LevelOne::LevelOne(int width,
                    int height,
                    std::vector<Item::Id> tiles_background,
                    std::vector<Item::Id> tiles_foreground,
-                   std::vector<geometry::Rectangle> aabbs,
                    std::vector<geometry::Position> platforms)
   : LevelBase(width,
               height,
-              {
-                // Player
-                geometry::Position(4 * 16, 22 * 16)
-              },
               std::move(tiles_background),
               std::move(tiles_foreground),
-              std::move(aabbs),
               std::move(platforms),
               {
                 // MovingPlatforms
@@ -27,4 +21,9 @@ LevelOne::LevelOne(int width,
                 },
               })
 {
+}
+
+geometry::Position LevelOne::get_player_spawn() const
+{
+  return geometry::Position(4 * 16, 22 * 16);
 }

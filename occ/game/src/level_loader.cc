@@ -67,48 +67,6 @@ std::unique_ptr<Level> load_level(const std::string& filename)
   }
   auto items_foreground = items_json["Foreground"].get<std::vector<Item::Id>>();
 
-  // Check and get "AABBs"
-  if (level_json.count("AABBs") == 0 || !level_json["AABBs"].is_array())
-  {
-    LOG_CRITICAL("Level is missing \"AABBs\" attribute or wrong type!");
-    return std::unique_ptr<Level>();
-  }
-  std::vector<geometry::Rectangle> aabbs;
-  for (const auto& aabb_json : level_json["AABBs"])
-  {
-    if (aabb_json.count("X") == 0 || !aabb_json["X"].is_number())
-    {
-      LOG_CRITICAL("AABB is missing \"X\" attribute or wrong type!");
-      return std::unique_ptr<Level>();
-    }
-
-    if (aabb_json.count("Y") == 0 || !aabb_json["Y"].is_number())
-    {
-      LOG_CRITICAL("AABB is missing \"Y\" attribute or wrong type!");
-      return std::unique_ptr<Level>();
-    }
-
-    if (aabb_json.count("W") == 0 || !aabb_json["W"].is_number())
-    {
-      LOG_CRITICAL("AABB is missing \"W\" attribute or wrong type!");
-      return std::unique_ptr<Level>();
-    }
-
-    if (aabb_json.count("H") == 0 || !aabb_json["H"].is_number())
-    {
-      LOG_CRITICAL("AABB is missing \"H\" attribute or wrong type!");
-      return std::unique_ptr<Level>();
-    }
-
-    auto x = aabb_json["X"].get<int>();
-    auto y = aabb_json["Y"].get<int>();
-    auto w = aabb_json["W"].get<int>();
-    auto h = aabb_json["H"].get<int>();
-
-    // Note that the AABBs are in "tiles" in the file but in pixels in Level
-    aabbs.emplace_back(x * 16, y * 16, w * 16, h * 16);
-  }
-
   // Check and get "Platforms"
   if (level_json.count("Platforms") == 0 || !level_json["Platforms"].is_array())
   {
@@ -140,10 +98,9 @@ std::unique_ptr<Level> load_level(const std::string& filename)
   LOG_INFO("Loaded level from '%s'", filename.c_str());
 
   // Debug
-  LOG_DEBUG("Level information: width=%d height=%d no_aabbs=%d no_platforms=%d",
+  LOG_DEBUG("Level information: width=%d height=%d no_platforms=%d",
             width,
             height,
-            static_cast<int>(aabbs.size()),
             static_cast<int>(platforms.size()));
 
   // TODO: Would be nice if we could verify that the given level is a valid
@@ -154,7 +111,6 @@ std::unique_ptr<Level> load_level(const std::string& filename)
                                             height,
                                             std::move(items_background),
                                             std::move(items_foreground),
-                                            std::move(aabbs),
                                             std::move(platforms));
   }
   else if (filename == "media/level1.json")
@@ -163,7 +119,6 @@ std::unique_ptr<Level> load_level(const std::string& filename)
                                       height,
                                       std::move(items_background),
                                       std::move(items_foreground),
-                                      std::move(aabbs),
                                       std::move(platforms));
   }
   else

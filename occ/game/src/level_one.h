@@ -10,8 +10,9 @@ class LevelOne : public LevelBase
            int height,
            std::vector<Item::Id> tiles_background,
            std::vector<Item::Id> tiles_foreground,
-           std::vector<geometry::Rectangle> aabbs,
            std::vector<geometry::Position> platforms);
+
+  geometry::Position get_player_spawn() const override;
 };
 
 #endif  // LEVEL_ONE_H_

@@ -4,17 +4,11 @@ LevelMainLevel::LevelMainLevel(int width,
                                int height,
                                std::vector<Item::Id> tiles_background,
                                std::vector<Item::Id> tiles_foreground,
-                               std::vector<geometry::Rectangle> aabbs,
                                std::vector<geometry::Position> platforms)
   : LevelBase(width,
               height,
-              {
-                // Player
-                geometry::Position(32, 48)
-              },
               std::move(tiles_background),
               std::move(tiles_foreground),
-              std::move(aabbs),
               std::move(platforms),
               {
                 // MovingPlatforms
@@ -39,6 +33,11 @@ LevelMainLevel::LevelMainLevel(int width,
      moon_(),
      volcano_()
 {
+}
+
+geometry::Position LevelMainLevel::get_player_spawn() const
+{
+  return geometry::Position(32, 48);
 }
 
 void LevelMainLevel::update(unsigned game_tick)

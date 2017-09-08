@@ -3,8 +3,10 @@
 
 #include <string>
 #include <memory>
+#include <vector>
 
 class Level;
+class Item;
 
 namespace LevelLoader
 {

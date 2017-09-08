@@ -398,18 +398,6 @@ void render_level_objects()
 
 void render_debug()
 {
-  // Render a red rectangle around every AABB
-  for (const auto& aabb : game.get_level().get_aabbs())
-  {
-    if (geometry::isColliding(game_camera, aabb))
-    {
-      // Adjust the aabb position based on camera and render it
-      draw::rectangle(geometry::Rectangle(aabb.position - game_camera.position, aabb.size),
-                      { 255u, 0u, 0u, 0u },
-                      game_surface.get());
-    }
-  }
-
   // Render a blue rectangle around every platform (static and moving)
   auto render_platform = [](const geometry::Position& platform)
   {

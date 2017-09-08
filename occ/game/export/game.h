@@ -13,7 +13,8 @@ class Game
 {
  public:
   Game()
-    : items_(),
+    : player_(),
+      items_(),
       level_()
   {
   }
@@ -21,13 +22,17 @@ class Game
   bool init();
   void update(unsigned game_tick, const PlayerInput& player_input);
 
-  const Player& get_player() const { return level_->get_player(); }
+  const Player& get_player() const { return player_; }
   const std::vector<Item>& get_items() const { return items_; }
   const Level& get_level() const { return *level_; }
 
  private:
+  void update_level(unsigned game_tick);
   void update_player(const PlayerInput& player_input);
 
+  bool player_collides(const geometry::Position& position);
+
+  Player player_;
   std::vector<Item> items_;
   std::unique_ptr<Level> level_;
 };
