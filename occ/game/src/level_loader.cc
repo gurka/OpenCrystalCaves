@@ -66,6 +66,14 @@ std::unique_ptr<LevelBase> load_level(const std::string& filename)
   }
   auto items_foreground = items_json["Foreground"].get<std::vector<Item::Id>>();
 
+  // Check and get "Score"
+  if (items_json.count("Score") == 0 || !items_json["Score"].is_array())
+  {
+    LOG_CRITICAL("Items is missing \"Score\" attribute or wrong type!");
+    return std::unique_ptr<LevelBase>();
+  }
+  auto items_score = items_json["Score"].get<std::vector<Item::Id>>();
+
   LOG_INFO("Loaded level from '%s'", filename.c_str());
   LOG_DEBUG("Level information: width=%d height=%d", width, height);
 
@@ -73,11 +81,11 @@ std::unique_ptr<LevelBase> load_level(const std::string& filename)
   // level before we get this far (without having to specify all valid levels in multiple places...)
   if (filename == "media/mainlevel.json")
   {
-    return std::make_unique<LevelMainLevel>(width, height, std::move(items_background), std::move(items_foreground));
+    return std::make_unique<LevelMainLevel>(width, height, std::move(items_background), std::move(items_foreground), std::move(items_score));
   }
   else if (filename == "media/level1.json")
   {
-    return std::make_unique<LevelOne>(width, height, std::move(items_background), std::move(items_foreground));
+    return std::make_unique<LevelOne>(width, height, std::move(items_background), std::move(items_foreground), std::move(items_score));
   }
   else
   {

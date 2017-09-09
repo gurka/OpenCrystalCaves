@@ -16,6 +16,7 @@ class LevelBase : public Level
             int height,
             std::vector<Item::Id> tiles_background,
             std::vector<Item::Id> tiles_foreground,
+            std::vector<Item::Id> tiles_score,
             std::vector<MovingPlatform> moving_platforms);
 
   virtual ~LevelBase() = default;
@@ -25,6 +26,7 @@ class LevelBase : public Level
   int get_tile_height() const override { return height_; }
   Item::Id get_tile_background(int tile_x, int tile_y) const override;
   Item::Id get_tile_foreground(int tile_x, int tile_y) const override;
+  Item::Id get_tile_score(int tile_x, int tile_y) const override;
   const std::vector<Object>& get_objects() const override { return objects_; }
 
   void update(unsigned game_tick);
@@ -46,6 +48,7 @@ class LevelBase : public Level
   // Static tiles, in order
   std::vector<Item::Id> tiles_background_;
   std::vector<Item::Id> tiles_foreground_;
+  std::vector<Item::Id> tiles_score_;
 
   // Moving platforms
   std::vector<MovingPlatform> moving_platforms_;

@@ -23,6 +23,7 @@ class Level
   // Static tiles
   virtual Item::Id get_tile_background(int tile_x, int tile_y) const = 0;
   virtual Item::Id get_tile_foreground(int tile_x, int tile_y) const = 0;
+  virtual Item::Id get_tile_score(int tile_x, int tile_y) const = 0;
 
   // Objects
   virtual const std::vector<Object>& get_objects() const = 0;

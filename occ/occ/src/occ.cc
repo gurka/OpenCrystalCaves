@@ -270,6 +270,38 @@ void render_objects()
   }
 }
 
+void render_score()
+{
+  const auto& level = game->get_level();
+  const auto& items = game->get_items();
+
+  const auto start_tile_x = game_camera.position.x() > 0 ? game_camera.position.x() / 16 : 0;
+  const auto start_tile_y = game_camera.position.y() > 0 ? game_camera.position.y() / 16 : 0;
+  const auto end_tile_x = (game_camera.position.x() + game_camera.size.x()) / 16;
+  const auto end_tile_y = (game_camera.position.y() + game_camera.size.y()) / 16;
+
+  for (int tile_y = start_tile_y; tile_y <= end_tile_y; tile_y++)
+  {
+    for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
+    {
+      auto item_id = level.get_tile_score(tile_x, tile_y);
+      if (item_id != Item::invalid)
+      {
+        const auto& item = items[item_id];
+        const auto src_rect = sprite_manager.get_rect_for_tile(item.get_sprite());
+        const geometry::Rectangle dest_rect
+        {
+          (tile_x * 16) - game_camera.position.x(),
+          (tile_y * 16) - game_camera.position.y(),
+          16,
+          16
+        };
+        game_surface->blit_surface(sprite_manager.get_surface(), src_rect, dest_rect, BlitType::CROP);
+      }
+    }
+  }
+}
+
 void render_game()
 {
   // Update game camera
@@ -313,6 +345,7 @@ void render_game()
   render_objects();
   render_player();
   render_foreground(true);
+  render_score();
 }
 
 PlayerInput input_to_player_input(const Input& input)
