@@ -4,19 +4,24 @@
 
 #include <memory>
 
-#include <SDL.h>
-
-#include "input.h"
 #include "spritemgr.h"
-#include "logger.h"
-#include "draw.h"
+
+// From game
 #include "game.h"
-#include "level.h"
-#include "player.h"
 #include "item.h"
+#include "level.h"
 #include "object.h"
 #include "player_input.h"
+#include "player.h"
+
+// From sdl_wrapper
+#include "sdl_wrapper.h"
+#include "event.h"
 #include "graphics.h"
+
+// From utils
+#include "geometry.h"
+#include "logger.h"
 #include "math.h"
 
 using Camera = geometry::Rectangle;
@@ -46,97 +51,6 @@ static unsigned game_tick;
 
 // Debug information
 static bool debug(false);
-
-void read_input(Input* input)
-{
-  assert(input != nullptr);
-
-  // Set any input that is pressed as repeated here
-  input->up.repeated    = input->up.pressed;
-  input->down.repeated  = input->down.pressed;
-  input->left.repeated  = input->left.pressed;
-  input->right.repeated = input->right.pressed;
-  input->z.repeated     = input->z.pressed;
-  input->x.repeated     = input->x.pressed;
-  input->num_1.repeated = input->num_1.pressed;
-  input->num_2.repeated = input->num_2.pressed;
-  input->enter.repeated = input->enter.pressed;
-  input->space.repeated = input->space.pressed;
-
-  // Read events
-  SDL_Event event;
-  while (SDL_PollEvent(&event) != 0)
-  {
-    if (event.type == SDL_QUIT)
-    {
-      input->quit = true;
-      return;  // Quit asap
-    }
-
-    else if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
-    {
-      switch (event.key.keysym.sym)
-      {
-        case SDLK_UP:
-          input->up.pressed = event.type == SDL_KEYDOWN;
-          if (!input->up.pressed) input->up.repeated = false;
-          break;
-
-        case SDLK_DOWN:
-          input->down.pressed = event.type == SDL_KEYDOWN;
-          if (!input->down.pressed) input->down.repeated = false;
-          break;
-
-        case SDLK_LEFT:
-          input->left.pressed = event.type == SDL_KEYDOWN;
-          if (!input->left.pressed) input->left.repeated = false;
-          break;
-
-        case SDLK_RIGHT:
-          input->right.pressed = event.type == SDL_KEYDOWN;
-          if (!input->right.pressed) input->right.repeated = false;
-          break;
-
-        case SDLK_z:
-          input->z.pressed = event.type == SDL_KEYDOWN;
-          if (!input->z.pressed) input->z.repeated = false;
-          break;
-
-        case SDLK_x:
-          input->x.pressed = event.type == SDL_KEYDOWN;
-          if (!input->x.pressed) input->x.repeated = false;
-          break;
-
-        case SDLK_1:
-          input->num_1.pressed = event.type == SDL_KEYDOWN;
-          if (!input->num_1.pressed) input->num_1.repeated = false;
-          break;
-
-        case SDLK_2:
-          input->num_2.pressed = event.type == SDL_KEYDOWN;
-          if (!input->num_2.pressed) input->num_2.repeated = false;
-          break;
-
-        case SDLK_RETURN:
-          input->enter.pressed = event.type == SDL_KEYDOWN;
-          if (!input->enter.pressed) input->enter.repeated = false;
-          break;
-
-        case SDLK_SPACE:
-          input->space.pressed = event.type == SDL_KEYDOWN;
-          if (!input->space.pressed) input->space.repeated = false;
-          break;
-
-        case SDLK_ESCAPE:
-          input->quit = true;
-          return;
-
-        default:
-          break;
-      }
-    }
-  }
-}
 
 void render_background()
 {
@@ -415,13 +329,29 @@ int main()
 {
   LOG_INFO("Starting!");
 
+  // Init SDL wrapper
+  auto sdl = SDLWrapper::create();
+  if (!sdl)
+  {
+    LOG_CRITICAL("Could not create SDLWrapper");
+    return 1;
+  }
+  if (!sdl->init())
+  {
+    LOG_CRITICAL("Could not initialize SDLWrapper");
+    return 1;
+  }
+  LOG_INFO("SDLWrapper initialized");
+
   // Create Window
   auto window = Window::create("OpenCrystalCaves", WINDOW_SIZE);
   if (!window)
   {
+    LOG_CRITICAL("Could not create Window");
     return 1;
   }
   auto window_surface = window->get_surface();
+  LOG_INFO("Window created");
 
   // Create game surface
   game_surface = window->create_surface(CAMERA_SIZE);
@@ -430,19 +360,37 @@ int main()
     LOG_CRITICAL("Could not create game surface");
     return 1;
   }
+  LOG_INFO("Game surface created");
 
+  // Create event handler
+  auto event = Event::create();
+  if (!event)
+  {
+    LOG_CRITICAL("Could not create event handler");
+    return 1;
+  }
+
+  // Load tileset
   if (!sprite_manager.load_tileset("media/sprites.bmp"))
   {
     LOG_CRITICAL("Could not load tileset");
     return 1;
   }
+  LOG_INFO("Tileset loaded");
 
+  // Create Game
   game = Game::create();
-  if (!game || !game->init())
+  if (!game)
+  {
+    LOG_CRITICAL("Could not create Game");
+    return 1;
+  }
+  if (!game->init())
   {
     LOG_CRITICAL("Could not initialize Game");
     return 1;
   }
+  LOG_INFO("Game initialized");
 
   // Set initial game camera
   game_camera = Camera(math::clamp(game->get_player().position.x() + (game->get_player().size.x() / 2) - (CAMERA_SIZE.x() / 2),
@@ -458,7 +406,7 @@ int main()
   {
     Input input;
 
-    auto sdl_tick = SDL_GetTicks();
+    auto sdl_tick = sdl->get_tick();
     game_tick = 0u;
 
     // Game loop logic
@@ -479,14 +427,14 @@ int main()
       ///  Logic
       ///
       /////////////////////////////////////////////////////////////////////////
-      sdl_tick = SDL_GetTicks();
+      sdl_tick = sdl->get_tick();
       auto elapsed_ticks = sdl_tick - tick_last_update;
       tick_last_update = sdl_tick;
       lag += elapsed_ticks;
       while (lag >= ms_per_update)
       {
         // Read input
-        read_input(&input);
+        event->poll_event(&input);
 
         // Handle input
         if (input.quit)

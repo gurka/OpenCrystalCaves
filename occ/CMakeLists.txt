@@ -37,6 +37,3 @@ target_include_directories(occ PUBLIC
   "game/export"
   "utils/export"
 )
-target_include_directories(occ SYSTEM PUBLIC
-  "/usr/include/SDL2"
-)

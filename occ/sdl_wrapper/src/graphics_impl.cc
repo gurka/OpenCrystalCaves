@@ -1,29 +1,13 @@
 #include "graphics_impl.h"
 
 #include <cassert>
+#include <cstdlib>
 #include <utility>
 
 #include "logger.h"
 
 std::unique_ptr<Window> Window::create(const std::string& title, geometry::Size size)
 {
-  // Init SDL
-  if (SDL_Init(SDL_INIT_VIDEO) < 0)
-  {
-    LOG_CRITICAL("Could not initialize SDL: %s", SDL_GetError());
-    return std::unique_ptr<Window>();
-  }
-
-  // Init SDL_ttf
-  if (TTF_Init() < 0)
-  {
-    LOG_CRITICAL("Could not initialize TTF: %s", TTF_GetError());
-    return std::unique_ptr<Window>();
-  }
-
-  atexit(SDL_Quit);
-
-  // Create SDL_Window
   auto sdl_window = std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)>(SDL_CreateWindow(title.c_str(),
                                                                                                0,
                                                                                                0,
@@ -118,6 +102,66 @@ void SurfaceImpl::render_text(const geometry::Position& pos, const std::string& 
   // Render surface to destination
   SDL_Rect dest_rect = { pos.x(), pos.y(), 0, 0 };
   SDL_BlitSurface(text_surface.get(), nullptr, sdl_surface_.get(), &dest_rect);
+}
+
+void SurfaceImpl::render_line(const geometry::Position& from,
+                              const geometry::Position& to,
+                              const Color& color)
+{
+  (void)from;
+  (void)to;
+  (void)color;
+  // TODO
+//  assert(from_x == to_x || from_y == to_y);
+//
+//  if (from_x == to_x)
+//  {
+//    // Vertical line
+//    const SDL_Rect rect { from_x, from_y, 1, math::abs(from_y - to_y) };
+//    SDL_FillRect(dest, &rect, SDL_MapRGB(dest->format, color.r, color.g, color.b));
+//  }
+//  else if (from_y == to_y)
+//  {
+//    // Horizontal line
+//    const SDL_Rect rect { from_x, from_y, math::abs(from_x - to_x), 1 };
+//    SDL_FillRect(dest, &rect, SDL_MapRGB(dest->format, color.r, color.g, color.b));
+//  }
+}
+
+void SurfaceImpl::render_rectangle(const geometry::Rectangle& rect, const Color& color)
+{
+  (void)rect;
+  (void)color;
+  // TODO
+//  assert(rectangle.size.x() > 0 && rectangle.size.y() > 0);
+//
+//  // top
+//  render_line(rectangle.position.x(),
+//       rectangle.position.y(),
+//       rectangle.position.x() + rectangle.size.x(),
+//       rectangle.position.y(),
+//       color);
+//
+//  // bottom
+//  render_line(rectangle.position.x(),
+//       rectangle.position.y() + rectangle.size.y() - 1,
+//       rectangle.position.x() + rectangle.size.x(),
+//       rectangle.position.y() + rectangle.size.y() - 1,
+//       color;
+//
+//  // left
+//  render_line(rectangle.position.x(),
+//       rectangle.position.y(),
+//       rectangle.position.x(),
+//       rectangle.position.y() + rectangle.size.y(),
+//       color);
+//
+//  // right
+//  render_line(rectangle.position.x() + rectangle.size.x() - 1,
+//       rectangle.position.y(),
+//       rectangle.position.x() + rectangle.size.x() - 1,
+//       rectangle.position.y() + rectangle.size.y(),
+//       color);
 }
 
 SDL_Rect SurfaceImpl::to_sdl_rect(const geometry::Rectangle& rect) const

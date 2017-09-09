@@ -1,5 +1,5 @@
-#ifndef SDL_WRAPPER_IMPL_H_
-#define SDL_WRAPPER_IMPL_H_
+#ifndef GRAPHICS_IMPL_H_
+#define GRAPHICS_IMPL_H_
 
 #include "graphics.h"
 
@@ -45,6 +45,8 @@ class SurfaceImpl : public Surface
                     BlitType blit_type) override;
   void fill_rect(const geometry::Rectangle& rect, const Color& color) override;
   void render_text(const geometry::Position& pos, const std::string& text, const Color& color) override;
+  void render_line(const geometry::Position& from, const geometry::Position& to, const Color& color) override;
+  void render_rectangle(const geometry::Rectangle& rect, const Color& color) override;
 
  private:
   SDL_Rect to_sdl_rect(const geometry::Rectangle& rect) const;
@@ -53,4 +55,4 @@ class SurfaceImpl : public Surface
   std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> sdl_surface_;
 };
 
-#endif  // SDL_WRAPPER_IMPL_H_
+#endif  // GRAPHICS_IMPL_H_

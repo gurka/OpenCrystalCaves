@@ -1,5 +1,19 @@
-#ifndef INPUT_H_
-#define INPUT_H_
+#ifndef EVENT_H_
+#define EVENT_H_
+
+#include <memory>
+
+struct Input;
+
+class Event
+{
+ public:
+  static std::unique_ptr<Event> create();
+
+  virtual ~Event() = default;
+
+  virtual void poll_event(Input* input) = 0;
+};
 
 struct Input
 {
@@ -25,4 +39,4 @@ struct Input
   bool quit    = false;
 };
 
-#endif  // INPUT_H_
+#endif  // EVENT_H_

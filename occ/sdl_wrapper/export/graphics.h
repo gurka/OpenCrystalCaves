@@ -1,5 +1,5 @@
-#ifndef SDL_WRAPPER_H_
-#define SDL_WRAPPER_H_
+#ifndef GRAPHICS_H_
+#define GRAPHICS_H_
 
 #include <string>
 #include <memory>
@@ -50,8 +50,8 @@ class Surface
                             BlitType blit_type) = 0;
   virtual void fill_rect(const geometry::Rectangle& rect, const Color& color) = 0;
   virtual void render_text(const geometry::Position& pos, const std::string& text, const Color& color) = 0;
-
-
+  virtual void render_line(const geometry::Position& from, const geometry::Position& to, const Color& color) = 0;
+  virtual void render_rectangle(const geometry::Rectangle& rect, const Color& color) = 0;
 };
 
-#endif  // SDL_WRAPPER_H_
+#endif  // GRAPHICS_H_
