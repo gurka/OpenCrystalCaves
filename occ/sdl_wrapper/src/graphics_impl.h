@@ -1,7 +1,7 @@
 #ifndef SDL_WRAPPER_IMPL_H_
 #define SDL_WRAPPER_IMPL_H_
 
-#include "sdl_wrapper.h"
+#include "graphics.h"
 
 #include <memory>
 #include <utility>

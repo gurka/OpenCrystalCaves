@@ -16,7 +16,7 @@
 #include "item.h"
 #include "object.h"
 #include "player_input.h"
-#include "sdl_wrapper.h"
+#include "graphics.h"
 #include "math.h"
 
 using Camera = geometry::Rectangle;

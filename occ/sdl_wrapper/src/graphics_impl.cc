@@ -1,4 +1,4 @@
-#include "sdl_wrapper_impl.h"
+#include "graphics_impl.h"
 
 #include <cassert>
 #include <utility>

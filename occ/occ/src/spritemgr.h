@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 
-#include "sdl_wrapper.h"
+#include "graphics.h"
 #include "geometry.h"
 
 class SpriteManager

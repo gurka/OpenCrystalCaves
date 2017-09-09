@@ -4,12 +4,12 @@ project(sdl_wrapper)
 
 add_library(sdl_wrapper
   "export/draw.h"
+  "export/graphics.h"
   "export/line.h"
-  "export/sdl_wrapper.h"
   "export/text.h"
+  "src/graphics_impl.cc"
+  "src/graphics_impl.h"
   "src/line.cc"
-  "src/sdl_wrapper_impl.cc"
-  "src/sdl_wrapper_impl.h"
   "src/text.cc"
 )
 
