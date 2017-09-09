@@ -10,7 +10,7 @@ add_executable(occ
 )
 target_link_libraries(occ
   "utils"
-  "gfx"
+  "sdl_wrapper"
   "game"
   "SDL2"
   "SDL2_ttf"

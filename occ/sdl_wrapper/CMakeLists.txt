@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(gfx)
+project(sdl_wrapper)
 
-add_library(gfx
+add_library(sdl_wrapper
   "export/draw.h"
   "export/line.h"
   "export/sdl_wrapper.h"
@@ -13,4 +13,4 @@ add_library(gfx
   "src/text.cc"
 )
 
-set_property(TARGET gfx PROPERTY CXX_STANDARD 14)
+set_property(TARGET sdl_wrapper PROPERTY CXX_STANDARD 14)

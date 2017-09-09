@@ -4,13 +4,13 @@ project(occ)
 
 add_compile_options(-Wall -Wextra -Wpedantic -Weffc++)
 
-# gfx
-add_subdirectory("gfx")
-target_include_directories(gfx PUBLIC
-  "gfx/export"
+# sdl_wrapper
+add_subdirectory("sdl_wrapper")
+target_include_directories(sdl_wrapper PUBLIC
+  "sdl_wrapper/export"
   "utils/export"
 )
-target_include_directories(gfx SYSTEM PUBLIC
+target_include_directories(sdl_wrapper SYSTEM PUBLIC
   "/usr/include/SDL2"
 )
 
@@ -33,7 +33,7 @@ target_include_directories(utils PUBLIC
 # occ
 add_subdirectory("occ")
 target_include_directories(occ PUBLIC
-  "gfx/export"
+  "sdl_wrapper/export"
   "game/export"
   "utils/export"
 )
