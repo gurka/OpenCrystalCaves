@@ -299,8 +299,7 @@ bool GameImpl::player_on_platform(const geometry::Position& position)
   // Check moving platforms
   for (const auto& platform : level_->get_moving_platforms())
   {
-    // Collision with platform only occurs if player is falling down (which we check above)
-    // and only for one single pixel on y axis, when the player is exactly on top of the platform
+    // Player only collides if standing exactly on top of the platform, just like with static platforms
     if ((position.y() + player_.size.y() - 1 == platform.position.y()) &&
         (position.x() < platform.position.x() + 16) &&
         (position.x() + player_.size.x() > platform.position.x()))
