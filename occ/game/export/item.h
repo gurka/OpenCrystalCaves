@@ -10,16 +10,14 @@ class Item
 
   static const Id invalid;
 
-  Item(std::string name, int sprite, int sprite_count, int type, int flags)
-    : name_(name),
-      sprite_(sprite),
+  Item(int sprite, int sprite_count, int type, int flags)
+    : sprite_(sprite),
       sprite_count_(sprite_count),
       type_(type),
       flags_(flags)
   {
   }
 
-  const std::string& get_name() const { return name_; }
   int get_sprite() const { return sprite_; }
   int get_sprite_count() const { return sprite_count_; }
 
@@ -39,7 +37,6 @@ class Item
   bool is_render_in_front() const { return is_type_foreground() && (flags_ & 0x20) != 0; }
 
  private:
-  std::string name_;
   int sprite_;
   int sprite_count_;
   int type_;

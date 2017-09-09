@@ -35,12 +35,6 @@ std::vector<Item> load_items(const std::string& filename)
   for (const auto& item_json : items_json)
   {
     // Verify that the required attributes exists
-    if (item_json.count("Name") == 0 || !item_json["Name"].is_string())
-    {
-      LOG_CRITICAL("Item is missing \"Name\" attribute or wrong type!");
-      return std::vector<Item>();
-    }
-
     if (item_json.count("Sprite") == 0 || !item_json["Sprite"].is_number())
     {
       LOG_CRITICAL("Item is missing \"Sprite\" attribute or wrong type!");
@@ -66,7 +60,6 @@ std::vector<Item> load_items(const std::string& filename)
     }
 
     // Create Item and read required attributes
-    auto name = item_json["Name"].get<std::string>();
     auto sprite = item_json["Sprite"].get<int>();
     auto sprite_count = item_json["SpriteCount"].get<int>();
     auto type = item_json["Type"].get<int>();
@@ -74,15 +67,14 @@ std::vector<Item> load_items(const std::string& filename)
 
 
     // Debug
-    LOG_DEBUG("Item: %s Sprite: %d SpriteCount: %d Type: %d Flags: 0x%x",
-              name.c_str(),
+    LOG_DEBUG("Loaded Item: Sprite: %d SpriteCount: %d Type: %d Flags: 0x%x",
               sprite,
               sprite_count,
               type,
               flags);
 
     // Add the item
-    items.emplace_back(name, sprite, sprite_count, type, flags);
+    items.emplace_back(sprite, sprite_count, type, flags);
   }
 
   LOG_INFO("Loaded %d items", static_cast<int>(items.size()));
