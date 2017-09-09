@@ -1,10 +1,10 @@
 #include <cassert>
 #include <cstdio>
+#include <cstdlib>
 
 #include <memory>
 
 #include <SDL.h>
-#include <SDL_ttf.h>
 
 #include "input.h"
 #include "spritemgr.h"
@@ -16,8 +16,9 @@
 #include "item.h"
 #include "object.h"
 #include "player_input.h"
+#include "sdl_wrapper.h"
+#include "math.h"
 
-using Window = std::unique_ptr<SDL_Window,  decltype(&SDL_DestroyWindow)>;
 using Camera = geometry::Rectangle;
 
 // The size of the game camera
@@ -39,39 +40,12 @@ static SpriteManager sprite_manager;
 static bool paused(false);
 
 // Used by the render_x functions and should be up to date before each call to render_x()
-static std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> game_surface(nullptr, &SDL_FreeSurface);
+static std::unique_ptr<Surface> game_surface;
 static Camera game_camera;
 static unsigned game_tick;
 
 // Debug information
 static bool debug(false);
-
-Window init_SDL()
-{
-  // Init SDL
-  if (SDL_Init(SDL_INIT_VIDEO) < 0)
-  {
-    LOG_CRITICAL("Could not initialize SDL: %s", SDL_GetError());
-    return Window(nullptr, SDL_DestroyWindow);
-  }
-
-  // Init SDL_ttf
-  if (TTF_Init() < 0)
-  {
-    LOG_CRITICAL("Could not initialize TTF: %s", TTF_GetError());
-    return Window(nullptr, SDL_DestroyWindow);
-  }
-
-  atexit(SDL_Quit);
-
-  return Window(SDL_CreateWindow("OpenCrystalCaves",
-                                 0,
-                                 0,
-                                 WINDOW_SIZE.x(),
-                                 WINDOW_SIZE.y(),
-                                 SDL_WINDOW_SHOWN),
-                SDL_DestroyWindow);
-}
 
 void read_input(Input* input)
 {
@@ -197,15 +171,15 @@ void render_background()
             return item.get_sprite();
           }
         }();
-        auto src_rect = sprite_manager.get_rect_for_tile(sprite_id);
-        SDL_Rect dest_rect
+        const auto src_rect = sprite_manager.get_rect_for_tile(sprite_id);
+        const geometry::Rectangle dest_rect
         {
           (tile_x * 16) - game_camera.position.x(),
           (tile_y * 16) - game_camera.position.y(),
           16,
           16
         };
-        SDL_BlitSurface(sprite_manager.get_surface(), &src_rect, game_surface.get(), &dest_rect);
+        game_surface->blit_surface(sprite_manager.get_surface(), src_rect, dest_rect, BlitType::CROP);
       }
     }
   }
@@ -232,7 +206,7 @@ void render_player()
 
   const auto& player = game->get_player();
 
-  SDL_Rect src_rect = [&player]()
+  const geometry::Rectangle src_rect = [&player]()
   {
     // Sprite selection priority: (currently 'shooting' means pressing shoot button without ammo)
     // If walking:
@@ -302,13 +276,13 @@ void render_player()
       }
     }
   }();
-  auto player_render_pos = player.position - game_camera.position;
+  const auto player_render_pos = player.position - game_camera.position;
 
   // Note: player size is 12x16 but the sprite is 16x16 so we need to adjust where
   // the player is rendered
-  SDL_Rect dest_rect { player_render_pos.x() - 2, player_render_pos.y(), 16, 16 };
+  const geometry::Rectangle dest_rect { player_render_pos.x() - 2, player_render_pos.y(), 16, 16 };
 
-  SDL_BlitSurface(sprite_manager.get_surface(), &src_rect, game_surface.get(), &dest_rect);
+  game_surface->blit_surface(sprite_manager.get_surface(), src_rect, dest_rect, BlitType::CROP);
 }
 
 void render_foreground(bool in_front)
@@ -347,15 +321,15 @@ void render_foreground(bool in_front)
             return item.get_sprite();
           }
         }();
-        auto src_rect = sprite_manager.get_rect_for_tile(sprite_id);
-        SDL_Rect dest_rect
+        const auto src_rect = sprite_manager.get_rect_for_tile(sprite_id);
+        const geometry::Rectangle dest_rect
         {
           (tile_x * 16) - game_camera.position.x(),
           (tile_y * 16) - game_camera.position.y(),
           16,
           16
         };
-        SDL_BlitSurface(sprite_manager.get_surface(), &src_rect, game_surface.get(), &dest_rect);
+        game_surface->blit_surface(sprite_manager.get_surface(), src_rect, dest_rect, BlitType::CROP);
       }
     }
   }
@@ -369,15 +343,15 @@ void render_objects()
     if (geometry::isColliding(geometry::Rectangle(object.position, object.size), game_camera))
     {
       const auto sprite_id = object.sprite_id + (game_tick % object.num_sprites);
-      auto src_rect = sprite_manager.get_rect_for_tile(sprite_id);
-      SDL_Rect dest_rect
+      const auto src_rect = sprite_manager.get_rect_for_tile(sprite_id);
+      const geometry::Rectangle dest_rect
       {
         object.position.x() - game_camera.position.x(),
         object.position.y() - game_camera.position.y(),
         object.size.x(),
         object.size.y()
       };
-      SDL_BlitSurface(sprite_manager.get_surface(), &src_rect, game_surface.get(), &dest_rect);
+      game_surface->blit_surface(sprite_manager.get_surface(), src_rect, dest_rect, BlitType::CROP);
     }
   }
 }
@@ -418,7 +392,7 @@ void render_game()
   }
 
   // Clear game surface (background now)
-  SDL_FillRect(game_surface.get(), nullptr, SDL_MapRGB(game_surface->format, 33, 33, 33));
+  game_surface->fill_rect(geometry::Rectangle(0, 0, CAMERA_SIZE), { 33u, 33u, 33u });
 
   render_background();
   render_foreground(false);
@@ -442,39 +416,32 @@ int main()
   LOG_INFO("Starting!");
 
   // Create Window
-  Window window = init_SDL();
+  auto window = Window::create("OpenCrystalCaves", WINDOW_SIZE);
   if (!window)
   {
-    return EXIT_FAILURE;
+    return 1;
   }
-  auto* window_surface = SDL_GetWindowSurface(window.get());
+  auto window_surface = window->get_surface();
 
   // Create game surface
-  game_surface.reset(SDL_CreateRGBSurface(0,
-                                          CAMERA_SIZE.x(),
-                                          CAMERA_SIZE.y(),
-                                          window_surface->format->BitsPerPixel,
-                                          window_surface->format->Rmask,
-                                          window_surface->format->Gmask,
-                                          window_surface->format->Bmask,
-                                          window_surface->format->Amask));
+  game_surface = window->create_surface(CAMERA_SIZE);
   if (!game_surface)
   {
     LOG_CRITICAL("Could not create game surface");
-    return EXIT_FAILURE;
+    return 1;
   }
 
   if (!sprite_manager.load_tileset("media/sprites.bmp"))
   {
     LOG_CRITICAL("Could not load tileset");
-    return EXIT_FAILURE;
+    return 1;
   }
 
   game = Game::create();
   if (!game || !game->init())
   {
     LOG_CRITICAL("Could not initialize Game");
-    return EXIT_FAILURE;
+    return 1;
   }
 
   // Set initial game camera
@@ -524,7 +491,7 @@ int main()
         // Handle input
         if (input.quit)
         {
-          return EXIT_SUCCESS;  // Quit ASAP
+          return 0;  // Quit ASAP
         }
         if (input.num_1.pressed && !input.num_1.repeated)
         {
@@ -552,31 +519,26 @@ int main()
       /////////////////////////////////////////////////////////////////////////
 
       // Clear window surface
-      SDL_FillRect(window_surface, nullptr, SDL_MapRGB(window_surface->format, 33, 33, 33));
+      window_surface->fill_rect(geometry::Rectangle(0, 0, WINDOW_SIZE), { 33u, 33u, 33u });
 
       // Render game
       render_game();
 
       // Render game surface to window surface, centered and scaled
-      SDL_Rect src_rect = { 0, 0, CAMERA_SIZE.x(), CAMERA_SIZE.y() };
-      SDL_Rect dest_rect = {
-          (WINDOW_SIZE.x() - CAMERA_SIZE_SCALED.x()) / 2,
-          (WINDOW_SIZE.y() - CAMERA_SIZE_SCALED.y()) / 2,
-          CAMERA_SIZE_SCALED.x(),
-          CAMERA_SIZE_SCALED.y()
-      };
-      SDL_BlitScaled(game_surface.get(), &src_rect, window_surface, &dest_rect);
+      window_surface->blit_surface(game_surface.get(),
+                                   geometry::Rectangle(0, 0, CAMERA_SIZE),
+                                   geometry::Rectangle((WINDOW_SIZE - CAMERA_SIZE_SCALED) / 2, CAMERA_SIZE_SCALED),
+                                   BlitType::SCALE);
 
       // Render FPS
       auto fps_str = "fps: " + std::to_string(fps);
-      draw::text(5, 5, fps_str, { 255u, 255u, 255u, 0u }, window_surface);
+      window_surface->render_text(geometry::Position(5, 5), fps_str, { 255u, 255u, 255u });
 
       // Debug
       if (debug)
       {
         // Put a black box where we're going to the draw the debug text
-        SDL_Rect box = { 0, 24, 200, 165 };
-        SDL_FillRect(window_surface, &box, SDL_MapRGB(window_surface->format, 0u, 0u, 0u));
+        window_surface->fill_rect({ 0, 24, 200, 165 }, { 0u, 0u, 0u });
 
         // Debug text
         const auto camera_position_str = "camera position: (" + std::to_string(game_camera.position.x()) + ", " + std::to_string(game_camera.position.y()) + ")";
@@ -588,19 +550,19 @@ int main()
         const auto player_shooting_str = std::string("player shooting: ") + (game->get_player().shooting ? "true" : "false");
         const auto collide_str         = std::string("player collide: ")  + (game->get_player().collide_x ? "x " : "_ ") + (game->get_player().collide_y ? "y" : "_");
 
-        draw::text(5,  25, camera_position_str, { 255u, 0u, 0u, 0u}, window_surface);
-        draw::text(5,  45, player_position_str, { 255u, 0u, 0u, 0u}, window_surface);
-        draw::text(5,  65, player_velocity_str, { 255u, 0u, 0u, 0u}, window_surface);
-        draw::text(5,  85, player_walking_str,  { 255u, 0u, 0u, 0u}, window_surface);
-        draw::text(5, 105, player_jumping_str,  { 255u, 0u, 0u, 0u}, window_surface);
-        draw::text(5, 125, player_falling_str,  { 255u, 0u, 0u, 0u}, window_surface);
-        draw::text(5, 145, player_shooting_str, { 255u, 0u, 0u, 0u}, window_surface);
-        draw::text(5, 165, collide_str,         { 255u, 0u, 0u, 0u}, window_surface);
+        window_surface->render_text(geometry::Position(5,  25), camera_position_str, { 255u, 0u, 0u });
+        window_surface->render_text(geometry::Position(5,  45), player_position_str, { 255u, 0u, 0u });
+        window_surface->render_text(geometry::Position(5,  65), player_velocity_str, { 255u, 0u, 0u });
+        window_surface->render_text(geometry::Position(5,  85), player_walking_str,  { 255u, 0u, 0u });
+        window_surface->render_text(geometry::Position(5, 105), player_jumping_str,  { 255u, 0u, 0u });
+        window_surface->render_text(geometry::Position(5, 125), player_falling_str,  { 255u, 0u, 0u });
+        window_surface->render_text(geometry::Position(5, 145), player_shooting_str, { 255u, 0u, 0u });
+        window_surface->render_text(geometry::Position(5, 165), collide_str,         { 255u, 0u, 0u });
 
       }
 
       // Update screen
-      SDL_UpdateWindowSurface(window.get());
+      window->refresh();
 
       // Calculate FPS each second
       fps_num_renders++;
@@ -617,5 +579,5 @@ int main()
     }
   }
 
-  return EXIT_SUCCESS;
+  return 0;
 }

@@ -5,8 +5,11 @@ project(gfx)
 add_library(gfx
   "export/draw.h"
   "export/line.h"
+  "export/sdl_wrapper.h"
   "export/text.h"
   "src/line.cc"
+  "src/sdl_wrapper_impl.cc"
+  "src/sdl_wrapper_impl.h"
   "src/text.cc"
 )
 
