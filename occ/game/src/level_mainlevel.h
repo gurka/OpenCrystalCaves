@@ -8,7 +8,6 @@ class LevelMainLevel : public LevelBase
  public:
   LevelMainLevel(int width,
                  int height,
-                 std::vector<Item::Id> tiles_background,
                  std::vector<Item::Id> tiles_foreground,
                  std::vector<Item::Id> tiles_score);
 

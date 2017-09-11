@@ -54,8 +54,11 @@ static bool debug(false);
 
 void render_background()
 {
-  const auto& level = game->get_level();
-  const auto& items = game->get_items();
+  const auto& background = game->get_level().get_background();
+
+  // TODO: Create a surface of size CAMERA + (background.size() * 16) and render the background
+  //       to it _once_, then just keep render that surface (with game_camera offset) until the
+  //       level changes.
 
   const auto start_tile_x = game_camera.position.x() > 0 ? game_camera.position.x() / 16 : 0;
   const auto start_tile_y = game_camera.position.y() > 0 ? game_camera.position.y() / 16 : 0;
@@ -66,35 +69,16 @@ void render_background()
   {
     for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
     {
-      auto item_id = level.get_tile_background(tile_x, tile_y);
-      if (item_id != Item::invalid)
+      const auto sprite_id = background.sprite_id + (((tile_y + 1) % background.size_in_tiles.y()) * 4) + (tile_x % background.size_in_tiles.x());
+      const auto src_rect = sprite_manager.get_rect_for_tile(sprite_id);
+      const geometry::Rectangle dest_rect
       {
-        const auto& item = items[item_id];
-        const auto sprite_id = [&item, &tile_x, &tile_y]()
-        {
-          if (item.is_multiple_2x2())
-          {
-            return item.get_sprite() + (((tile_y + 1) % 2) * 4) + (tile_x % 2);
-          }
-          else if (item.is_multiple_4x2())
-          {
-            return item.get_sprite() + (((tile_y + 1) % 2) * 4) + (tile_x % 4);
-          }
-          else
-          {
-            return item.get_sprite();
-          }
-        }();
-        const auto src_rect = sprite_manager.get_rect_for_tile(sprite_id);
-        const geometry::Rectangle dest_rect
-        {
-          (tile_x * 16) - game_camera.position.x(),
-          (tile_y * 16) - game_camera.position.y(),
-          16,
-          16
-        };
-        game_surface->blit_surface(sprite_manager.get_surface(), src_rect, dest_rect, BlitType::CROP);
-      }
+        (tile_x * 16) - game_camera.position.x(),
+        (tile_y * 16) - game_camera.position.y(),
+        16,
+        16
+      };
+      game_surface->blit_surface(sprite_manager.get_surface(), src_rect, dest_rect, BlitType::CROP);
     }
   }
 }

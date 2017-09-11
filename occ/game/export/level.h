@@ -8,6 +8,12 @@
 
 class Object;
 
+struct Background
+{
+  int sprite_id;
+  geometry::Size size_in_tiles;
+};
+
 class Level
 {
  public:
@@ -21,7 +27,7 @@ class Level
   virtual int get_tile_height() const = 0;
 
   // Static tiles
-  virtual Item::Id get_tile_background(int tile_x, int tile_y) const = 0;
+  virtual const Background& get_background() const = 0;
   virtual Item::Id get_tile_foreground(int tile_x, int tile_y) const = 0;
   virtual Item::Id get_tile_score(int tile_x, int tile_y) const = 0;
 

@@ -6,23 +6,18 @@
 
 LevelBase::LevelBase(int width,
                      int height,
-                     std::vector<Item::Id> tiles_background,
+                     Background background,
                      std::vector<Item::Id> tiles_foreground,
                      std::vector<Item::Id> tiles_score,
                      std::vector<MovingPlatform> moving_platforms)
   : width_(width),
     height_(height),
-    tiles_background_(std::move(tiles_background)),
+    background_(std::move(background)),
     tiles_foreground_(std::move(tiles_foreground)),
     tiles_score_(std::move(tiles_score)),
     moving_platforms_(std::move(moving_platforms)),
     objects_()
 {
-}
-
-Item::Id LevelBase::get_tile_background(int tile_x, int tile_y) const
-{
-  return get_tile(tile_x, tile_y, tiles_background_);
 }
 
 Item::Id LevelBase::get_tile_foreground(int tile_x, int tile_y) const

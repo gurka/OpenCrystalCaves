@@ -2,12 +2,11 @@
 
 LevelOne::LevelOne(int width,
                    int height,
-                   std::vector<Item::Id> tiles_background,
                    std::vector<Item::Id> tiles_foreground,
                    std::vector<Item::Id> tiles_score)
   : LevelBase(width,
               height,
-              std::move(tiles_background),
+              { 970, geometry::Size(2, 2) },  // Background
               std::move(tiles_foreground),
               std::move(tiles_score),
               {

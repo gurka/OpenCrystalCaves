@@ -14,7 +14,7 @@ class LevelBase : public Level
  public:
   LevelBase(int width,
             int height,
-            std::vector<Item::Id> tiles_background,
+            Background background,
             std::vector<Item::Id> tiles_foreground,
             std::vector<Item::Id> tiles_score,
             std::vector<MovingPlatform> moving_platforms);
@@ -24,7 +24,7 @@ class LevelBase : public Level
   // From Level
   int get_tile_width() const override { return width_; }
   int get_tile_height() const override { return height_; }
-  Item::Id get_tile_background(int tile_x, int tile_y) const override;
+  const Background& get_background() const override { return background_; }
   Item::Id get_tile_foreground(int tile_x, int tile_y) const override;
   Item::Id get_tile_score(int tile_x, int tile_y) const override;
   const std::vector<Object>& get_objects() const override { return objects_; }
@@ -46,7 +46,7 @@ class LevelBase : public Level
   int height_;
 
   // Static tiles, in order
-  std::vector<Item::Id> tiles_background_;
+  Background background_;
   std::vector<Item::Id> tiles_foreground_;
   std::vector<Item::Id> tiles_score_;
 
