@@ -30,6 +30,7 @@ class GameRenderer
   geometry::Rectangle game_camera_;
 
   unsigned game_tick_;
+  unsigned game_tick_diff_;
 };
 
 #endif  // GAME_RENDERER_H_

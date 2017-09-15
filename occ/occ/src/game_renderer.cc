@@ -21,12 +21,14 @@ GameRenderer::GameRenderer(Game* game, SpriteManager* sprite_manager, Surface* g
                              (game_->get_level().get_tile_height() * 16) - CAMERA_SIZE.y()),
                  CAMERA_SIZE.x(),
                  CAMERA_SIZE.y()),
-    game_tick_(0)
+    game_tick_(0u),
+    game_tick_diff_(0u)
 {
 }
 
 void GameRenderer::render_game(unsigned game_tick)
 {
+  game_tick_diff_ = game_tick - game_tick_;
   game_tick_ = game_tick;
 
   // Update game camera
@@ -102,12 +104,24 @@ void GameRenderer::render_background()
     }
   }
 
-  // Special handling for MAIN_LEVEL
+  // MAIN_LEVEL has some special things that needs to be rendered
   if (game_->get_level().get_level_id() == LevelId::MAIN_LEVEL)
   {
+    // Might be cleaner to have this in a dedicated struct for MainLevel stuff
     static bool initialized = false;
+
     static std::vector<int> space_sprites;
     static std::vector<int> horizon_sprites;
+
+    static bool volcano_active = false;
+    static unsigned volcano_tick_start = 0u;
+
+    static bool earth_right = false;
+    static int earth_pos_x = 128;
+
+    static bool moon_right = false;
+    static int moon_pos_x = 160;
+
     if (!initialized)
     {
       // Generate space sprites
@@ -133,7 +147,58 @@ void GameRenderer::render_background()
       initialized = true;
     }
 
-    // Render space, earth, moon and volcano fire
+    // Update earth and moon, but only when game tick has increased since they use absolute movement
+    if (game_tick_diff_ != 0)
+    {
+      if (earth_right)
+      {
+        earth_pos_x += 1;
+        if ((earth_pos_x / 2) + 16 == game_->get_level().get_tile_width() * 16)
+        {
+          earth_right = false;
+        }
+      }
+      else
+      {
+        earth_pos_x -= 1;
+        if (earth_pos_x == 32)
+        {
+          earth_right = true;
+        }
+      }
+
+      if (moon_right)
+      {
+        moon_pos_x += earth_right ? 2 : 1;
+        if (moon_pos_x > earth_pos_x + 72 || (moon_pos_x / 2) + 16 == game_->get_level().get_tile_width() * 16)
+        {
+          moon_right = false;
+        }
+      }
+      else
+      {
+        moon_pos_x -= !earth_right ? 2 : 1;
+        if (moon_pos_x < earth_pos_x - 64 || moon_pos_x == 32)
+        {
+          moon_right = true;
+        }
+      }
+    }
+
+    // Update volcano
+    if (volcano_active && game_tick_ - volcano_tick_start >= 81u)
+    {
+      volcano_active = false;
+      volcano_tick_start = game_tick_;
+    }
+    else if (!volcano_active && game_tick_ - volcano_tick_start >= 220u)
+    {
+      volcano_active = true;
+      volcano_tick_start = game_tick_;
+    }
+
+    // Render space and horizon
+    // FIXME: refactor this
     for (int tile_y = start_tile_y; tile_y <= end_tile_y; tile_y++)
     {
       for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
@@ -166,6 +231,97 @@ void GameRenderer::render_background()
           };
           game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
         }
+      }
+    }
+
+    // Render earth and moon if visible
+    const auto earth_rect = geometry::Rectangle(geometry::Position(earth_pos_x / 2, 0), geometry::Size(16, 16));
+    const auto moon_rect = geometry::Rectangle(geometry::Position(moon_pos_x / 2, 0), geometry::Size(16, 16));
+    if (moon_right)
+    {
+      // Moon is behind earth, render moon first
+      if (geometry::isColliding(game_camera_, moon_rect))
+      {
+        const auto src_rect = sprite_manager_->get_rect_for_tile(634);
+        const geometry::Rectangle dest_rect
+        {
+          moon_rect.position.x() - game_camera_.position.x(),
+          moon_rect.position.y() - game_camera_.position.y(),
+          16,
+          16
+        };
+        game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
+      }
+      if (geometry::isColliding(game_camera_, earth_rect))
+      {
+        const auto src_rect = sprite_manager_->get_rect_for_tile(632);
+        const geometry::Rectangle dest_rect
+        {
+          earth_rect.position.x() - game_camera_.position.x(),
+          earth_rect.position.y() - game_camera_.position.y(),
+          16,
+          16
+        };
+        game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
+      }
+    }
+    else
+    {
+      // Earth is behind moon, render earth first
+      if (geometry::isColliding(game_camera_, earth_rect))
+      {
+        const auto src_rect = sprite_manager_->get_rect_for_tile(632);
+        const geometry::Rectangle dest_rect
+        {
+          earth_rect.position.x() - game_camera_.position.x(),
+          earth_rect.position.y() - game_camera_.position.y(),
+          16,
+          16
+        };
+        game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
+      }
+      if (geometry::isColliding(game_camera_, moon_rect))
+      {
+        const auto src_rect = sprite_manager_->get_rect_for_tile(634);
+        const geometry::Rectangle dest_rect
+        {
+          moon_rect.position.x() - game_camera_.position.x(),
+          moon_rect.position.y() - game_camera_.position.y(),
+          16,
+          16
+        };
+        game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
+      }
+    }
+
+    // Render volcano fire if active and visible
+    if (volcano_active)
+    {
+      if (start_tile_x <= 29 && end_tile_x >= 29)
+      {
+        const auto sprite_id = 752 + ((game_tick_ - volcano_tick_start) / 3) % 4;
+        const auto src_rect = sprite_manager_->get_rect_for_tile(sprite_id);
+        const geometry::Rectangle dest_rect
+        {
+          (29 * 16) - game_camera_.position.x(),
+          (2 * 16) - game_camera_.position.y(),
+          16,
+          16
+        };
+        game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
+      }
+      if (start_tile_x <= 30 && end_tile_x >= 30)
+      {
+        const auto sprite_id = 748 + ((game_tick_ - volcano_tick_start) / 3) % 4;
+        const auto src_rect = sprite_manager_->get_rect_for_tile(sprite_id);
+        const geometry::Rectangle dest_rect
+        {
+          (30 * 16) - game_camera_.position.x(),
+          (2 * 16) - game_camera_.position.y(),
+          16,
+          16
+        };
+        game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
       }
     }
   }
