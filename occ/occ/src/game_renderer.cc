@@ -7,6 +7,7 @@
 #include "spritemgr.h"
 #include "graphics.h"
 #include "math.h"
+#include "misc.h"
 
 GameRenderer::GameRenderer(Game* game, SpriteManager* sprite_manager, Surface* game_surface)
   : game_(game),
@@ -98,6 +99,74 @@ void GameRenderer::render_background()
         16
       };
       game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
+    }
+  }
+
+  // Special handling for MAIN_LEVEL
+  if (game_->get_level().get_level_id() == LevelId::MAIN_LEVEL)
+  {
+    static bool initialized = false;
+    static std::vector<int> space_sprites;
+    static std::vector<int> horizon_sprites;
+    if (!initialized)
+    {
+      // Generate space sprites
+      for (int x = 0; x < game_->get_level().get_tile_width(); x++)
+      {
+        for (int y = 0; y < 4; y++)
+        {
+          // The sprite with the bright star (358) seems to be less common...
+          static const auto sprites = misc::make_array(356, 356, 356, 356, 357, 357, 357, 357, 358, 359, 359, 359, 359, 360, 360, 360, 360, 361, 361, 361, 361);
+          const auto sprite_index = misc::random<int>(0, sprites.size() - 1);
+          space_sprites.emplace_back(sprites[sprite_index]);
+        }
+      }
+
+      // Generate horizon
+      for (int x = 0; x < game_->get_level().get_tile_width(); x++)
+      {
+        static const auto sprites = misc::make_array(240, 247, 248, 249, 250);
+        const auto sprite_index = misc::random<int>(0, sprites.size() - 1);
+        horizon_sprites.emplace_back(sprites[sprite_index]);
+      }
+
+      initialized = true;
+    }
+
+    // Render space, earth, moon and volcano fire
+    for (int tile_y = start_tile_y; tile_y <= end_tile_y; tile_y++)
+    {
+      for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
+      {
+        if (tile_y >= 0 && tile_y < 4)
+        {
+          // Render space sprite
+          const auto sprite_id = space_sprites[(tile_y * game_->get_level().get_tile_width()) + tile_x];
+          const auto src_rect = sprite_manager_->get_rect_for_tile(sprite_id);
+          const geometry::Rectangle dest_rect
+          {
+            (tile_x * 16) - game_camera_.position.x(),
+            (tile_y * 16) - game_camera_.position.y(),
+            16,
+            16
+          };
+          game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
+        }
+        else if (tile_y == 4)
+        {
+          // Render horizon
+          const auto sprite_id = horizon_sprites[tile_x];
+          const auto src_rect = sprite_manager_->get_rect_for_tile(sprite_id);
+          const geometry::Rectangle dest_rect
+          {
+            (tile_x * 16) - game_camera_.position.x(),
+            (tile_y * 16) - game_camera_.position.y(),
+            16,
+            16
+          };
+          game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
+        }
+      }
     }
   }
 }
