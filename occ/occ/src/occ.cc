@@ -4,13 +4,12 @@
 
 #include <memory>
 
+#include "constants.h"
+#include "game_renderer.h"
 #include "spritemgr.h"
 
 // From game
 #include "game.h"
-#include "item.h"
-#include "level.h"
-#include "object.h"
 #include "player_input.h"
 #include "player.h"
 
@@ -22,315 +21,6 @@
 // From utils
 #include "geometry.h"
 #include "logger.h"
-#include "math.h"
-
-using Camera = geometry::Rectangle;
-
-// The size of the game camera
-// TODO: It seems as if Crystal Caves actually renders 12½ tiles on y axis - verify this and adjust accordingly
-static constexpr geometry::Size CAMERA_SIZE = geometry::Size(320, 192);
-
-// The size of the game camera after stretching, which is done in the original Crystal Caves
-static constexpr geometry::Size CAMERA_SIZE_STRETCHED = geometry::Size(CAMERA_SIZE.x(), CAMERA_SIZE.y() * 1.2f);
-
-// The size of the game camera after scaling - this should be based on the (dynamic) window size in the future
-static constexpr geometry::Size CAMERA_SIZE_SCALED = CAMERA_SIZE_STRETCHED * 3.0f;
-
-// The size of the game window
-static constexpr geometry::Size WINDOW_SIZE = CAMERA_SIZE_SCALED;
-
-// Game variables
-static std::unique_ptr<Game> game;
-static SpriteManager sprite_manager;
-static bool paused(false);
-
-// Used by the render_x functions and should be up to date before each call to render_x()
-static std::unique_ptr<Surface> game_surface;
-static Camera game_camera;
-static unsigned game_tick;
-
-// Debug information
-static bool debug(false);
-
-void render_background()
-{
-  const auto& background = game->get_level().get_background();
-
-  // TODO: Create a surface of size CAMERA + (background.size() * 16) and render the background
-  //       to it _once_, then just keep render that surface (with game_camera offset) until the
-  //       level changes.
-
-  const auto start_tile_x = game_camera.position.x() > 0 ? game_camera.position.x() / 16 : 0;
-  const auto start_tile_y = game_camera.position.y() > 0 ? game_camera.position.y() / 16 : 0;
-  const auto end_tile_x = (game_camera.position.x() + game_camera.size.x()) / 16;
-  const auto end_tile_y = (game_camera.position.y() + game_camera.size.y()) / 16;
-
-  for (int tile_y = start_tile_y; tile_y <= end_tile_y; tile_y++)
-  {
-    for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
-    {
-      const auto sprite_id = background.sprite_id + (((tile_y + 1) % background.size_in_tiles.y()) * 4) + (tile_x % background.size_in_tiles.x());
-      const auto src_rect = sprite_manager.get_rect_for_tile(sprite_id);
-      const geometry::Rectangle dest_rect
-      {
-        (tile_x * 16) - game_camera.position.x(),
-        (tile_y * 16) - game_camera.position.y(),
-        16,
-        16
-      };
-      game_surface->blit_surface(sprite_manager.get_surface(), src_rect, dest_rect, BlitType::CROP);
-    }
-  }
-}
-
-void render_player()
-{
-  // Player sprite ids
-  static constexpr int sprite_standing_right = 260;
-  static constexpr std::array<int, 12> sprite_walking_right =
-  {
-      260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271
-  };
-  static constexpr int sprite_jumping_right = 284;
-  static constexpr int sprite_shooting_right = 286;
-
-  static constexpr int sprite_standing_left = 272;
-  static constexpr std::array<int, 12> sprite_walking_left =
-  {
-      272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283
-  };
-  static constexpr int sprite_jumping_left = 285;
-  static constexpr int sprite_shooting_left = 287;
-
-  const auto& player = game->get_player();
-
-  const geometry::Rectangle src_rect = [&player]()
-  {
-    // Sprite selection priority: (currently 'shooting' means pressing shoot button without ammo)
-    // If walking:
-    //   1. Jumping or falling
-    //   2. Walking
-    // Else:
-    //   1. Shooting
-    //   2. Jumping or falling
-    //   3. Standing still
-
-    if (player.direction == Player::Direction::right)
-    {
-      if (player.walking)
-      {
-        if (player.jumping || player.falling)
-        {
-          return sprite_manager.get_rect_for_tile(sprite_jumping_right);
-        }
-        else
-        {
-          return sprite_manager.get_rect_for_tile(sprite_walking_right[player.walk_tick % sprite_walking_right.size()]);
-        }
-      }
-      else
-      {
-        if (player.shooting)
-        {
-          return sprite_manager.get_rect_for_tile(sprite_shooting_right);
-        }
-        else if (player.jumping || player.falling)
-        {
-          return sprite_manager.get_rect_for_tile(sprite_jumping_right);
-        }
-        else
-        {
-          return sprite_manager.get_rect_for_tile(sprite_standing_right);
-        }
-      }
-    }
-    else  // player_.direction == Player::Direction::left
-    {
-      if (player.walking)
-      {
-        if (player.jumping || player.falling)
-        {
-          return sprite_manager.get_rect_for_tile(sprite_jumping_left);
-        }
-        else
-        {
-          return sprite_manager.get_rect_for_tile(sprite_walking_left[player.walk_tick % sprite_walking_left.size()]);
-        }
-      }
-      else
-      {
-        if (player.shooting)
-        {
-          return sprite_manager.get_rect_for_tile(sprite_shooting_left);
-        }
-        else if (player.jumping || player.falling)
-        {
-          return sprite_manager.get_rect_for_tile(sprite_jumping_left);
-        }
-        else
-        {
-          return sprite_manager.get_rect_for_tile(sprite_standing_left);
-        }
-      }
-    }
-  }();
-  const auto player_render_pos = player.position - game_camera.position;
-
-  // Note: player size is 12x16 but the sprite is 16x16 so we need to adjust where
-  // the player is rendered
-  const geometry::Rectangle dest_rect { player_render_pos.x() - 2, player_render_pos.y(), 16, 16 };
-
-  game_surface->blit_surface(sprite_manager.get_surface(), src_rect, dest_rect, BlitType::CROP);
-}
-
-void render_foreground(bool in_front)
-{
-  const auto& level = game->get_level();
-  const auto& items = game->get_items();
-
-  const auto start_tile_x = game_camera.position.x() > 0 ? game_camera.position.x() / 16 : 0;
-  const auto start_tile_y = game_camera.position.y() > 0 ? game_camera.position.y() / 16 : 0;
-  const auto end_tile_x = (game_camera.position.x() + game_camera.size.x()) / 16;
-  const auto end_tile_y = (game_camera.position.y() + game_camera.size.y()) / 16;
-
-  for (int tile_y = start_tile_y; tile_y <= end_tile_y; tile_y++)
-  {
-    for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
-    {
-      auto item_id = level.get_tile_foreground(tile_x, tile_y);
-      if (item_id != Item::invalid)
-      {
-        const auto& item = items[item_id];
-
-        if ((in_front && !item.is_render_in_front()) ||
-            (!in_front && item.is_render_in_front()))
-        {
-          continue;
-        }
-
-        const auto sprite_id = [&item]()
-        {
-          if (item.is_animated())
-          {
-            return item.get_sprite() + static_cast<int>((game_tick / 2) % item.get_sprite_count());
-          }
-          else
-          {
-            return item.get_sprite();
-          }
-        }();
-        const auto src_rect = sprite_manager.get_rect_for_tile(sprite_id);
-        const geometry::Rectangle dest_rect
-        {
-          (tile_x * 16) - game_camera.position.x(),
-          (tile_y * 16) - game_camera.position.y(),
-          16,
-          16
-        };
-        game_surface->blit_surface(sprite_manager.get_surface(), src_rect, dest_rect, BlitType::CROP);
-      }
-    }
-  }
-}
-
-void render_objects()
-{
-  // Render additional objects
-  for (const auto& object : game->get_level().get_objects())
-  {
-    if (geometry::isColliding(geometry::Rectangle(object.position, object.size), game_camera))
-    {
-      const auto sprite_id = object.sprite_id + (game_tick % object.num_sprites);
-      const auto src_rect = sprite_manager.get_rect_for_tile(sprite_id);
-      const geometry::Rectangle dest_rect
-      {
-        object.position.x() - game_camera.position.x(),
-        object.position.y() - game_camera.position.y(),
-        object.size.x(),
-        object.size.y()
-      };
-      game_surface->blit_surface(sprite_manager.get_surface(), src_rect, dest_rect, BlitType::CROP);
-    }
-  }
-}
-
-void render_score()
-{
-  const auto& level = game->get_level();
-  const auto& items = game->get_items();
-
-  const auto start_tile_x = game_camera.position.x() > 0 ? game_camera.position.x() / 16 : 0;
-  const auto start_tile_y = game_camera.position.y() > 0 ? game_camera.position.y() / 16 : 0;
-  const auto end_tile_x = (game_camera.position.x() + game_camera.size.x()) / 16;
-  const auto end_tile_y = (game_camera.position.y() + game_camera.size.y()) / 16;
-
-  for (int tile_y = start_tile_y; tile_y <= end_tile_y; tile_y++)
-  {
-    for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
-    {
-      auto item_id = level.get_tile_score(tile_x, tile_y);
-      if (item_id != Item::invalid)
-      {
-        const auto& item = items[item_id];
-        const auto src_rect = sprite_manager.get_rect_for_tile(item.get_sprite());
-        const geometry::Rectangle dest_rect
-        {
-          (tile_x * 16) - game_camera.position.x(),
-          (tile_y * 16) - game_camera.position.y(),
-          16,
-          16
-        };
-        game_surface->blit_surface(sprite_manager.get_surface(), src_rect, dest_rect, BlitType::CROP);
-      }
-    }
-  }
-}
-
-void render_game()
-{
-  // Update game camera
-  // Note: this isn't exactly how the Crystal Caves camera work, but it's good enough
-  const geometry::Position player_camera_relative_position {(game->get_player().position + (game->get_player().size / 2)) - (game_camera.position + (game_camera.size / 2))};
-  if (player_camera_relative_position.x() < -4)
-  {
-    game_camera.position = geometry::Position(math::clamp(game_camera.position.x() + player_camera_relative_position.x() + 4,
-                                                          0,
-                                                          (game->get_level().get_tile_width() * 16) - CAMERA_SIZE.x()),
-                                              game_camera.position.y());
-  }
-  else if (player_camera_relative_position.x() > 20)
-  {
-    game_camera.position = geometry::Position(math::clamp(game_camera.position.x() + player_camera_relative_position.x() - 20,
-                                                          0,
-                                                          (game->get_level().get_tile_width() * 16) - CAMERA_SIZE.x()),
-                                              game_camera.position.y());
-  }
-
-  if (player_camera_relative_position.y() < -10)
-  {
-    game_camera.position = geometry::Position(game_camera.position.x(),
-                                              math::clamp(game_camera.position.y() + player_camera_relative_position.y() + 10,
-                                                          0,
-                                                          (game->get_level().get_tile_height() * 16) - CAMERA_SIZE.y()));
-  }
-  else if (player_camera_relative_position.y() > 32)
-  {
-    game_camera.position = geometry::Position(game_camera.position.x(),
-                                              math::clamp(game_camera.position.y() + player_camera_relative_position.y() - 32,
-                                                          0,
-                                                          (game->get_level().get_tile_height() * 16) - CAMERA_SIZE.y()));
-  }
-
-  // Clear game surface (background now)
-  game_surface->fill_rect(geometry::Rectangle(0, 0, CAMERA_SIZE), { 33u, 33u, 33u });
-
-  render_background();
-  render_foreground(false);
-  render_objects();
-  render_player();
-  render_foreground(true);
-  render_score();
-}
 
 PlayerInput input_to_player_input(const Input& input)
 {
@@ -371,7 +61,7 @@ int main()
   LOG_INFO("Window created");
 
   // Create game surface
-  game_surface = window->create_surface(CAMERA_SIZE);
+  std::unique_ptr<Surface> game_surface = window->create_surface(CAMERA_SIZE);
   if (!game_surface)
   {
     LOG_CRITICAL("Could not create game surface");
@@ -388,6 +78,7 @@ int main()
   }
 
   // Load tileset
+  SpriteManager sprite_manager;
   if (!sprite_manager.load_tileset("media/sprites.bmp"))
   {
     LOG_CRITICAL("Could not load tileset");
@@ -396,7 +87,7 @@ int main()
   LOG_INFO("Tileset loaded");
 
   // Create Game
-  game = Game::create();
+  std::unique_ptr<Game> game = Game::create();
   if (!game)
   {
     LOG_CRITICAL("Could not create Game");
@@ -409,24 +100,21 @@ int main()
   }
   LOG_INFO("Game initialized");
 
-  // Set initial game camera
-  game_camera = Camera(math::clamp(game->get_player().position.x() + (game->get_player().size.x() / 2) - (CAMERA_SIZE.x() / 2),
-                                   0,
-                                   (game->get_level().get_tile_width() * 16) - CAMERA_SIZE.x()),
-                       math::clamp(game->get_player().position.y() + (game->get_player().size.y() / 2) - (CAMERA_SIZE.y() / 2),
-                                   0,
-                                   (game->get_level().get_tile_height() * 16) - CAMERA_SIZE.y()),
-                       CAMERA_SIZE.x(),
-                       CAMERA_SIZE.y());
+  // Create GameRenderer
+  GameRenderer game_renderer(game.get(), &sprite_manager, game_surface.get());
 
   // Game loop
   {
+    // Game variables
+    bool paused = false;
+    unsigned game_tick = 0u;
     Input input;
 
-    auto sdl_tick = sdl->get_tick();
-    game_tick = 0u;
+    // Debug information
+    bool debug = false;
 
     // Game loop logic
+    auto sdl_tick = sdl->get_tick();
     const auto ms_per_update = 57;  // 17.5~ ticks per second
     auto tick_last_update = sdl_tick;
     auto lag = 0u;
@@ -487,7 +175,7 @@ int main()
       window_surface->fill_rect(geometry::Rectangle(0, 0, WINDOW_SIZE), { 33u, 33u, 33u });
 
       // Render game
-      render_game();
+      game_renderer.render_game(game_tick);
 
       // Render game surface to window surface, centered and scaled
       window_surface->blit_surface(game_surface.get(),
@@ -504,6 +192,8 @@ int main()
       {
         // Put a black box where we're going to the draw the debug text
         window_surface->fill_rect({ 0, 24, 200, 165 }, { 0u, 0u, 0u });
+
+        const auto& game_camera = game_renderer.get_game_camera();
 
         // Debug text
         const auto camera_position_str = "camera position: (" + std::to_string(game_camera.position.x()) + ", " + std::to_string(game_camera.position.y()) + ")";
