@@ -6,6 +6,7 @@ add_library(utils
   "export/geometry.h"
   "export/logger.h"
   "export/math.h"
+  "export/misc.h"
   "export/vector.h"
   "src/geometry.cc"
   "src/logger.cc"
