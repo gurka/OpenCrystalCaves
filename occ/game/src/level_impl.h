@@ -1,5 +1,5 @@
-#ifndef LEVEL_BASE_H_
-#define LEVEL_BASE_H_
+#ifndef LEVEL_IMPL_H_
+#define LEVEL_IMPL_H_
 
 #include <vector>
 
@@ -9,17 +9,16 @@
 #include "object.h"
 #include "moving_platform.h"
 
-class LevelBase : public Level
+class LevelImpl : public Level
 {
  public:
-  LevelBase(int width,
+  LevelImpl(int width,
             int height,
+            const geometry::Position& player_spawn,
             Background background,
             std::vector<Item::Id> tiles_foreground,
             std::vector<Item::Id> tiles_score,
             std::vector<MovingPlatform> moving_platforms);
-
-  virtual ~LevelBase() = default;
 
   // From Level
   int get_tile_width() const override { return width_; }
@@ -29,11 +28,8 @@ class LevelBase : public Level
   Item::Id get_tile_score(int tile_x, int tile_y) const override;
   const std::vector<Object>& get_objects() const override { return objects_; }
 
+  const geometry::Position& get_player_spawn() const { return player_spawn_; }
   void update(unsigned game_tick);
-
-  // Must be overriden by Levels
-  virtual geometry::Position get_player_spawn() const = 0;
-  virtual void update_level(unsigned game_tick) = 0;
 
   // Used by Game to update the moving platforms
   std::vector<MovingPlatform>& get_moving_platforms() { return moving_platforms_; }
@@ -44,6 +40,8 @@ class LevelBase : public Level
   // Size of level in number of tiles
   int width_;
   int height_;
+
+  geometry::Position player_spawn_;
 
   // Static tiles, in order
   Background background_;
@@ -57,4 +55,4 @@ class LevelBase : public Level
   std::vector<Object> objects_;
 };
 
-#endif  // LEVEL_BASE_H_
+#endif  // LEVEL_IMPL_H_

@@ -10,6 +10,12 @@ class Object;
 
 struct Background
 {
+  Background(int sprite_id, geometry::Size size_in_tiles)
+    : sprite_id(sprite_id),
+      size_in_tiles(size_in_tiles)
+  {
+  }
+
   int sprite_id;
   geometry::Size size_in_tiles;
 };
