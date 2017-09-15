@@ -4,14 +4,16 @@
 
 #include "geometry.h"
 
-LevelImpl::LevelImpl(int width,
+LevelImpl::LevelImpl(LevelId level_id,
+                     int width,
                      int height,
                      const geometry::Position& player_spawn,
                      Background background,
                      std::vector<Item::Id> tiles_foreground,
                      std::vector<Item::Id> tiles_score,
                      std::vector<MovingPlatform> moving_platforms)
-  : width_(width),
+  : level_id_(level_id),
+    width_(width),
     height_(height),
     player_spawn_(player_spawn),
     background_(std::move(background)),

@@ -20,6 +20,12 @@ struct Background
   geometry::Size size_in_tiles;
 };
 
+enum class LevelId
+{
+  MAIN_LEVEL,
+  LEVEL_ONE,
+};
+
 class Level
 {
  public:
@@ -27,6 +33,7 @@ class Level
 
   // The only functions that need to be declared here
   // are functions that are used for rendering the level
+  virtual LevelId get_level_id() const = 0;
 
   // Width and height of the level in tiles
   virtual int get_tile_width() const = 0;

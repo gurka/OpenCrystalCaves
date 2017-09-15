@@ -5,13 +5,14 @@
 #include <memory>
 #include <vector>
 
+enum class LevelId;
 class LevelImpl;
 class Item;
 
 namespace LevelLoader
 {
 
-std::unique_ptr<LevelImpl> load_level(const std::string& filename);
+std::unique_ptr<LevelImpl> load_level(LevelId level_id);
 
 }
 

@@ -25,8 +25,8 @@ bool GameImpl::init()
     return false;
   }
 
-  //level_ = LevelLoader::load_level("media/mainlevel.json");
-  level_ = LevelLoader::load_level("media/level1.json");
+  level_ = LevelLoader::load_level(LevelId::MAIN_LEVEL);
+  //level_ = LevelLoader::load_level(LevelId::LEVEL_ONE);
   if (!level_)
   {
     return false;

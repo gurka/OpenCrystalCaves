@@ -2,17 +2,38 @@
 
 #include <cstdio>
 #include <fstream>
+#include <unordered_map>
 #include <utility>
 #include <json.hpp>
 
 #include "logger.h"
 #include "level_impl.h"
 
+namespace
+{
+
+const std::unordered_map<LevelId, std::string> level_filename =
+{
+    { LevelId::MAIN_LEVEL, "media/mainlevel.json" },
+    { LevelId::LEVEL_ONE,  "media/level1.json" },
+};
+
+}
+
 namespace LevelLoader
 {
 
-std::unique_ptr<LevelImpl> load_level(const std::string& filename)
+std::unique_ptr<LevelImpl> load_level(LevelId level_id)
 {
+  // Check if level is valid
+  if (level_filename.count(level_id) == 0)
+  {
+    LOG_CRITICAL("Unknown level id: %d", static_cast<int>(level_id));
+    return std::unique_ptr<LevelImpl>();
+  }
+
+  const auto& filename = level_filename.at(level_id);
+
   // Open and parse JSON file
   std::ifstream level_file(filename);
   if (!level_file.good())
@@ -67,11 +88,10 @@ std::unique_ptr<LevelImpl> load_level(const std::string& filename)
   LOG_INFO("Loaded level from '%s'", filename.c_str());
   LOG_DEBUG("Level information: width=%d height=%d", width, height);
 
-  // TODO: Would be nice if we could verify that the given level is a valid
-  // level before we get this far (without having to specify all valid levels in multiple places...)
-  if (filename == "media/mainlevel.json")
+  if (level_id == LevelId::MAIN_LEVEL)
   {
-    return std::make_unique<LevelImpl>(width,
+    return std::make_unique<LevelImpl>(level_id,
+                                       width,
                                        height,
                                        geometry::Position(32, 48),  // Player spawn
                                        Background(20, geometry::Size(2, 2)),
@@ -97,9 +117,10 @@ std::unique_ptr<LevelImpl> load_level(const std::string& filename)
                                          }
                                        }));
   }
-  else if (filename == "media/level1.json")
+  else if (level_id == LevelId::LEVEL_ONE)
   {
-    return std::make_unique<LevelImpl>(width,
+    return std::make_unique<LevelImpl>(level_id,
+                                       width,
                                        height,
                                        geometry::Position(4 * 16, 22 * 16),  // Player spawn
                                        Background(970, geometry::Size(2, 2)),

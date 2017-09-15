@@ -12,7 +12,8 @@
 class LevelImpl : public Level
 {
  public:
-  LevelImpl(int width,
+  LevelImpl(LevelId level_id,
+            int width,
             int height,
             const geometry::Position& player_spawn,
             Background background,
@@ -21,6 +22,7 @@ class LevelImpl : public Level
             std::vector<MovingPlatform> moving_platforms);
 
   // From Level
+  LevelId get_level_id() const override { return level_id_; }
   int get_tile_width() const override { return width_; }
   int get_tile_height() const override { return height_; }
   const Background& get_background() const override { return background_; }
@@ -36,6 +38,8 @@ class LevelImpl : public Level
 
  protected:
   Item::Id get_tile(int tile_x, int tile_y, const std::vector<Item::Id>& items) const;
+
+  LevelId level_id_;
 
   // Size of level in number of tiles
   int width_;
