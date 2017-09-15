@@ -39,8 +39,10 @@ bool GameImpl::init()
 
 void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
 {
+  (void)game_tick;  // Not needed atm
+
   // Update the level (e.g. moving platforms and other objects)
-  update_level(game_tick);
+  update_level();
 
   // Update the player
   update_player(player_input);
@@ -52,7 +54,7 @@ void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
   // ...
 }
 
-void GameImpl::update_level(unsigned game_tick)
+void GameImpl::update_level()
 {
   // Update all MovingPlatforms
   for (auto& platform : level_->get_moving_platforms())
@@ -85,9 +87,6 @@ void GameImpl::update_level(unsigned game_tick)
       platform.forward = !platform.forward;
     }
   }
-
-  // Update additional objects in the level
-  level_->update(game_tick);
 }
 
 void GameImpl::update_player(const PlayerInput& player_input)

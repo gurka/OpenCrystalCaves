@@ -5,6 +5,7 @@
 
 #include "item.h"
 #include "geometry.h"
+#include "moving_platform.h"
 
 class Object;
 
@@ -39,13 +40,10 @@ class Level
   virtual int get_tile_width() const = 0;
   virtual int get_tile_height() const = 0;
 
-  // Static tiles
   virtual const Background& get_background() const = 0;
   virtual Item::Id get_tile_foreground(int tile_x, int tile_y) const = 0;
   virtual Item::Id get_tile_score(int tile_x, int tile_y) const = 0;
-
-  // Objects
-  virtual const std::vector<Object>& get_objects() const = 0;
+  virtual const std::vector<MovingPlatform>& get_moving_platforms() const = 0;
 };
 
 #endif  // LEVEL_H_

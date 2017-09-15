@@ -19,8 +19,7 @@ LevelImpl::LevelImpl(LevelId level_id,
     background_(std::move(background)),
     tiles_foreground_(std::move(tiles_foreground)),
     tiles_score_(std::move(tiles_score)),
-    moving_platforms_(std::move(moving_platforms)),
-    objects_()
+    moving_platforms_(std::move(moving_platforms))
 {
 }
 
@@ -43,19 +42,5 @@ Item::Id LevelImpl::get_tile(int tile_x, int tile_y, const std::vector<Item::Id>
   else
   {
     return Item::invalid;
-  }
-}
-
-void LevelImpl::update(unsigned game_tick)
-{
-  (void)game_tick;
-
-  // Clear objects
-  objects_.clear();
-
-  // Add MovingPlatform Objects
-  for (const auto& platform : moving_platforms_)
-  {
-    objects_.emplace_back(platform.position, geometry::Size(16, 16), platform.sprite_id, platform.num_sprites);
   }
 }

@@ -6,7 +6,6 @@
 #include "level.h"
 #include "item.h"
 #include "geometry.h"
-#include "object.h"
 #include "moving_platform.h"
 
 class LevelImpl : public Level
@@ -23,17 +22,17 @@ class LevelImpl : public Level
 
   // From Level
   LevelId get_level_id() const override { return level_id_; }
+
   int get_tile_width() const override { return width_; }
   int get_tile_height() const override { return height_; }
+
   const Background& get_background() const override { return background_; }
   Item::Id get_tile_foreground(int tile_x, int tile_y) const override;
   Item::Id get_tile_score(int tile_x, int tile_y) const override;
-  const std::vector<Object>& get_objects() const override { return objects_; }
+  const std::vector<MovingPlatform>& get_moving_platforms() const override { return moving_platforms_; }
 
+  // Used by Game
   const geometry::Position& get_player_spawn() const { return player_spawn_; }
-  void update(unsigned game_tick);
-
-  // Used by Game to update the moving platforms
   std::vector<MovingPlatform>& get_moving_platforms() { return moving_platforms_; }
 
  protected:
@@ -54,9 +53,6 @@ class LevelImpl : public Level
 
   // Moving platforms
   std::vector<MovingPlatform> moving_platforms_;
-
-  // Objects
-  std::vector<Object> objects_;
 };
 
 #endif  // LEVEL_IMPL_H_

@@ -29,7 +29,7 @@ class GameImpl : public Game
   const Level& get_level() const override { return *level_; }
 
  private:
-  void update_level(unsigned game_tick);
+  void update_level();
   void update_player(const PlayerInput& player_input);
 
   bool player_collides(const geometry::Position& position);

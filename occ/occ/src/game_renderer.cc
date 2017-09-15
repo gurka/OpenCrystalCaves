@@ -7,7 +7,6 @@
 #include "spritemgr.h"
 #include "graphics.h"
 #include "math.h"
-#include "object.h"
 
 GameRenderer::GameRenderer(Game* game, SpriteManager* sprite_manager, Surface* game_surface)
   : game_(game),
@@ -70,7 +69,6 @@ void GameRenderer::render_game(unsigned game_tick)
   render_objects();
   render_player();
   render_foreground(true);
-  render_score();
 }
 
 void GameRenderer::render_background()
@@ -256,26 +254,26 @@ void GameRenderer::render_foreground(bool in_front)
 
 void GameRenderer::render_objects()
 {
-  for (const auto& object : game_->get_level().get_objects())
+  // Render moving platforms
+  for (const auto& platform : game_->get_level().get_moving_platforms())
   {
-    if (geometry::isColliding(geometry::Rectangle(object.position, object.size), game_camera_))
+    static constexpr geometry::Size platform_size = geometry::Size(16, 16);
+    if (geometry::isColliding(geometry::Rectangle(platform.position, platform_size), game_camera_))
     {
-      const auto sprite_id = object.sprite_id + (game_tick_ % object.num_sprites);
+      const auto sprite_id = platform.sprite_id + (game_tick_ % platform.num_sprites);
       const auto src_rect = sprite_manager_->get_rect_for_tile(sprite_id);
       const geometry::Rectangle dest_rect
       {
-        object.position.x() - game_camera_.position.x(),
-        object.position.y() - game_camera_.position.y(),
-        object.size.x(),
-        object.size.y()
+        platform.position.x() - game_camera_.position.x(),
+        platform.position.y() - game_camera_.position.y(),
+        platform_size.x(),
+        platform_size.y()
       };
       game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
     }
   }
-}
 
-void GameRenderer::render_score()
-{
+  // Render score
   const auto& level = game_->get_level();
   const auto& items = game_->get_items();
 
