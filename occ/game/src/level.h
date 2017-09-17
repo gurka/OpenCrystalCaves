@@ -17,8 +17,7 @@ class Level
         int height,
         const geometry::Position& player_spawn,
         Background background,
-        std::vector<Item::Id> tiles_foreground,
-        std::vector<Item::Id> tiles_score,
+        std::vector<Item::Id> tiles,
         std::vector<MovingPlatform> moving_platforms);
 
   LevelId get_level_id() const { return level_id_; }
@@ -28,16 +27,13 @@ class Level
 
   const Background& get_background() const { return background_; }
 
-  Item::Id get_tile_foreground(int tile_x, int tile_y) const;
-  Item::Id get_tile_score(int tile_x, int tile_y) const;
+  Item::Id get_tile(int tile_x, int tile_y) const;
 
   const geometry::Position& get_player_spawn() const { return player_spawn_; }
 
   std::vector<MovingPlatform>& get_moving_platforms() { return moving_platforms_; }
 
  protected:
-  Item::Id get_tile(int tile_x, int tile_y, const std::vector<Item::Id>& items) const;
-
   LevelId level_id_;
 
   // Size of level in number of tiles
@@ -48,8 +44,7 @@ class Level
 
   // Static tiles, in order
   Background background_;
-  std::vector<Item::Id> tiles_foreground_;
-  std::vector<Item::Id> tiles_score_;
+  std::vector<Item::Id> tiles_;
 
   // Moving platforms
   std::vector<MovingPlatform> moving_platforms_;

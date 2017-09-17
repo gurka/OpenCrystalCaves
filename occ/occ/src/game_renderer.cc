@@ -439,7 +439,7 @@ void GameRenderer::render_foreground(bool in_front)
   {
     for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
     {
-      auto item_id = game_->get_tile_foreground(tile_x, tile_y);
+      auto item_id = game_->get_tile(tile_x, tile_y);
       if (item_id != Item::invalid)
       {
         const auto& item = items[item_id];
@@ -492,35 +492,6 @@ void GameRenderer::render_objects()
         object_size.y()
       };
       game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
-    }
-  }
-
-  // Render score
-  const auto& items = game_->get_items();
-
-  const auto start_tile_x = game_camera_.position.x() > 0 ? game_camera_.position.x() / 16 : 0;
-  const auto start_tile_y = game_camera_.position.y() > 0 ? game_camera_.position.y() / 16 : 0;
-  const auto end_tile_x = (game_camera_.position.x() + game_camera_.size.x()) / 16;
-  const auto end_tile_y = (game_camera_.position.y() + game_camera_.size.y()) / 16;
-
-  for (int tile_y = start_tile_y; tile_y <= end_tile_y; tile_y++)
-  {
-    for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
-    {
-      auto item_id = game_->get_tile_score(tile_x, tile_y);
-      if (item_id != Item::invalid)
-      {
-        const auto& item = items[item_id];
-        const auto src_rect = sprite_manager_->get_rect_for_tile(item.get_sprite());
-        const geometry::Rectangle dest_rect
-        {
-          (tile_x * 16) - game_camera_.position.x(),
-          (tile_y * 16) - game_camera_.position.y(),
-          16,
-          16
-        };
-        game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
-      }
     }
   }
 }

@@ -30,8 +30,7 @@ class Game
   virtual int get_tile_width() const = 0;
   virtual int get_tile_height() const = 0;
   virtual const Background& get_background() const = 0;
-  virtual Item::Id get_tile_foreground(int tile_x, int tile_y) const = 0;
-  virtual Item::Id get_tile_score(int tile_x, int tile_y) const = 0;
+  virtual Item::Id get_tile(int tile_x, int tile_y) const = 0;
   virtual const std::vector<Object>& get_objects() const = 0;
 };
 

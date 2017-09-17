@@ -33,8 +33,7 @@ class GameImpl : public Game
   int get_tile_width() const { return level_->get_tile_width(); }
   int get_tile_height() const { return level_->get_tile_height(); }
   const Background& get_background() const { return level_->get_background(); }
-  Item::Id get_tile_foreground(int tile_x, int tile_y) const { return level_->get_tile_foreground(tile_x, tile_y); }
-  Item::Id get_tile_score(int tile_x, int tile_y) const { return level_->get_tile_score(tile_x, tile_y); }
+  Item::Id get_tile(int tile_x, int tile_y) const { return level_->get_tile(tile_x, tile_y); }
   const std::vector<Object>& get_objects() const { return objects_; }
 
  private:

@@ -76,15 +76,7 @@ std::unique_ptr<Level> load_level(LevelId level_id)
     LOG_CRITICAL("Items is missing \"Foreground\" attribute or wrong type!");
     return std::unique_ptr<Level>();
   }
-  auto items_foreground = items_json["Foreground"].get<std::vector<Item::Id>>();
-
-  // Check and get "Score"
-  if (items_json.count("Score") == 0 || !items_json["Score"].is_array())
-  {
-    LOG_CRITICAL("Items is missing \"Score\" attribute or wrong type!");
-    return std::unique_ptr<Level>();
-  }
-  auto items_score = items_json["Score"].get<std::vector<Item::Id>>();
+  auto tiles = items_json["Foreground"].get<std::vector<Item::Id>>();
 
   LOG_INFO("Loaded level from '%s'", filename.c_str());
   LOG_DEBUG("Level information: width=%d height=%d", width, height);
@@ -96,8 +88,7 @@ std::unique_ptr<Level> load_level(LevelId level_id)
                                    height,
                                    geometry::Position(32, 48),  // Player spawn
                                    Background(20, geometry::Size(2, 2)),
-                                   std::move(items_foreground),
-                                   std::move(items_score),
+                                   std::move(tiles),
                                    std::vector<MovingPlatform>(
                                    {
                                      {
@@ -125,8 +116,7 @@ std::unique_ptr<Level> load_level(LevelId level_id)
                                    height,
                                    geometry::Position(4 * 16, 22 * 16),  // Player spawn
                                    Background(970, geometry::Size(2, 2)),
-                                   std::move(items_foreground),
-                                   std::move(items_score),
+                                   std::move(tiles),
                                    std::vector<MovingPlatform>(
                                    {
                                      {

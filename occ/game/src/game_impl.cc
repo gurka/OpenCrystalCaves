@@ -280,10 +280,10 @@ bool GameImpl::player_collides(const geometry::Position& position)
 {
   // Player can cover at maximum 4 tiles
   // Check all 4 tiles, even though we might check the same tile multiple times
-  return items_[level_->get_tile_foreground( position.x() / 16,                          position.y() / 16)                        ].is_solid() ||
-         items_[level_->get_tile_foreground((position.x() + player_.size.x() - 1) / 16,  position.y() / 16)                        ].is_solid() ||
-         items_[level_->get_tile_foreground( position.x() / 16,                         (position.y() + player_.size.y() - 1) / 16)].is_solid() ||
-         items_[level_->get_tile_foreground((position.x() + player_.size.x() - 1) / 16, (position.y() + player_.size.y() - 1) / 16)].is_solid();
+  return items_[level_->get_tile( position.x() / 16,                          position.y() / 16)                        ].is_solid() ||
+         items_[level_->get_tile((position.x() + player_.size.x() - 1) / 16,  position.y() / 16)                        ].is_solid() ||
+         items_[level_->get_tile( position.x() / 16,                         (position.y() + player_.size.y() - 1) / 16)].is_solid() ||
+         items_[level_->get_tile((position.x() + player_.size.x() - 1) / 16, (position.y() + player_.size.y() - 1) / 16)].is_solid();
 }
 
 bool GameImpl::player_on_platform(const geometry::Position& position)
@@ -295,8 +295,8 @@ bool GameImpl::player_on_platform(const geometry::Position& position)
   if ((position.y() + player_.size.y() - 1) % 16 == 0)
   {
     // Player can be on either 1 or 2 tiles, check both (or same...)
-    if (items_[level_->get_tile_foreground( position.x() / 16,                     (position.y() + player_.size.y() - 1) / 16)].is_solid_top() ||
-        items_[level_->get_tile_foreground((position.x() + player_.size.x()) / 16, (position.y() + player_.size.y() - 1) / 16)].is_solid_top())
+    if (items_[level_->get_tile( position.x() / 16,                     (position.y() + player_.size.y() - 1) / 16)].is_solid_top() ||
+        items_[level_->get_tile((position.x() + player_.size.x()) / 16, (position.y() + player_.size.y() - 1) / 16)].is_solid_top())
     {
       return true;
     }
