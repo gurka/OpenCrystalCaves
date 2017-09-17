@@ -8,6 +8,7 @@
 #include "geometry.h"
 #include "moving_platform.h"
 
+// TODO: struct?
 class Level
 {
  public:
@@ -26,12 +27,12 @@ class Level
   int get_tile_height() const { return height_; }
 
   const Background& get_background() const { return background_; }
+
   Item::Id get_tile_foreground(int tile_x, int tile_y) const;
   Item::Id get_tile_score(int tile_x, int tile_y) const;
-  const std::vector<MovingPlatform>& get_moving_platforms() const { return moving_platforms_; }
 
-  // Used by Game
   const geometry::Position& get_player_spawn() const { return player_spawn_; }
+
   std::vector<MovingPlatform>& get_moving_platforms() { return moving_platforms_; }
 
  protected:

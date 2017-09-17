@@ -17,7 +17,8 @@ class GameImpl : public Game
   GameImpl()
     : player_(),
       items_(),
-      level_()
+      level_(),
+      objects_()
   {
   }
 
@@ -34,7 +35,7 @@ class GameImpl : public Game
   const Background& get_background() const { return level_->get_background(); }
   Item::Id get_tile_foreground(int tile_x, int tile_y) const { return level_->get_tile_foreground(tile_x, tile_y); }
   Item::Id get_tile_score(int tile_x, int tile_y) const { return level_->get_tile_score(tile_x, tile_y); }
-  const std::vector<MovingPlatform>& get_moving_platforms() const { return level_->get_moving_platforms(); }
+  const std::vector<Object>& get_objects() const { return objects_; }
 
  private:
   void update_level();
@@ -46,6 +47,7 @@ class GameImpl : public Game
   Player player_;
   std::vector<Item> items_;
   std::unique_ptr<Level> level_;
+  std::vector<Object> objects_;
 };
 
 #endif  // GAME_IMPL_H_

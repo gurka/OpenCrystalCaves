@@ -87,6 +87,13 @@ void GameImpl::update_level()
       platform.forward = !platform.forward;
     }
   }
+
+  // Re-generate objects_
+  objects_.clear();
+  for (auto& platform : level_->get_moving_platforms())
+  {
+    objects_.emplace_back(platform.position, platform.sprite_id, platform.num_sprites);
+  }
 }
 
 void GameImpl::update_player(const PlayerInput& player_input)

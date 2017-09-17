@@ -9,7 +9,7 @@
 #include "item.h"
 #include "level_id.h"
 #include "background.h"
-#include "moving_platform.h"
+#include "object.h"
 
 class Game
 {
@@ -32,7 +32,7 @@ class Game
   virtual const Background& get_background() const = 0;
   virtual Item::Id get_tile_foreground(int tile_x, int tile_y) const = 0;
   virtual Item::Id get_tile_score(int tile_x, int tile_y) const = 0;
-  virtual const std::vector<MovingPlatform>& get_moving_platforms() const = 0;
+  virtual const std::vector<Object>& get_objects() const = 0;
 };
 
 #endif  // GAME_H_

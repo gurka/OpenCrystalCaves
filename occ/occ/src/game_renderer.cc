@@ -477,20 +477,19 @@ void GameRenderer::render_foreground(bool in_front)
 
 void GameRenderer::render_objects()
 {
-  // Render moving platforms
-  for (const auto& platform : game_->get_moving_platforms())
+  for (const auto& object : game_->get_objects())
   {
-    static constexpr geometry::Size platform_size = geometry::Size(16, 16);
-    if (geometry::isColliding(geometry::Rectangle(platform.position, platform_size), game_camera_))
+    static constexpr geometry::Size object_size = geometry::Size(16, 16);
+    if (geometry::isColliding(geometry::Rectangle(object.position, object_size), game_camera_))
     {
-      const auto sprite_id = platform.sprite_id + (game_tick_ % platform.num_sprites);
+      const auto sprite_id = object.sprite_id + (game_tick_ % object.num_sprites);
       const auto src_rect = sprite_manager_->get_rect_for_tile(sprite_id);
       const geometry::Rectangle dest_rect
       {
-        platform.position.x() - game_camera_.position.x(),
-        platform.position.y() - game_camera_.position.y(),
-        platform_size.x(),
-        platform_size.y()
+        object.position.x() - game_camera_.position.x(),
+        object.position.y() - game_camera_.position.y(),
+        object_size.x(),
+        object_size.y()
       };
       game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
     }
