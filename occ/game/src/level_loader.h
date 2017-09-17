@@ -6,13 +6,13 @@
 #include <vector>
 
 enum class LevelId;
-class LevelImpl;
+class Level;
 class Item;
 
 namespace LevelLoader
 {
 
-std::unique_ptr<LevelImpl> load_level(LevelId level_id);
+std::unique_ptr<Level> load_level(LevelId level_id);
 
 }
 

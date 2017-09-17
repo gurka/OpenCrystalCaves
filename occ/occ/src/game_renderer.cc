@@ -2,7 +2,6 @@
 
 #include "constants.h"
 #include "game.h"
-#include "level.h"
 #include "player.h"
 #include "spritemgr.h"
 #include "graphics.h"
@@ -15,10 +14,10 @@ GameRenderer::GameRenderer(Game* game, SpriteManager* sprite_manager, Surface* g
     game_surface_(game_surface),
     game_camera_(math::clamp(game_->get_player().position.x() + (game_->get_player().size.x() / 2) - (CAMERA_SIZE.x() / 2),
                              0,
-                             (game_->get_level().get_tile_width() * 16) - CAMERA_SIZE.x()),
+                             (game_->get_tile_width() * 16) - CAMERA_SIZE.x()),
                  math::clamp(game_->get_player().position.y() + (game_->get_player().size.y() / 2) - (CAMERA_SIZE.y() / 2),
                              0,
-                             (game_->get_level().get_tile_height() * 16) - CAMERA_SIZE.y()),
+                             (game_->get_tile_height() * 16) - CAMERA_SIZE.y()),
                  CAMERA_SIZE.x(),
                  CAMERA_SIZE.y()),
     game_tick_(0u),
@@ -38,14 +37,14 @@ void GameRenderer::render_game(unsigned game_tick)
   {
     game_camera_.position = geometry::Position(math::clamp(game_camera_.position.x() + player_camera_relative_position.x() + 4,
                                                            0,
-                                                           (game_->get_level().get_tile_width() * 16) - CAMERA_SIZE.x()),
+                                                           (game_->get_tile_width() * 16) - CAMERA_SIZE.x()),
                                                game_camera_.position.y());
   }
   else if (player_camera_relative_position.x() > 20)
   {
     game_camera_.position = geometry::Position(math::clamp(game_camera_.position.x() + player_camera_relative_position.x() - 20,
                                                            0,
-                                                           (game_->get_level().get_tile_width() * 16) - CAMERA_SIZE.x()),
+                                                           (game_->get_tile_width() * 16) - CAMERA_SIZE.x()),
                                                game_camera_.position.y());
   }
 
@@ -54,14 +53,14 @@ void GameRenderer::render_game(unsigned game_tick)
     game_camera_.position = geometry::Position(game_camera_.position.x(),
                                                math::clamp(game_camera_.position.y() + player_camera_relative_position.y() + 10,
                                                            0,
-                                                           (game_->get_level().get_tile_height() * 16) - CAMERA_SIZE.y()));
+                                                           (game_->get_tile_height() * 16) - CAMERA_SIZE.y()));
   }
   else if (player_camera_relative_position.y() > 32)
   {
     game_camera_.position = geometry::Position(game_camera_.position.x(),
                                                math::clamp(game_camera_.position.y() + player_camera_relative_position.y() - 32,
                                                            0,
-                                                           (game_->get_level().get_tile_height() * 16) - CAMERA_SIZE.y()));
+                                                           (game_->get_tile_height() * 16) - CAMERA_SIZE.y()));
   }
 
   // Clear game surface (background now)
@@ -76,7 +75,7 @@ void GameRenderer::render_game(unsigned game_tick)
 
 void GameRenderer::render_background()
 {
-  const auto& background = game_->get_level().get_background();
+  const auto& background = game_->get_background();
 
   // TODO: Create a surface of size CAMERA + (background.size() * 16) and render the background
   //       to it _once_, then just keep render that surface (with game_camera offset) until the
@@ -105,7 +104,7 @@ void GameRenderer::render_background()
   }
 
   // MAIN_LEVEL has some special things that needs to be rendered
-  if (game_->get_level().get_level_id() == LevelId::MAIN_LEVEL)
+  if (game_->get_level_id() == LevelId::MAIN_LEVEL)
   {
     // Might be cleaner to have this in a dedicated struct for MainLevel stuff
     static bool initialized = false;
@@ -125,7 +124,7 @@ void GameRenderer::render_background()
     if (!initialized)
     {
       // Generate space sprites
-      for (int x = 0; x < game_->get_level().get_tile_width(); x++)
+      for (int x = 0; x < game_->get_tile_width(); x++)
       {
         for (int y = 0; y < 4; y++)
         {
@@ -137,7 +136,7 @@ void GameRenderer::render_background()
       }
 
       // Generate horizon
-      for (int x = 0; x < game_->get_level().get_tile_width(); x++)
+      for (int x = 0; x < game_->get_tile_width(); x++)
       {
         static const auto sprites = misc::make_array(240, 247, 248, 249, 250);
         const auto sprite_index = misc::random<int>(0, sprites.size() - 1);
@@ -153,7 +152,7 @@ void GameRenderer::render_background()
       if (earth_right)
       {
         earth_pos_x += 1;
-        if ((earth_pos_x / 2) + 16 == game_->get_level().get_tile_width() * 16)
+        if ((earth_pos_x / 2) + 16 == game_->get_tile_width() * 16)
         {
           earth_right = false;
         }
@@ -170,7 +169,7 @@ void GameRenderer::render_background()
       if (moon_right)
       {
         moon_pos_x += earth_right ? 2 : 1;
-        if (moon_pos_x > earth_pos_x + 72 || (moon_pos_x / 2) + 16 == game_->get_level().get_tile_width() * 16)
+        if (moon_pos_x > earth_pos_x + 72 || (moon_pos_x / 2) + 16 == game_->get_tile_width() * 16)
         {
           moon_right = false;
         }
@@ -206,7 +205,7 @@ void GameRenderer::render_background()
         if (tile_y >= 0 && tile_y < 4)
         {
           // Render space sprite
-          const auto sprite_id = space_sprites[(tile_y * game_->get_level().get_tile_width()) + tile_x];
+          const auto sprite_id = space_sprites[(tile_y * game_->get_tile_width()) + tile_x];
           const auto src_rect = sprite_manager_->get_rect_for_tile(sprite_id);
           const geometry::Rectangle dest_rect
           {
@@ -429,7 +428,6 @@ void GameRenderer::render_player()
 
 void GameRenderer::render_foreground(bool in_front)
 {
-  const auto& level = game_->get_level();
   const auto& items = game_->get_items();
 
   const auto start_tile_x = game_camera_.position.x() > 0 ? game_camera_.position.x() / 16 : 0;
@@ -441,7 +439,7 @@ void GameRenderer::render_foreground(bool in_front)
   {
     for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
     {
-      auto item_id = level.get_tile_foreground(tile_x, tile_y);
+      auto item_id = game_->get_tile_foreground(tile_x, tile_y);
       if (item_id != Item::invalid)
       {
         const auto& item = items[item_id];
@@ -480,7 +478,7 @@ void GameRenderer::render_foreground(bool in_front)
 void GameRenderer::render_objects()
 {
   // Render moving platforms
-  for (const auto& platform : game_->get_level().get_moving_platforms())
+  for (const auto& platform : game_->get_moving_platforms())
   {
     static constexpr geometry::Size platform_size = geometry::Size(16, 16);
     if (geometry::isColliding(geometry::Rectangle(platform.position, platform_size), game_camera_))
@@ -499,7 +497,6 @@ void GameRenderer::render_objects()
   }
 
   // Render score
-  const auto& level = game_->get_level();
   const auto& items = game_->get_items();
 
   const auto start_tile_x = game_camera_.position.x() > 0 ? game_camera_.position.x() / 16 : 0;
@@ -511,7 +508,7 @@ void GameRenderer::render_objects()
   {
     for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
     {
-      auto item_id = level.get_tile_score(tile_x, tile_y);
+      auto item_id = game_->get_tile_score(tile_x, tile_y);
       if (item_id != Item::invalid)
       {
         const auto& item = items[item_id];

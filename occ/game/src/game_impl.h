@@ -8,7 +8,7 @@
 
 #include "player_input.h"
 #include "item.h"
-#include "level_impl.h"
+#include "level.h"
 #include "player.h"
 
 class GameImpl : public Game
@@ -25,8 +25,16 @@ class GameImpl : public Game
   void update(unsigned game_tick, const PlayerInput& player_input) override;
 
   const Player& get_player() const override { return player_; }
+
   const std::vector<Item>& get_items() const override { return items_; }
-  const Level& get_level() const override { return *level_; }
+
+  LevelId get_level_id() const { return level_->get_level_id(); }
+  int get_tile_width() const { return level_->get_tile_width(); }
+  int get_tile_height() const { return level_->get_tile_height(); }
+  const Background& get_background() const { return level_->get_background(); }
+  Item::Id get_tile_foreground(int tile_x, int tile_y) const { return level_->get_tile_foreground(tile_x, tile_y); }
+  Item::Id get_tile_score(int tile_x, int tile_y) const { return level_->get_tile_score(tile_x, tile_y); }
+  const std::vector<MovingPlatform>& get_moving_platforms() const { return level_->get_moving_platforms(); }
 
  private:
   void update_level();
@@ -37,7 +45,7 @@ class GameImpl : public Game
 
   Player player_;
   std::vector<Item> items_;
-  std::unique_ptr<LevelImpl> level_;
+  std::unique_ptr<Level> level_;
 };
 
 #endif  // GAME_IMPL_H_

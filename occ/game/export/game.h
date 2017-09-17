@@ -4,10 +4,12 @@
 #include <memory>
 #include <vector>
 
-class PlayerInput;
-class Player;
-class Item;
-class Level;
+#include "player_input.h"
+#include "player.h"
+#include "item.h"
+#include "level_id.h"
+#include "background.h"
+#include "moving_platform.h"
 
 class Game
 {
@@ -20,8 +22,17 @@ class Game
   virtual void update(unsigned game_tick, const PlayerInput& player_input) = 0;
 
   virtual const Player& get_player() const = 0;
+
   virtual const std::vector<Item>& get_items() const = 0;
-  virtual const Level& get_level() const = 0;
+
+  // Level functions
+  virtual LevelId get_level_id() const = 0;
+  virtual int get_tile_width() const = 0;
+  virtual int get_tile_height() const = 0;
+  virtual const Background& get_background() const = 0;
+  virtual Item::Id get_tile_foreground(int tile_x, int tile_y) const = 0;
+  virtual Item::Id get_tile_score(int tile_x, int tile_y) const = 0;
+  virtual const std::vector<MovingPlatform>& get_moving_platforms() const = 0;
 };
 
 #endif  // GAME_H_
