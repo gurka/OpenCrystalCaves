@@ -46,37 +46,39 @@ std::unique_ptr<Level> load_level(LevelId level_id)
   level_file >> level_json;
   level_file.close();
 
-  // Check and get "Width"
+  // Check attributes
   if (level_json.count("Width") == 0 || !level_json["Width"].is_number())
   {
     LOG_CRITICAL("Level is missing \"Width\" attribute or wrong type!");
     return std::unique_ptr<Level>();
   }
-  auto width = level_json["Width"].get<int>();
-
-  // Check and get "Height"
   if (level_json.count("Height") == 0 || !level_json["Height"].is_number())
   {
     LOG_CRITICAL("Level is missing \"Height\" attribute or wrong type!");
     return std::unique_ptr<Level>();
   }
-  auto height = level_json["Height"].get<int>();
-
-  // Check and get "Items"
-  if (level_json.count("Items") == 0 || !level_json["Items"].is_object())
+  if (level_json.count("BackgroundId") == 0 || !level_json["BackgroundId"].is_number())
   {
-    LOG_CRITICAL("Level is missing \"Items\" attribute or wrong type!");
+    LOG_CRITICAL("Level is missing \"BackgroundId\" attribute or wrong type!");
     return std::unique_ptr<Level>();
   }
-  const auto& items_json = level_json["Items"];
-
-  // Check and get "Foreground"
-  if (items_json.count("Foreground") == 0 || !items_json["Foreground"].is_array())
+  if (level_json.count("TileIds") == 0 || !level_json["TileIds"].is_array())
   {
-    LOG_CRITICAL("Items is missing \"Foreground\" attribute or wrong type!");
+    LOG_CRITICAL("Level is missing \"TileIds\" attribute or wrong type!");
     return std::unique_ptr<Level>();
   }
-  auto tiles = items_json["Foreground"].get<std::vector<Item::Id>>();
+  if (level_json.count("ItemIds") == 0 || !level_json["ItemIds"].is_array())
+  {
+    LOG_CRITICAL("Level is missing \"ItemIds\" attribute or wrong type!");
+    return std::unique_ptr<Level>();
+  }
+
+  // Read attributes
+  const auto width = level_json["Width"].get<int>();
+  const auto height = level_json["Height"].get<int>();
+  const auto background_id = level_json["BackgroundId"].get<int>();
+  auto tile_ids = level_json["TileIds"].get<std::vector<int>>();  // TODO: Tile::Id ?
+  auto item_ids = level_json["ItemIds"].get<std::vector<int>>();  // TODO: Item::Id ?
 
   LOG_INFO("Loaded level from '%s'", filename.c_str());
   LOG_DEBUG("Level information: width=%d height=%d", width, height);
@@ -87,8 +89,9 @@ std::unique_ptr<Level> load_level(LevelId level_id)
                                    width,
                                    height,
                                    geometry::Position(32, 48),  // Player spawn
-                                   Background(20, geometry::Size(2, 2)),
-                                   std::move(tiles),
+                                   background_id,
+                                   std::move(tile_ids),
+                                   std::move(item_ids),
                                    std::vector<MovingPlatform>(
                                    {
                                      {
@@ -115,8 +118,9 @@ std::unique_ptr<Level> load_level(LevelId level_id)
                                    width,
                                    height,
                                    geometry::Position(4 * 16, 22 * 16),  // Player spawn
-                                   Background(970, geometry::Size(2, 2)),
-                                   std::move(tiles),
+                                   background_id,
+                                   std::move(tile_ids),
+                                   std::move(item_ids),
                                    std::vector<MovingPlatform>(
                                    {
                                      {

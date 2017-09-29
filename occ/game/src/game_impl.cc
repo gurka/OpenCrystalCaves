@@ -3,14 +3,18 @@
 #include <cstdint>
 #include <array>
 
-#include "item_loader.h"
 #include "level_loader.h"
 #include "misc.h"
 #include "logger.h"
+#include "object_manager.h"
 
 static constexpr auto gravity = 8u;
 static constexpr auto jump_velocity = misc::make_array<int>(0, -8, -8, -8, -4, -4, -2, -2, -2, -2, 2, 2, 2, 2, 4, 4);
 static constexpr auto jump_velocity_fall_index = 10u;
+
+const Background Background::INVALID;
+const Tile Tile::INVALID;
+const Item Item::INVALID;
 
 std::unique_ptr<Game> Game::create()
 {
@@ -19,20 +23,19 @@ std::unique_ptr<Game> Game::create()
 
 bool GameImpl::init()
 {
-  items_ = ItemLoader::load_items("media/items.json");
-  if (items_.empty())
+  if (!object_manager_.load("media/items.json"))
   {
     return false;
   }
 
-  level_ = LevelLoader::load_level(LevelId::MAIN_LEVEL);
-  //level_ = LevelLoader::load_level(LevelId::LEVEL_ONE);
+  //level_ = LevelLoader::load_level(LevelId::MAIN_LEVEL);
+  level_ = LevelLoader::load_level(LevelId::LEVEL_ONE);
   if (!level_)
   {
     return false;
   }
 
-  player_.position = level_->get_player_spawn();
+  player_.position = level_->player_spawn;
 
   return true;
 }
@@ -54,10 +57,58 @@ void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
   // ...
 }
 
+const Background& GameImpl::get_background() const
+{
+  if (level_->background_id != -1)
+  {
+    return object_manager_.get_background(level_->background_id);
+  }
+  else
+  {
+    return Background::INVALID;
+  }
+}
+
+const Tile& GameImpl::get_tile(int tile_x, int tile_y) const
+{
+  if (tile_x < 0 || tile_x >= level_->width || tile_y < 0 || tile_y >= level_->height)
+  {
+    return Tile::INVALID;
+  }
+
+  const auto tile_id = level_->tile_ids[(tile_y * level_->width) + tile_x];
+  if (tile_id != -1)
+  {
+    return object_manager_.get_tile(tile_id);
+  }
+  else
+  {
+    return Tile::INVALID;
+  }
+}
+
+const Item& GameImpl::get_item(int tile_x, int tile_y) const
+{
+  if (tile_x < 0 || tile_x >= level_->width || tile_y < 0 || tile_y >= level_->height)
+  {
+    return Item::INVALID;
+  }
+
+  const auto item_id = level_->item_ids[(tile_y * level_->width) + tile_x];
+  if (item_id != -1)
+  {
+    return object_manager_.get_item(item_id);
+  }
+  else
+  {
+    return Item::INVALID;
+  }
+}
+
 void GameImpl::update_level()
 {
   // Update all MovingPlatforms
-  for (auto& platform : level_->get_moving_platforms())
+  for (auto& platform : level_->moving_platforms)
   {
     // Update platform
     const auto platform_velocity = platform.forward ? platform.velocity_forward : -platform.velocity_forward;
@@ -90,7 +141,7 @@ void GameImpl::update_level()
 
   // Re-generate objects_
   objects_.clear();
-  for (auto& platform : level_->get_moving_platforms())
+  for (auto& platform : level_->moving_platforms)
   {
     objects_.emplace_back(platform.position, platform.sprite_id, platform.num_sprites);
   }
@@ -280,10 +331,10 @@ bool GameImpl::player_collides(const geometry::Position& position)
 {
   // Player can cover at maximum 4 tiles
   // Check all 4 tiles, even though we might check the same tile multiple times
-  return items_[level_->get_tile( position.x() / 16,                          position.y() / 16)                        ].is_solid() ||
-         items_[level_->get_tile((position.x() + player_.size.x() - 1) / 16,  position.y() / 16)                        ].is_solid() ||
-         items_[level_->get_tile( position.x() / 16,                         (position.y() + player_.size.y() - 1) / 16)].is_solid() ||
-         items_[level_->get_tile((position.x() + player_.size.x() - 1) / 16, (position.y() + player_.size.y() - 1) / 16)].is_solid();
+  return get_tile( position.x() / 16,                          position.y() / 16)                        .is_solid() ||
+         get_tile((position.x() + player_.size.x() - 1) / 16,  position.y() / 16)                        .is_solid() ||
+         get_tile( position.x() / 16,                         (position.y() + player_.size.y() - 1) / 16).is_solid() ||
+         get_tile((position.x() + player_.size.x() - 1) / 16, (position.y() + player_.size.y() - 1) / 16).is_solid();
 }
 
 bool GameImpl::player_on_platform(const geometry::Position& position)
@@ -295,15 +346,15 @@ bool GameImpl::player_on_platform(const geometry::Position& position)
   if ((position.y() + player_.size.y() - 1) % 16 == 0)
   {
     // Player can be on either 1 or 2 tiles, check both (or same...)
-    if (items_[level_->get_tile( position.x() / 16,                     (position.y() + player_.size.y() - 1) / 16)].is_solid_top() ||
-        items_[level_->get_tile((position.x() + player_.size.x()) / 16, (position.y() + player_.size.y() - 1) / 16)].is_solid_top())
+    if (get_tile( position.x() / 16,                     (position.y() + player_.size.y() - 1) / 16).is_solid_top() ||
+        get_tile((position.x() + player_.size.x()) / 16, (position.y() + player_.size.y() - 1) / 16).is_solid_top())
     {
       return true;
     }
   }
 
   // Check moving platforms
-  for (const auto& platform : level_->get_moving_platforms())
+  for (const auto& platform : level_->moving_platforms)
   {
     // Player only collides if standing exactly on top of the platform, just like with static platforms
     if ((position.y() + player_.size.y() - 1 == platform.position.y()) &&

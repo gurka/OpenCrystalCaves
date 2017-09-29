@@ -67,15 +67,21 @@ void GameRenderer::render_game(unsigned game_tick)
   game_surface_->fill_rect(geometry::Rectangle(0, 0, CAMERA_SIZE), { 33u, 33u, 33u });
 
   render_background();
-  render_foreground(false);
+  render_tiles(false);
   render_objects();
   render_player();
-  render_foreground(true);
+  render_tiles(true);
+  render_items();
 }
 
 void GameRenderer::render_background()
 {
   const auto& background = game_->get_background();
+
+  if (!background.valid)
+  {
+    return;
+  }
 
   // TODO: Create a surface of size CAMERA + (background.size() * 16) and render the background
   //       to it _once_, then just keep render that surface (with game_camera offset) until the
@@ -426,10 +432,8 @@ void GameRenderer::render_player()
   game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
 }
 
-void GameRenderer::render_foreground(bool in_front)
+void GameRenderer::render_tiles(bool in_front)
 {
-  const auto& items = game_->get_items();
-
   const auto start_tile_x = game_camera_.position.x() > 0 ? game_camera_.position.x() / 16 : 0;
   const auto start_tile_y = game_camera_.position.y() > 0 ? game_camera_.position.y() / 16 : 0;
   const auto end_tile_x = (game_camera_.position.x() + game_camera_.size.x()) / 16;
@@ -439,38 +443,39 @@ void GameRenderer::render_foreground(bool in_front)
   {
     for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
     {
-      auto item_id = game_->get_tile(tile_x, tile_y);
-      if (item_id != Item::invalid)
+      const auto& tile = game_->get_tile(tile_x, tile_y);
+
+      if (!tile.valid())
       {
-        const auto& item = items[item_id];
-
-        if ((in_front && !item.is_render_in_front()) ||
-            (!in_front && item.is_render_in_front()))
-        {
-          continue;
-        }
-
-        const auto sprite_id = [&item](unsigned game_tick)
-        {
-          if (item.is_animated())
-          {
-            return item.get_sprite() + static_cast<int>((game_tick / 2) % item.get_sprite_count());
-          }
-          else
-          {
-            return item.get_sprite();
-          }
-        }(game_tick_);
-        const auto src_rect = sprite_manager_->get_rect_for_tile(sprite_id);
-        const geometry::Rectangle dest_rect
-        {
-          (tile_x * 16) - game_camera_.position.x(),
-          (tile_y * 16) - game_camera_.position.y(),
-          16,
-          16
-        };
-        game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
+        continue;
       }
+
+      if ((in_front && !tile.is_render_in_front()) ||
+          (!in_front && tile.is_render_in_front()))
+      {
+        continue;
+      }
+
+      const auto sprite_id = [&tile](unsigned game_tick)
+      {
+        if (tile.is_animated())
+        {
+          return tile.get_sprite() + static_cast<int>((game_tick / 2) % tile.get_sprite_count());
+        }
+        else
+        {
+          return tile.get_sprite();
+        }
+      }(game_tick_);
+      const auto src_rect = sprite_manager_->get_rect_for_tile(sprite_id);
+      const geometry::Rectangle dest_rect
+      {
+        (tile_x * 16) - game_camera_.position.x(),
+        (tile_y * 16) - game_camera_.position.y(),
+        16,
+        16
+      };
+      game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
     }
   }
 }
@@ -490,6 +495,37 @@ void GameRenderer::render_objects()
         object.position.y() - game_camera_.position.y(),
         object_size.x(),
         object_size.y()
+      };
+      game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
+    }
+  }
+}
+
+void GameRenderer::render_items()
+{
+  const auto start_tile_x = game_camera_.position.x() > 0 ? game_camera_.position.x() / 16 : 0;
+  const auto start_tile_y = game_camera_.position.y() > 0 ? game_camera_.position.y() / 16 : 0;
+  const auto end_tile_x = (game_camera_.position.x() + game_camera_.size.x()) / 16;
+  const auto end_tile_y = (game_camera_.position.y() + game_camera_.size.y()) / 16;
+
+  for (int tile_y = start_tile_y; tile_y <= end_tile_y; tile_y++)
+  {
+    for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
+    {
+      const auto& item = game_->get_item(tile_x, tile_y);
+
+      if (!item.valid())
+      {
+        continue;
+      }
+
+      const auto src_rect = sprite_manager_->get_rect_for_tile(item.get_sprite());
+      const geometry::Rectangle dest_rect
+      {
+        (tile_x * 16) - game_camera_.position.x(),
+        (tile_y * 16) - game_camera_.position.y(),
+        16,
+        16
       };
       game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
     }

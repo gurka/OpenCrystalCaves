@@ -18,10 +18,10 @@ class GameRenderer
 
  private:
   void render_background();
-  void render_objects();
   void render_player();
-  void render_foreground(bool in_front);
-  void render_score();
+  void render_tiles(bool in_front);
+  void render_objects();
+  void render_items();
 
   Game* game_;
   SpriteManager* sprite_manager_;

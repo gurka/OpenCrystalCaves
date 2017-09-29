@@ -3,51 +3,43 @@
 
 #include <vector>
 
-#include "game.h"
-#include "item.h"
+#include "level_id.h"
 #include "geometry.h"
 #include "moving_platform.h"
 
-// TODO: struct?
-class Level
+struct Level
 {
- public:
   Level(LevelId level_id,
         int width,
         int height,
         const geometry::Position& player_spawn,
-        Background background,
-        std::vector<Item::Id> tiles,
-        std::vector<MovingPlatform> moving_platforms);
+        int background_id,
+        std::vector<int>&& tile_ids,
+        std::vector<int>&& item_ids,
+        std::vector<MovingPlatform>&& moving_platforms)
+    : level_id(level_id),
+      width(width),
+      height(height),
+      player_spawn(player_spawn),
+      background_id(background_id),
+      tile_ids(std::move(tile_ids)),
+      item_ids(std::move(item_ids)),
+      moving_platforms(std::move(moving_platforms))
+  {
+  }
 
-  LevelId get_level_id() const { return level_id_; }
+  LevelId level_id;
 
-  int get_tile_width() const { return width_; }
-  int get_tile_height() const { return height_; }
+  int width;
+  int height;
 
-  const Background& get_background() const { return background_; }
+  geometry::Position player_spawn;
 
-  Item::Id get_tile(int tile_x, int tile_y) const;
+  int background_id;
+  std::vector<int> tile_ids;
+  std::vector<int> item_ids;
 
-  const geometry::Position& get_player_spawn() const { return player_spawn_; }
-
-  std::vector<MovingPlatform>& get_moving_platforms() { return moving_platforms_; }
-
- protected:
-  LevelId level_id_;
-
-  // Size of level in number of tiles
-  int width_;
-  int height_;
-
-  geometry::Position player_spawn_;
-
-  // Static tiles, in order
-  Background background_;
-  std::vector<Item::Id> tiles_;
-
-  // Moving platforms
-  std::vector<MovingPlatform> moving_platforms_;
+  std::vector<MovingPlatform> moving_platforms;
 };
 
 #endif  // LEVEL_H_

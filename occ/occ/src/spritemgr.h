@@ -7,6 +7,8 @@
 #include "graphics.h"
 #include "geometry.h"
 
+// TODO: Rename files to sprite_manager.cc/h ?
+
 class SpriteManager
 {
  public:
