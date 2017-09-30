@@ -41,9 +41,12 @@ class GameImpl : public Game
  private:
   void update_level();
   void update_player(const PlayerInput& player_input);
+  void update_items();
 
-  bool player_collides(const geometry::Position& position);
-  bool player_on_platform(const geometry::Position& position);
+  bool player_collides(const geometry::Position& player_position);
+  bool player_on_platform(const geometry::Position& player_position);
+
+  void remove_item(int tile_x, int tile_y);
 
   Player player_;
   ObjectManager object_manager_;

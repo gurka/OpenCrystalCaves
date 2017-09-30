@@ -50,6 +50,9 @@ void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
   // Update the player
   update_player(player_input);
 
+  // Update items
+  update_items();
+
   // Update enemies
   // ...
 
@@ -327,27 +330,62 @@ void GameImpl::update_player(const PlayerInput& player_input)
                     !player_collides(player_.position + geometry::Position(0, 1));
 }
 
-bool GameImpl::player_collides(const geometry::Position& position)
+void GameImpl::update_items()
+{
+  // Check if player hit an item
+  // Player can cover at maximum 4 items
+  // Check all 4 items, even though we might check the same item multiple times
+  const std::array<geometry::Position, 4> positions =
+  {
+    geometry::Position((player_.position.x() + 0)                    / 16, (player_.position.y() + 0)                    / 16),
+    geometry::Position((player_.position.x() + player_.size.x() - 1) / 16, (player_.position.y() + 0)                    / 16),
+    geometry::Position((player_.position.x() + 0)                    / 16, (player_.position.y() + player_.size.y() - 1) / 16),
+    geometry::Position((player_.position.x() + player_.size.x() - 1) / 16, (player_.position.y() + player_.size.y() - 1) / 16)
+  };
+
+  for (const auto& position : positions)
+  {
+    const auto& item = get_item(position.x(), position.y());
+    if (item.valid())
+    {
+      LOG_DEBUG("Player took Item of type: %d amount: %d", item.get_type(), item.get_amount());
+      remove_item(position.x(), position.y());
+    }
+  }
+}
+
+bool GameImpl::player_collides(const geometry::Position& player_position)
 {
   // Player can cover at maximum 4 tiles
   // Check all 4 tiles, even though we might check the same tile multiple times
-  return get_tile( position.x() / 16,                          position.y() / 16)                        .is_solid() ||
-         get_tile((position.x() + player_.size.x() - 1) / 16,  position.y() / 16)                        .is_solid() ||
-         get_tile( position.x() / 16,                         (position.y() + player_.size.y() - 1) / 16).is_solid() ||
-         get_tile((position.x() + player_.size.x() - 1) / 16, (position.y() + player_.size.y() - 1) / 16).is_solid();
+  const std::array<geometry::Position, 4> positions =
+  {
+    geometry::Position((player_position.x() + 0)                    / 16, (player_position.y() + 0)                    / 16),
+    geometry::Position((player_position.x() + player_.size.x() - 1) / 16, (player_position.y() + 0)                    / 16),
+    geometry::Position((player_position.x() + 0)                    / 16, (player_position.y() + player_.size.y() - 1) / 16),
+    geometry::Position((player_position.x() + player_.size.x() - 1) / 16, (player_position.y() + player_.size.y() - 1) / 16)
+  };
+  for (const auto& position : positions)
+  {
+    if (get_tile(position.x(), position.y()).is_solid())
+    {
+      return true;
+    }
+  }
+  return false;
 }
 
-bool GameImpl::player_on_platform(const geometry::Position& position)
+bool GameImpl::player_on_platform(const geometry::Position& player_position)
 {
   // Need to check both static platforms (e.g. foreground items with SOLID_TOP)
   // and moving platforms
 
   // Standing on a static platform requires the player to stand on the edge of a tile
-  if ((position.y() + player_.size.y() - 1) % 16 == 0)
+  if ((player_position.y() + player_.size.y() - 1) % 16 == 0)
   {
     // Player can be on either 1 or 2 tiles, check both (or same...)
-    if (get_tile( position.x() / 16,                     (position.y() + player_.size.y() - 1) / 16).is_solid_top() ||
-        get_tile((position.x() + player_.size.x()) / 16, (position.y() + player_.size.y() - 1) / 16).is_solid_top())
+    if (get_tile( player_position.x() / 16,                     (player_position.y() + player_.size.y() - 1) / 16).is_solid_top() ||
+        get_tile((player_position.x() + player_.size.x()) / 16, (player_position.y() + player_.size.y() - 1) / 16).is_solid_top())
     {
       return true;
     }
@@ -357,13 +395,18 @@ bool GameImpl::player_on_platform(const geometry::Position& position)
   for (const auto& platform : level_->moving_platforms)
   {
     // Player only collides if standing exactly on top of the platform, just like with static platforms
-    if ((position.y() + player_.size.y() - 1 == platform.position.y()) &&
-        (position.x() < platform.position.x() + 16) &&
-        (position.x() + player_.size.x() > platform.position.x()))
+    if ((player_position.y() + player_.size.y() - 1 == platform.position.y()) &&
+        (player_position.x() < platform.position.x() + 16) &&
+        (player_position.x() + player_.size.x() > platform.position.x()))
     {
       return true;
     }
   }
 
   return false;
+}
+
+void GameImpl::remove_item(int tile_x, int tile_y)
+{
+  level_->item_ids[(tile_y * level_->width) + tile_x] = -1;  // TODO: Item::INVALID_ID (ObjectManager::INVALID_ID?)
 }
