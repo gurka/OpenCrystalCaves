@@ -20,3 +20,5 @@ add_library(game
 )
 
 set_property(TARGET game PROPERTY CXX_STANDARD 14)
+
+add_executable(game_test "test/game_test.cc")

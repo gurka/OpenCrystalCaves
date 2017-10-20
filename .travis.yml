@@ -12,4 +12,4 @@ addons:
       - libsdl2-ttf-dev
 
 script:
-  - CXX=/usr/bin/g++-6 CC=/usr/bin/gcc-6 tools/build_debug.sh
+  - CXX=/usr/bin/g++-6 CC=/usr/bin/gcc-6 tools/travis.sh

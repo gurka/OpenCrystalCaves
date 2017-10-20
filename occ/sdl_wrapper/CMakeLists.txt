@@ -15,3 +15,5 @@ add_library(sdl_wrapper
 )
 
 set_property(TARGET sdl_wrapper PROPERTY CXX_STANDARD 14)
+
+add_executable(sdl_wrapper_test "test/sdl_wrapper_test.cc")

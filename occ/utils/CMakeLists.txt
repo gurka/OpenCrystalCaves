@@ -13,3 +13,5 @@ add_library(utils
 )
 
 set_property(TARGET utils PROPERTY CXX_STANDARD 14)
+
+add_executable(utils_test "test/utils_test.cc")

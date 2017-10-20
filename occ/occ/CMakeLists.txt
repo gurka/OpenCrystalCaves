@@ -19,3 +19,5 @@ target_link_libraries(occ
 )
 
 set_property(TARGET occ PROPERTY CXX_STANDARD 14)
+
+add_executable(occ_test "test/occ_test.cc")

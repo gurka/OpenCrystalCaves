@@ -2,8 +2,10 @@
 set -e
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DEBUG_DIR="$DIR/../debug"
 
-mkdir -p "$DIR/../debug"
-cd "$DIR/../debug"
+mkdir -p "$DEBUG_DIR"
+cd "$DEBUG_DIR"
 cmake ../occ -DCMAKE_BUILD_TYPE=debug
 cmake --build . -- -j2
+ctest
