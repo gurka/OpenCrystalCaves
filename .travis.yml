@@ -1,0 +1,15 @@
+dist: trusty
+sudo: false
+language: cpp
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-6
+      - libsdl2-dev
+      - libsdl2-ttf-dev
+
+script:
+  - CXX=/usr/bin/g++-6 CC=/usr/bin/gcc-6 tools/build_debug.sh

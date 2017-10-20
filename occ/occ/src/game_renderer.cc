@@ -5,7 +5,7 @@
 #include "player.h"
 #include "spritemgr.h"
 #include "graphics.h"
-#include "math.h"
+#include "occ_math.h"
 #include "misc.h"
 
 GameRenderer::GameRenderer(Game* game, SpriteManager* sprite_manager, Surface* game_surface)
