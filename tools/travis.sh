@@ -8,4 +8,4 @@ mkdir -p "$DEBUG_DIR"
 cd "$DEBUG_DIR"
 cmake ../occ -DCMAKE_BUILD_TYPE=debug
 cmake --build .
-ctest
+ctest -V
