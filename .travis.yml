@@ -8,6 +8,7 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-5
+      - libsdl2-dev
 
 script:
   - CXX=/usr/bin/g++-5 CC=/usr/bin/gcc-5 tools/build_debug.sh
