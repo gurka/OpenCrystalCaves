@@ -1,0 +1,6 @@
+dist: trusty
+sudo: false
+language: cpp
+
+script:
+  - tools/build_debug.sh
