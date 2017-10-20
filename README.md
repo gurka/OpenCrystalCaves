@@ -1,9 +1,11 @@
+[![Build Status](https://travis-ci.org/gurka/OpenCrystalCaves.svg?branch=master)](https://travis-ci.org/gurka/OpenCrystalCaves)
+
 # OpenCrystalCaves
 OCC is an unofficial open source engine reimplementation of the game trilogy [Crystal Caves](https://en.wikipedia.org/wiki/Crystal_Caves).
 
-Current state of OCC:
-
 **Note that the sprites are not available in this repository. You need to own the original Crystal Caves to be able to extract the sprites and use this engine, see below. The original Crystal Caves can be purchased at [Steam](http://store.steampowered.com/app/358260/Crystal_Caves/).**
+
+Current state of OCC:
 
 ![Screenshot 1](/screenshots/screenshot1.png?raw=true "Screenshot 1")
 
@@ -14,9 +16,9 @@ Current state of OCC:
 Currently the engine can:
 
 - Load sprite, item and level data.
-- Render the (one and only) level, including items that are rendered both behind and infront of the player as well as animated items.
+- Render a level that is selected at compile time.
+- Render items that, both behind and infront of the player, as well as animated items.
 - Move the player around, jumping, colliding with solid items and moving platforms.
-- Render and interact with everything in the main level (the overworld), except spawning fruits randomly and having the player enter doors.
 
 Features that are missing:
 
@@ -24,7 +26,6 @@ Features that are missing:
 - Entering levels.
 - Shooting.
 - Enemies.
-- Picking up items.
 - (and much more).
 
 ## Compiling OCC
