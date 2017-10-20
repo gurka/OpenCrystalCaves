@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.2)
 
 project(utils)
 
-add_library(utils
+set(utils_src
   "export/geometry.h"
   "export/logger.h"
   "export/occ_math.h"
@@ -12,6 +12,17 @@ add_library(utils
   "src/logger.cc"
 )
 
+add_library(utils ${utils_src})
+target_include_directories(utils PUBLIC
+  "export"
+)
+
 set_property(TARGET utils PROPERTY CXX_STANDARD 14)
 
-add_executable(utils_test "test/utils_test.cc")
+add_executable(utils_test
+  ${utils_src}
+  "test/src/utils_test.cc"
+)
+target_include_directories(utils_test PUBLIC
+  "export"
+)

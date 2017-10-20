@@ -7,5 +7,5 @@ DEBUG_DIR="$DIR/../debug"
 mkdir -p "$DEBUG_DIR"
 cd "$DEBUG_DIR"
 cmake ../occ -DCMAKE_BUILD_TYPE=debug
-cmake --build . -- -j2
+cmake --build .
 ctest
