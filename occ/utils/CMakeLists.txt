@@ -19,10 +19,15 @@ target_include_directories(utils PUBLIC
 
 set_property(TARGET utils PROPERTY CXX_STANDARD 14)
 
+# test
 add_executable(utils_test
-  ${utils_src}
   "test/src/utils_test.cc"
 )
 target_include_directories(utils_test PUBLIC
   "export"
+)
+target_link_libraries(utils_test
+  gtest_main
+  gmock_main
+  utils
 )

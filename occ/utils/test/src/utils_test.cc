@@ -1,4 +1,7 @@
-int main()
+#include <gtest/gtest.h>
+
+TEST(ThisIsATest, TestOne)
 {
-  return 0;
+  int a = 1;
+  ASSERT_EQ(1, a);
 }
