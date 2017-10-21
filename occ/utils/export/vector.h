@@ -110,7 +110,7 @@ class Vector
 
   constexpr bool operator!=(const Vector& other) const
   {
-    return *this != other;
+    return !(*this == other);
   }
 
   constexpr Vector& operator+=(const Vector& other)

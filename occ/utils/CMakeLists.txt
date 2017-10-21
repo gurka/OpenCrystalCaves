@@ -8,7 +8,6 @@ set(utils_src
   "export/occ_math.h"
   "export/misc.h"
   "export/vector.h"
-  "src/geometry.cc"
   "src/logger.cc"
 )
 
@@ -21,7 +20,10 @@ set_property(TARGET utils PROPERTY CXX_STANDARD 14)
 
 # test
 add_executable(utils_test
-  "test/src/utils_test.cc"
+  "test/src/geometry_test.cc"
+  "test/src/misc_test.cc"
+  "test/src/occ_math_test.cc"
+  "test/src/vector_test.cc"
 )
 target_include_directories(utils_test PUBLIC
   "export"
