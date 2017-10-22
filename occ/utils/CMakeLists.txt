@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.2)
 
 project(utils)
 
-set(utils_src
+add_library(utils
   "export/geometry.h"
   "export/logger.h"
   "export/occ_math.h"
@@ -10,15 +10,11 @@ set(utils_src
   "export/vector.h"
   "src/logger.cc"
 )
-
-add_library(utils ${utils_src})
 target_include_directories(utils PUBLIC
   "export"
 )
-
 set_property(TARGET utils PROPERTY CXX_STANDARD 14)
 
-# test
 add_executable(utils_test
   "test/src/geometry_test.cc"
   "test/src/misc_test.cc"
@@ -33,3 +29,4 @@ target_link_libraries(utils_test
   gmock_main
   utils
 )
+set_property(TARGET utils_test PROPERTY CXX_STANDARD 14)

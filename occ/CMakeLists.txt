@@ -39,6 +39,5 @@ target_include_directories(occ PUBLIC
 enable_testing()
 add_subdirectory(external/googletest)
 add_test(game game/game_test)
-add_test(occ occ/occ_test)
 add_test(sdl_wrapper sdl_wrapper/sdl_wrapper_test)
 add_test(utils utils/utils_test)

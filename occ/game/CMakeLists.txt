@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.2)
 
 project(game)
 
-set(game_src
+add_library(game
   "export/game.h"
   "export/level_id.h"
   "export/object.h"
@@ -18,18 +18,20 @@ set(game_src
   "src/object_manager.h"
   "src/player.cc"
 )
-
-add_library(game ${game_src})
 target_include_directories(game PUBLIC
   "export"
 )
-
 set_property(TARGET game PROPERTY CXX_STANDARD 14)
 
 add_executable(game_test
-#  ${game_src}
   "test/src/game_test.cc"
 )
 target_include_directories(game_test PUBLIC
   "export"
 )
+target_link_libraries(game_test
+  gtest_main
+  gmock_main
+  game
+)
+set_property(TARGET game_test PROPERTY CXX_STANDARD 14)

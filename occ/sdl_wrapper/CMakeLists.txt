@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.2)
 
 project(sdl_wrapper)
 
-set(sdl_wrapper_src
+add_library(sdl_wrapper
   "export/event.h"
   "export/graphics.h"
   "export/sdl_wrapper.h"
@@ -13,19 +13,20 @@ set(sdl_wrapper_src
   "src/sdl_wrapper_impl.cc"
   "src/sdl_wrapper_impl.h"
 )
-
-
-add_library(sdl_wrapper ${sdl_wrapper_src})
 target_include_directories(sdl_wrapper PUBLIC
   "export"
 )
-
 set_property(TARGET sdl_wrapper PROPERTY CXX_STANDARD 14)
 
 add_executable(sdl_wrapper_test
-#  ${sdl_wrapper_src}
   "test/src/sdl_wrapper_test.cc"
 )
 target_include_directories(sdl_wrapper_test PUBLIC
   "export"
 )
+target_link_libraries(sdl_wrapper_test
+  gtest_main
+  gmock_main
+  sdl_wrapper
+)
+set_property(TARGET sdl_wrapper_test PROPERTY CXX_STANDARD 14)
