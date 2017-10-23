@@ -20,13 +20,17 @@ set_property(TARGET sdl_wrapper PROPERTY CXX_STANDARD 14)
 
 add_executable(sdl_wrapper_test
   "test/src/sdl_wrapper_test.cc"
+  "test/src/graphics_test.cc"
+  "test/src/stubs/sdl_stub.cc"
 )
 target_include_directories(sdl_wrapper_test PUBLIC
   "export"
+  "test/src/stubs"
 )
 target_link_libraries(sdl_wrapper_test
   gtest_main
   gmock_main
   sdl_wrapper
+  utils_stubs
 )
 set_property(TARGET sdl_wrapper_test PROPERTY CXX_STANDARD 14)

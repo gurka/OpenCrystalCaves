@@ -30,3 +30,11 @@ target_link_libraries(utils_test
   utils
 )
 set_property(TARGET utils_test PROPERTY CXX_STANDARD 14)
+
+add_library(utils_stubs
+	"test/stubs/logger_stub.cc"
+)
+target_include_directories(utils_stubs PUBLIC
+  "export"
+)
+set_property(TARGET utils_stubs PROPERTY CXX_STANDARD 14)
