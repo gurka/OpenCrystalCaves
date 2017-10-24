@@ -24,6 +24,8 @@ class SDLStub
   MOCK_METHOD4(SDL_MapRGB, Uint32(const SDL_PixelFormat*, Uint8, Uint8, Uint8));
   MOCK_METHOD3(SDL_FillRect, int(SDL_Surface*, const SDL_Rect*, Uint32));
 
+  MOCK_METHOD1(SDL_PollEvent, int(SDL_Event*));
+
   MOCK_METHOD0(TTF_Init, int());
   MOCK_METHOD2(TTF_OpenFont, TTF_Font*(const char*, int));
   MOCK_METHOD1(TTF_CloseFont, void(TTF_Font*));

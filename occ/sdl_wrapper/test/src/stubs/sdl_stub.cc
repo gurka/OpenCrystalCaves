@@ -103,6 +103,11 @@ int SDL_FillRect(SDL_Surface* dst, const SDL_Rect* rect, Uint32 color)
   return SDLStub::get().SDL_FillRect(dst, rect, color);
 }
 
+int SDL_PollEvent(SDL_Event* event)
+{
+  return SDLStub::get().SDL_PollEvent(event);
+}
+
 int TTF_Init()
 {
   return SDLStub::get().TTF_Init();
