@@ -49,7 +49,15 @@ std::unique_ptr<Surface> Surface::from_bmp(const std::string& filename)
 {
   auto sdl_surface = std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)>(SDL_LoadBMP(filename.c_str()),
                                                                               SDL_FreeSurface);
-  return std::make_unique<SurfaceImpl>(std::move(sdl_surface));
+  if (!sdl_surface)
+  {
+    LOG_CRITICAL("Could not load BMP: %s", SDL_GetError());
+    return std::unique_ptr<Surface>();
+  }
+  else
+  {
+    return std::make_unique<SurfaceImpl>(std::move(sdl_surface));
+  }
 }
 
 void SurfaceImpl::blit_surface(const Surface* surface,
