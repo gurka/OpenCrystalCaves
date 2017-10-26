@@ -15,8 +15,8 @@ namespace
 
 const std::unordered_map<LevelId, std::string> level_filename =
 {
-    { LevelId::MAIN_LEVEL, "media/mainlevel.json" },
-    { LevelId::LEVEL_ONE,  "media/level1.json" },
+  { LevelId::MAIN_LEVEL, "media/mainlevel.json" },
+  { LevelId::LEVEL_ONE,  "media/level1.json" },
 };
 
 }
