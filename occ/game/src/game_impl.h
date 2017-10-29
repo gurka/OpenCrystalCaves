@@ -18,7 +18,10 @@ class GameImpl : public Game
     : player_(),
       object_manager_(),
       level_(),
-      objects_()
+      objects_(),
+      score_(0u),
+      num_ammo_(0u),
+      num_lives_(0u)
   {
   }
 
@@ -38,6 +41,10 @@ class GameImpl : public Game
 
   const std::vector<Object>& get_objects() const override { return objects_; }
 
+  unsigned get_score() const { return score_; }
+  unsigned get_num_ammo() const { return num_ammo_; }
+  unsigned get_num_lives() const { return num_lives_; }
+
  private:
   void update_level();
   void update_player(const PlayerInput& player_input);
@@ -52,6 +59,10 @@ class GameImpl : public Game
   ObjectManager object_manager_;
   std::unique_ptr<Level> level_;
   std::vector<Object> objects_;
+
+  unsigned score_;
+  unsigned num_ammo_;
+  unsigned num_lives_;
 };
 
 #endif  // GAME_IMPL_H_

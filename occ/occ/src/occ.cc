@@ -32,14 +32,18 @@ PlayerInput input_to_player_input(const Input& input)
   return pi;
 }
 
-void render_statusbar(Surface* surface)
+void render_statusbar(Surface* surface, unsigned score, unsigned num_ammo, unsigned num_lives)
 {
   constexpr auto statusbar_height = WINDOW_SIZE.y() / 12 / 2;
   constexpr auto statusbar_rect = geometry::Rectangle(0, WINDOW_SIZE.y() - statusbar_height,
                                                       WINDOW_SIZE.x(), statusbar_height);
+
+  char statusbar_text[64];
+  snprintf(statusbar_text, 64, "Score: %8u Ammo: %2u Life: %u", score, num_ammo, num_lives);
+
   surface->fill_rect(statusbar_rect, { 0u, 0u, 0u });
   surface->render_text(statusbar_rect.position + geometry::Position(32, 0),
-                       "Score: 000000 Ammo: 00",
+                       statusbar_text,
                        { 255u, 255u, 255u });
 }
 
@@ -195,7 +199,7 @@ int main()
                                    BlitType::SCALE);
 
       // Render statusbar
-      render_statusbar(window_surface.get());
+      render_statusbar(window_surface.get(), game->get_score(), game->get_num_ammo(), game->get_num_lives());
 
       // Render FPS
       auto fps_str = "fps: " + std::to_string(fps);

@@ -128,6 +128,10 @@ class Game
   virtual const Item& get_item(int tile_x, int tile_y) const = 0;
 
   virtual const std::vector<Object>& get_objects() const = 0;
+
+  virtual unsigned get_score() const = 0;
+  virtual unsigned get_num_ammo() const = 0;
+  virtual unsigned get_num_lives() const = 0;
 };
 
 #endif  // GAME_H_

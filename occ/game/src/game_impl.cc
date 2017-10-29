@@ -37,6 +37,10 @@ bool GameImpl::init()
 
   player_.position = level_->player_spawn;
 
+  score_ = 0u;
+  num_ammo_ = 5u;
+  num_lives_ = 3u;
+
   return true;
 }
 
@@ -348,7 +352,25 @@ void GameImpl::update_items()
     const auto& item = get_item(position.x(), position.y());
     if (item.valid())
     {
-      LOG_DEBUG("Player took Item of type: %d amount: %d", item.get_type(), item.get_amount());
+      if (item.get_type() == 0)
+      {
+        LOG_DEBUG("Player took item of type crystal (%d)", item.get_type());
+        score_ += 500;  // TODO: Check how much score a crystal gives
+      }
+      else if (item.get_type() == 1)
+      {
+        LOG_DEBUG("Player took item of type ammo (%d), amount: %d", item.get_type(), item.get_amount());
+        num_ammo_ += item.get_amount();
+
+        // 99 is max ammo
+        num_ammo_ = num_ammo_ > 99 ? 99 : num_ammo_;
+      }
+      else if (item.get_type() == 2)
+      {
+        LOG_DEBUG("Player took item of type score (%d), amount: %d", item.get_type(), item.get_amount());
+        score_ += item.get_amount();
+      }
+
       remove_item(position.x(), position.y());
     }
   }
