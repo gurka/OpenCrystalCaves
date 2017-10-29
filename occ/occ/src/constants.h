@@ -4,7 +4,6 @@
 #include "geometry.h"
 
 // The size of the game camera
-// TODO: It seems as if Crystal Caves actually renders 12½ tiles on y axis - verify this and adjust accordingly
 static constexpr geometry::Size CAMERA_SIZE = geometry::Size(320, 192);
 
 // The size of the game camera after stretching, which is done in the original Crystal Caves

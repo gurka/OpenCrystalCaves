@@ -32,6 +32,17 @@ PlayerInput input_to_player_input(const Input& input)
   return pi;
 }
 
+void render_statusbar(Surface* surface)
+{
+  constexpr auto statusbar_height = WINDOW_SIZE.y() / 12 / 2;
+  constexpr auto statusbar_rect = geometry::Rectangle(0, WINDOW_SIZE.y() - statusbar_height,
+                                                      WINDOW_SIZE.x(), statusbar_height);
+  surface->fill_rect(statusbar_rect, { 0u, 0u, 0u });
+  surface->render_text(statusbar_rect.position + geometry::Position(32, 0),
+                       "Score: 000000 Ammo: 00",
+                       { 255u, 255u, 255u });
+}
+
 int main()
 {
   LOG_INFO("Starting!");
@@ -182,6 +193,9 @@ int main()
                                    geometry::Rectangle(0, 0, CAMERA_SIZE),
                                    geometry::Rectangle((WINDOW_SIZE - CAMERA_SIZE_SCALED) / 2, CAMERA_SIZE_SCALED),
                                    BlitType::SCALE);
+
+      // Render statusbar
+      render_statusbar(window_surface.get());
 
       // Render FPS
       auto fps_str = "fps: " + std::to_string(fps);
