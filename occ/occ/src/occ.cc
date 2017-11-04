@@ -44,6 +44,7 @@ void render_statusbar(Surface* surface, unsigned score, unsigned num_ammo, unsig
   surface->fill_rect(statusbar_rect, { 0u, 0u, 0u });
   surface->render_text(statusbar_rect.position + geometry::Position(32, 0),
                        statusbar_text,
+                       16,
                        { 255u, 255u, 255u });
 }
 
@@ -203,7 +204,7 @@ int main()
 
       // Render FPS
       auto fps_str = "fps: " + std::to_string(fps);
-      window_surface->render_text(geometry::Position(5, 5), fps_str, { 255u, 255u, 255u });
+      window_surface->render_text(geometry::Position(5, 5), fps_str, 12, { 255u, 255u, 255u });
 
       // Debug
       if (debug)
@@ -223,14 +224,14 @@ int main()
         const auto player_shooting_str = std::string("player shooting: ") + (game->get_player().shooting ? "true" : "false");
         const auto collide_str         = std::string("player collide: ")  + (game->get_player().collide_x ? "x " : "_ ") + (game->get_player().collide_y ? "y" : "_");
 
-        window_surface->render_text(geometry::Position(5,  25), camera_position_str, { 255u, 0u, 0u });
-        window_surface->render_text(geometry::Position(5,  45), player_position_str, { 255u, 0u, 0u });
-        window_surface->render_text(geometry::Position(5,  65), player_velocity_str, { 255u, 0u, 0u });
-        window_surface->render_text(geometry::Position(5,  85), player_walking_str,  { 255u, 0u, 0u });
-        window_surface->render_text(geometry::Position(5, 105), player_jumping_str,  { 255u, 0u, 0u });
-        window_surface->render_text(geometry::Position(5, 125), player_falling_str,  { 255u, 0u, 0u });
-        window_surface->render_text(geometry::Position(5, 145), player_shooting_str, { 255u, 0u, 0u });
-        window_surface->render_text(geometry::Position(5, 165), collide_str,         { 255u, 0u, 0u });
+        window_surface->render_text(geometry::Position(5,  25), camera_position_str, 12, { 255u, 0u, 0u });
+        window_surface->render_text(geometry::Position(5,  45), player_position_str, 12, { 255u, 0u, 0u });
+        window_surface->render_text(geometry::Position(5,  65), player_velocity_str, 12, { 255u, 0u, 0u });
+        window_surface->render_text(geometry::Position(5,  85), player_walking_str , 12, { 255u, 0u, 0u });
+        window_surface->render_text(geometry::Position(5, 105), player_jumping_str , 12, { 255u, 0u, 0u });
+        window_surface->render_text(geometry::Position(5, 125), player_falling_str , 12, { 255u, 0u, 0u });
+        window_surface->render_text(geometry::Position(5, 145), player_shooting_str, 12, { 255u, 0u, 0u });
+        window_surface->render_text(geometry::Position(5, 165), collide_str        , 12, { 255u, 0u, 0u });
 
       }
 

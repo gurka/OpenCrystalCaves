@@ -168,14 +168,31 @@ TEST_F(GraphicsTest, surface_render_text)
   auto window_surface = window->get_surface();
 
   const auto* filename = "media/DejaVuSansMono.ttf";
-  TTF_Font ttf_font;
   const auto* text = "test";
+  TTF_Font ttf_font;
   SDL_Surface sdl_surface_text;
-  EXPECT_CALL(SDLStub::get(), TTF_OpenFont(StrEq(filename), _)).WillOnce(Return(&ttf_font));
+
+  // Render text with size 12
+  auto font_size = 12;
+  EXPECT_CALL(SDLStub::get(), TTF_OpenFont(StrEq(filename), font_size)).WillOnce(Return(&ttf_font));
   EXPECT_CALL(SDLStub::get(), TTF_RenderText_Solid(&ttf_font, StrEq(text), _)).WillOnce(Return(&sdl_surface_text));
   EXPECT_CALL(SDLStub::get(), SDL_FreeSurface(&sdl_surface_text));
   EXPECT_CALL(SDLStub::get(), SDL_BlitSurface(&sdl_surface_text, _, &sdl_window_surface, _));
-  window_surface->render_text(geometry::Position(0, 0), text, { 0u, 0u, 0u });
+  window_surface->render_text(geometry::Position(0, 0), text, font_size, { 0u, 0u, 0u });
+
+  // Render text with size 12 again, the font should not be opened agian
+  EXPECT_CALL(SDLStub::get(), TTF_RenderText_Solid(&ttf_font, StrEq(text), _)).WillOnce(Return(&sdl_surface_text));
+  EXPECT_CALL(SDLStub::get(), SDL_FreeSurface(&sdl_surface_text));
+  EXPECT_CALL(SDLStub::get(), SDL_BlitSurface(&sdl_surface_text, _, &sdl_window_surface, _));
+  window_surface->render_text(geometry::Position(0, 0), text, font_size, { 0u, 0u, 0u });
+
+  // Render text with size 14
+  font_size = 14;
+  EXPECT_CALL(SDLStub::get(), TTF_OpenFont(StrEq(filename), font_size)).WillOnce(Return(&ttf_font));
+  EXPECT_CALL(SDLStub::get(), TTF_RenderText_Solid(&ttf_font, StrEq(text), _)).WillOnce(Return(&sdl_surface_text));
+  EXPECT_CALL(SDLStub::get(), SDL_FreeSurface(&sdl_surface_text));
+  EXPECT_CALL(SDLStub::get(), SDL_BlitSurface(&sdl_surface_text, _, &sdl_window_surface, _));
+  window_surface->render_text(geometry::Position(0, 0), text, font_size, { 0u, 0u, 0u });
 
   EXPECT_CALL(SDLStub::get(), SDL_DestroyWindow(&sdl_window));
   window.reset();

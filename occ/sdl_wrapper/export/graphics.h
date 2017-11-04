@@ -49,7 +49,7 @@ class Surface
                             const geometry::Rectangle& dest,
                             BlitType blit_type) = 0;
   virtual void fill_rect(const geometry::Rectangle& rect, const Color& color) = 0;
-  virtual void render_text(const geometry::Position& pos, const std::string& text, const Color& color) = 0;
+  virtual void render_text(const geometry::Position& pos, const std::string& text, unsigned font_size, const Color& color) = 0;
   virtual void render_line(const geometry::Position& from, const geometry::Position& to, const Color& color) = 0;
   virtual void render_rectangle(const geometry::Rectangle& rect, const Color& color) = 0;
 };

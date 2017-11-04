@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <cstdlib>
+#include <algorithm>
 #include <utility>
 
 #include "logger.h"
@@ -85,25 +86,41 @@ void SurfaceImpl::fill_rect(const geometry::Rectangle& rect, const Color& color)
   SDL_FillRect(sdl_surface_.get(), &sdl_rect, SDL_MapRGB(sdl_surface_->format, color.red, color.green, color.blue));
 }
 
-void SurfaceImpl::render_text(const geometry::Position& pos, const std::string& text, const Color& color)
+void SurfaceImpl::render_text(const geometry::Position& pos, const std::string& text, unsigned font_size, const Color& color)
 {
-  // Only open font once
-  static std::unique_ptr<TTF_Font, decltype(&TTF_CloseFont)> font { nullptr, TTF_CloseFont };
-  if (!font)
+  struct Font
   {
-    // TODO: Font size...
-    font.reset(TTF_OpenFont("media/DejaVuSansMono.ttf", 12));
-    if (!font)
+    unsigned size;
+    std::unique_ptr<TTF_Font, decltype(&TTF_CloseFont)> font;
+  };
+  static std::vector<Font> fonts;
+
+  // Check if requested font size already exist
+  auto it = std::find_if(fonts.begin(), fonts.end(), [font_size](const Font& f)
+  {
+    return f.size == font_size;
+  });
+
+  if (it == fonts.end())
+  {
+    // Open requested font
+    Font f { font_size, { nullptr, TTF_CloseFont } };
+    f.font.reset(TTF_OpenFont("media/DejaVuSansMono.ttf", f.size));
+    if (!f.font)
     {
       LOG_CRITICAL("TTF_OpenFont failed with: '%s'", TTF_GetError());
-      assert(font);
+      assert(false);
     }
+
+    // Insert and set iterator to point to it
+    fonts.push_back(std::move(f));
+    it = --fonts.end();
   }
 
   // Render text to surface
   std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> text_surface
   {
-    TTF_RenderText_Solid(font.get(), text.c_str(), to_sdl_color(color)),
+    TTF_RenderText_Solid(it->font.get(), text.c_str(), to_sdl_color(color)),
     SDL_FreeSurface
   };
 

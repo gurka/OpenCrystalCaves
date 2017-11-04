@@ -44,7 +44,7 @@ class SurfaceImpl : public Surface
                     const geometry::Rectangle& dest,
                     BlitType blit_type) override;
   void fill_rect(const geometry::Rectangle& rect, const Color& color) override;
-  void render_text(const geometry::Position& pos, const std::string& text, const Color& color) override;
+  void render_text(const geometry::Position& pos, const std::string& text, unsigned font_size, const Color& color) override;
   void render_line(const geometry::Position& from, const geometry::Position& to, const Color& color) override;
   void render_rectangle(const geometry::Rectangle& rect, const Color& color) override;
 
