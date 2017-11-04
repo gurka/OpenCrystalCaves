@@ -44,7 +44,7 @@ void render_statusbar(Surface* surface, unsigned score, unsigned num_ammo, unsig
   surface->fill_rect(statusbar_rect, { 0u, 0u, 0u });
   surface->render_text(statusbar_rect.position + geometry::Position(32, 0),
                        statusbar_text,
-                       16,
+                       24,
                        { 255u, 255u, 255u });
 }
 
