@@ -21,7 +21,8 @@ class GameImpl : public Game
       objects_(),
       score_(0u),
       num_ammo_(0u),
-      num_lives_(0u)
+      num_lives_(0u),
+      shot_()
   {
   }
 
@@ -49,6 +50,7 @@ class GameImpl : public Game
   void update_level();
   void update_player(const PlayerInput& player_input);
   void update_items();
+  void update_shot();
 
   bool player_collides(const geometry::Position& player_position);
   bool player_on_platform(const geometry::Position& player_position);
@@ -63,6 +65,20 @@ class GameImpl : public Game
   unsigned score_;
   unsigned num_ammo_;
   unsigned num_lives_;
+
+  struct Shot
+  {
+    Shot()
+      : alive(false),
+        position(),
+        right(false)
+    {
+    }
+
+    bool alive;
+    geometry::Position position;
+    bool right;  // Direction...
+  } shot_;
 };
 
 #endif  // GAME_IMPL_H_

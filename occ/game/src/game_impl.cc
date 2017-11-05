@@ -41,12 +41,17 @@ bool GameImpl::init()
   num_ammo_ = 5u;
   num_lives_ = 3u;
 
+  shot_.alive = false;
+
   return true;
 }
 
 void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
 {
   (void)game_tick;  // Not needed atm
+
+  // Clear objects_
+  objects_.clear();
 
   // Update the level (e.g. moving platforms and other objects)
   update_level();
@@ -56,6 +61,9 @@ void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
 
   // Update items
   update_items();
+
+  // Update shot
+  update_shot();
 
   // Update enemies
   // ...
@@ -146,8 +154,7 @@ void GameImpl::update_level()
     }
   }
 
-  // Re-generate objects_
-  objects_.clear();
+  // Add moving platforms to objects_
   for (auto& platform : level_->moving_platforms)
   {
     objects_.emplace_back(platform.position, platform.sprite_id, platform.num_sprites);
@@ -373,6 +380,50 @@ void GameImpl::update_items()
 
       remove_item(position.x(), position.y());
     }
+  }
+}
+
+void GameImpl::update_shot()
+{
+  // Check current shot (if alive)
+  if (shot_.alive)
+  {
+    // Check collision with enemy, before moving it
+    // TODO
+
+    // Move it
+    shot_.position += geometry::Position((shot_.right ? 2 : -2), 0);
+
+    // Check collision with enemy, after moving it
+    // TODO
+
+    // Check if outside screen
+    if (std::abs(player_.position.x() - shot_.position.x()) > 200)  // TODO check
+    {
+      shot_.alive = false;
+    }
+  }
+  else if (player_.shooting)
+  {
+    // Player wants to shoot new shot
+    if (num_ammo_ > 0)
+    {
+      shot_.alive = true;
+      shot_.right = player_.direction == Player::Direction::right;
+      shot_.position = player_.position + geometry::Position((shot_.right ? 2 : -2), 0);
+
+      num_ammo_ -= 1;
+    }
+    else
+    {
+      // Play "no ammo" sound when we have audio
+    }
+  }
+
+  // Add shot to objects_ if alive
+  if (shot_.alive)
+  {
+    objects_.emplace_back(shot_.position, (shot_.right ? 296 : 302), 6);
   }
 }
 
