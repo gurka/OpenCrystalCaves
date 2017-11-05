@@ -2,7 +2,9 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include <sstream>
 #include <memory>
+#include <utility>
 
 #include "constants.h"
 #include "game_renderer.h"
@@ -209,30 +211,31 @@ int main()
       // Debug
       if (debug)
       {
+        // Get debug information from Game and split on newline
+        auto game_debug_info_iss = std::istringstream(game->get_debug_info());
+        std::string temp;
+        std::vector<std::string> game_debug_infos;
+        while (std::getline(game_debug_info_iss, temp))
+        {
+          game_debug_infos.push_back(std::move(temp));
+        }
+
         // Put a black box where we're going to the draw the debug text
-        window_surface->fill_rect({ 0, 24, 200, 165 }, { 0u, 0u, 0u });
+        // 20 pixels per line (1 line + Game's lines)
+        window_surface->fill_rect({ 0, 24, 200, 20 + (20 * static_cast<int>(game_debug_infos.size())) }, { 0u, 0u, 0u });
 
+        // Render debug text
+        auto pos_y = 25;
         const auto& game_camera = game_renderer.get_game_camera();
-
-        // Debug text
         const auto camera_position_str = "camera position: (" + std::to_string(game_camera.position.x()) + ", " + std::to_string(game_camera.position.y()) + ")";
-        const auto player_position_str = "player position: (" + std::to_string(game->get_player().position.x()) + ", " + std::to_string(game->get_player().position.y()) + ")";
-        const auto player_velocity_str = "player velocity: (" + std::to_string(game->get_player().velocity.x()) + ", " + std::to_string(game->get_player().velocity.y()) + ")";
-        const auto player_walking_str  = std::string("player walking: ") + (game->get_player().walking ? "true" : "false");
-        const auto player_jumping_str  = std::string("player jumping: ") + (game->get_player().jumping ? "true" : "false");
-        const auto player_falling_str  = std::string("player falling: ") + (game->get_player().falling ? "true" : "false");
-        const auto player_shooting_str = std::string("player shooting: ") + (game->get_player().shooting ? "true" : "false");
-        const auto collide_str         = std::string("player collide: ")  + (game->get_player().collide_x ? "x " : "_ ") + (game->get_player().collide_y ? "y" : "_");
+        window_surface->render_text(geometry::Position(5,  pos_y), camera_position_str, 12, { 255u, 0u, 0u });
+        pos_y += 20;
 
-        window_surface->render_text(geometry::Position(5,  25), camera_position_str, 12, { 255u, 0u, 0u });
-        window_surface->render_text(geometry::Position(5,  45), player_position_str, 12, { 255u, 0u, 0u });
-        window_surface->render_text(geometry::Position(5,  65), player_velocity_str, 12, { 255u, 0u, 0u });
-        window_surface->render_text(geometry::Position(5,  85), player_walking_str , 12, { 255u, 0u, 0u });
-        window_surface->render_text(geometry::Position(5, 105), player_jumping_str , 12, { 255u, 0u, 0u });
-        window_surface->render_text(geometry::Position(5, 125), player_falling_str , 12, { 255u, 0u, 0u });
-        window_surface->render_text(geometry::Position(5, 145), player_shooting_str, 12, { 255u, 0u, 0u });
-        window_surface->render_text(geometry::Position(5, 165), collide_str        , 12, { 255u, 0u, 0u });
-
+        for (const auto& game_debug_info : game_debug_infos)
+        {
+          window_surface->render_text(geometry::Position(5,  pos_y), game_debug_info, 12, { 255u, 0u, 0u });
+          pos_y += 20;
+        }
       }
 
       // Update screen

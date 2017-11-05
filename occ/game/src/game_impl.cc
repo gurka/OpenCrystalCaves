@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <array>
+#include <sstream>
 
 #include "level_loader.h"
 #include "misc.h"
@@ -118,6 +119,23 @@ const Item& GameImpl::get_item(int tile_x, int tile_y) const
   {
     return Item::INVALID;
   }
+}
+
+std::string GameImpl::get_debug_info() const
+{
+  std::ostringstream oss;
+
+  oss << "player position: (" << player_.position.x() << ", " << player_.position.y() << ")" << "\n";
+  oss << "player velocity: (" << player_.velocity.x() << ", " << player_.velocity.y() << ")" << "\n";
+  oss << "player collide: " << (player_.collide_x ? "x " : "_ ") << (player_.collide_y ? "y" : "_") << "\n";
+  oss << "player walking: " << (player_.walking ? "true" : "false") << "\n";
+  oss << "player jumping: " << (player_.jumping ? "true" : "false") << "\n";
+  oss << "player falling: " << (player_.falling ? "true" : "false") << "\n";
+  oss << "player shooting: " << (player_.shooting ? "true" : "false") << "\n";
+  oss << "shot alive: " << (shot_.alive ? "true" : "false") << "\n";
+  oss << "shot position: (" << shot_.position.x() << ", " << shot_.position.y() << ")" << "\n";
+
+  return oss.str();
 }
 
 void GameImpl::update_level()

@@ -42,9 +42,11 @@ class GameImpl : public Game
 
   const std::vector<Object>& get_objects() const override { return objects_; }
 
-  unsigned get_score() const { return score_; }
-  unsigned get_num_ammo() const { return num_ammo_; }
-  unsigned get_num_lives() const { return num_lives_; }
+  unsigned get_score() const override { return score_; }
+  unsigned get_num_ammo() const override { return num_ammo_; }
+  unsigned get_num_lives() const override { return num_lives_; }
+
+  std::string get_debug_info() const override;
 
  private:
   void update_level();
