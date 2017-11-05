@@ -77,6 +77,7 @@ class GameImpl : public Game
 
     bool alive;
     geometry::Position position;
+    static constexpr geometry::Size size = geometry::Size(16, 16);
     bool right;  // Direction...
   } shot_;
 };
