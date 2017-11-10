@@ -13,6 +13,9 @@ static constexpr auto gravity = 8u;
 static constexpr auto jump_velocity = misc::make_array<int>(0, -8, -8, -8, -4, -4, -2, -2, -2, -2, 2, 2, 2, 2, 4, 4);
 static constexpr auto jump_velocity_fall_index = 10u;
 
+static constexpr auto shot_size = geometry::Size(16, 16);
+static constexpr auto shot_speed = misc::make_array(4, 4, 4, 4, 4, 4, 6, 8, 10, 12, 14);
+
 const Background Background::INVALID;
 const Tile Tile::INVALID;
 const Item Item::INVALID;
@@ -406,17 +409,19 @@ void GameImpl::update_shot()
   // Check current shot (if alive)
   if (shot_.alive)
   {
-    // Check collision with enemy, before moving it
+    // Check collision with enemy or wall, before moving it
     // TODO
 
-    // Move it
-    shot_.position += geometry::Position((shot_.right ? 2 : -2), 0);
+    // Move it and increase frame number
+    const auto speed = shot_.frame < static_cast<int>(shot_speed.size()) ? shot_speed[shot_.frame] : shot_speed.back();
+    shot_.position += geometry::Position((shot_.right ? speed : -speed), 0);
+    shot_.frame += 1;
 
-    // Check collision with enemy, after moving it
+    // Check collision with enemy or wall, after moving it
     // TODO
 
     // Check if outside screen
-    if (std::abs(player_.position.x() - shot_.position.x()) > 200)  // TODO check
+    if (shot_.frame > 30)  // TODO: verify
     {
       shot_.alive = false;
     }
@@ -427,8 +432,17 @@ void GameImpl::update_shot()
     if (num_ammo_ > 0)
     {
       shot_.alive = true;
-      shot_.right = player_.direction == Player::Direction::right;
-      shot_.position = player_.position + geometry::Position((shot_.right ? 2 : -2), 0);
+      shot_.frame = 0;
+      if (player_.direction == Player::Direction::right)
+      {
+        shot_.right = true;
+        shot_.position = player_.position + geometry::Position(player_.size.x(), 0);
+      }
+      else
+      {
+        shot_.right = false;
+        shot_.position = player_.position - geometry::Position(player_.size.x(), 0);
+      }
 
       num_ammo_ -= 1;
     }

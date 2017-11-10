@@ -72,14 +72,15 @@ class GameImpl : public Game
   {
     Shot()
       : alive(false),
+        frame(0),
         position(),
         right(false)
     {
     }
 
     bool alive;
+    int frame;
     geometry::Position position;
-    static constexpr geometry::Size size = geometry::Size(16, 16);
     bool right;  // Direction...
   } shot_;
 };
