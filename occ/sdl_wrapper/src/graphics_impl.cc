@@ -6,6 +6,7 @@
 #include <utility>
 
 #include "logger.h"
+#include "occ_math.h"
 
 std::unique_ptr<Window> Window::create(const std::string& title, geometry::Size size)
 {
@@ -133,60 +134,53 @@ void SurfaceImpl::render_line(const geometry::Position& from,
                               const geometry::Position& to,
                               const Color& color)
 {
-  (void)from;
-  (void)to;
-  (void)color;
-  // TODO
-//  assert(from_x == to_x || from_y == to_y);
-//
-//  if (from_x == to_x)
-//  {
-//    // Vertical line
-//    const SDL_Rect rect { from_x, from_y, 1, math::abs(from_y - to_y) };
-//    SDL_FillRect(dest, &rect, SDL_MapRGB(dest->format, color.r, color.g, color.b));
-//  }
-//  else if (from_y == to_y)
-//  {
-//    // Horizontal line
-//    const SDL_Rect rect { from_x, from_y, math::abs(from_x - to_x), 1 };
-//    SDL_FillRect(dest, &rect, SDL_MapRGB(dest->format, color.r, color.g, color.b));
-//  }
+  assert(from.x() == to.x() || from.y() == to.y());
+
+  if (from.x() == to.x())
+  {
+    // Vertical line
+    const SDL_Rect rect { from.x(), from.y(), 1, math::abs(from.y() - to.y()) };
+    SDL_FillRect(sdl_surface_.get(),
+                 &rect,
+                 SDL_MapRGB(sdl_surface_->format, color.red, color.green, color.blue));
+  }
+  else if (from.y() == to.y())
+  {
+    // Horizontal line
+    const SDL_Rect rect { from.x(), from.y(), math::abs(from.x() - to.x()), 1 };
+    SDL_FillRect(sdl_surface_.get(),
+                 &rect,
+                 SDL_MapRGB(sdl_surface_->format, color.red, color.green, color.blue));
+  }
 }
 
 void SurfaceImpl::render_rectangle(const geometry::Rectangle& rect, const Color& color)
 {
-  (void)rect;
-  (void)color;
-  // TODO
-//  assert(rectangle.size.x() > 0 && rectangle.size.y() > 0);
-//
-//  // top
-//  render_line(rectangle.position.x(),
-//       rectangle.position.y(),
-//       rectangle.position.x() + rectangle.size.x(),
-//       rectangle.position.y(),
-//       color);
-//
-//  // bottom
-//  render_line(rectangle.position.x(),
-//       rectangle.position.y() + rectangle.size.y() - 1,
-//       rectangle.position.x() + rectangle.size.x(),
-//       rectangle.position.y() + rectangle.size.y() - 1,
-//       color;
-//
-//  // left
-//  render_line(rectangle.position.x(),
-//       rectangle.position.y(),
-//       rectangle.position.x(),
-//       rectangle.position.y() + rectangle.size.y(),
-//       color);
-//
-//  // right
-//  render_line(rectangle.position.x() + rectangle.size.x() - 1,
-//       rectangle.position.y(),
-//       rectangle.position.x() + rectangle.size.x() - 1,
-//       rectangle.position.y() + rectangle.size.y(),
-//       color);
+  // top
+  render_line(rect.position,
+              geometry::Position(rect.position.x() + rect.size.x(),
+                                 rect.position.y()),
+              color);
+
+  // bottom
+  render_line(geometry::Position(rect.position.x(),
+                                 rect.position.y() + rect.size.y() - 1),
+              geometry::Position(rect.position.x() + rect.size.x(),
+                                 rect.position.y() + rect.size.y() - 1),
+              color);
+
+  // left
+  render_line(rect.position,
+              geometry::Position(rect.position.x(),
+                                 rect.position.y() + rect.size.y()),
+              color);
+
+  // right
+  render_line(geometry::Position(rect.position.x() + rect.size.x() - 1,
+                                 rect.position.y()),
+              geometry::Position(rect.position.x() + rect.size.x() - 1,
+                                 rect.position.y() + rect.size.y()),
+              color);
 }
 
 SDL_Rect SurfaceImpl::to_sdl_rect(const geometry::Rectangle& rect) const
