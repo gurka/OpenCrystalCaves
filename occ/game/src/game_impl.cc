@@ -13,7 +13,7 @@ static constexpr auto gravity = 8u;
 static constexpr auto jump_velocity = misc::make_array<int>(0, -8, -8, -8, -4, -4, -2, -2, -2, -2, 2, 2, 2, 2, 4, 4);
 static constexpr auto jump_velocity_fall_index = 10u;
 
-//static constexpr auto shot_size = geometry::Size(16, 16);
+static constexpr auto shot_size = geometry::Size(16, 16);
 static constexpr auto shot_speed = misc::make_array(4, 4, 4, 4, 4, 4, 6, 8, 10, 12, 14);
 static constexpr auto explosion_sprites = misc::make_array(28, 29, 30, 31, 30, 29, 28);
 
@@ -158,7 +158,7 @@ void GameImpl::update_level()
     {
       // Only move player if not colliding with any static objects
       const auto new_player_pos = player_.position + platform_velocity;
-      if (!player_collides(new_player_pos))
+      if (!collides(new_player_pos, player_.size))
       {
         player_.position = new_player_pos;
       }
@@ -225,7 +225,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
   if (player_input.jump &&
       !player_.jumping &&
       !player_.falling &&
-      !player_collides(player_.position + geometry::Position(0, -1)))
+      !collides(player_.position + geometry::Position(0, -1), player_.size))
   {
     // Player wants to jump
     player_.jumping = true;
@@ -287,7 +287,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
   {
     const auto new_player_pos = player_.position + geometry::Position(step_x, 0);
 
-    if (player_collides(new_player_pos))
+    if (collides(new_player_pos, player_.size))
     {
       player_.collide_x = true;
       break;
@@ -303,7 +303,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
     const auto new_player_pos = player_.position + geometry::Position(0, step_y);
 
     // If player is falling down (step_y == 1) we need to check for collision with platforms
-    if (player_collides(new_player_pos) ||
+    if (collides(new_player_pos, player_.size) ||
         (step_y == 1 && player_on_platform(new_player_pos)))
     {
       player_.collide_y = true;
@@ -347,7 +347,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
       player_.jumping = false;
     }
     else if (player_.jump_tick != 0 &&
-             player_collides(player_.position + geometry::Position(0, 1)))
+             collides(player_.position + geometry::Position(0, 1), player_.size))
     {
       // Player did not actually collide with the ground, but standing directly above it
       // and this isn't the first tick in the jump, so we can consider the jump to have
@@ -360,7 +360,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
   player_.falling = !player_.jumping &&
                     player_.velocity.y() > 0 &&
                     !player_.collide_y &&
-                    !player_collides(player_.position + geometry::Position(0, 1));
+                    !collides(player_.position + geometry::Position(0, 1), player_.size);
 }
 
 void GameImpl::update_items()
@@ -431,7 +431,7 @@ void GameImpl::update_shot()
     // Check collision with enemy or wall, after moving it
     // TODO: This doesn't work 100% since player size is smaller than missile size
     //       Need to write a collidies() that takes position and size
-    if (player_collides(shot_.position))
+    if (collides(shot_.position, shot_size))
     {
       shot_.alive = false;
 
@@ -483,16 +483,17 @@ void GameImpl::update_shot()
   }
 }
 
-bool GameImpl::player_collides(const geometry::Position& player_position)
+bool GameImpl::collides(const geometry::Position& position, const geometry::Size& size)
 {
-  // Player can cover at maximum 4 tiles
+  // Note: this function only works with size x and y <= 16
+  // With size 16x16 the object can cover at maximum 4 tiles
   // Check all 4 tiles, even though we might check the same tile multiple times
   const std::array<geometry::Position, 4> positions =
   {
-    geometry::Position((player_position.x() + 0)                    / 16, (player_position.y() + 0)                    / 16),
-    geometry::Position((player_position.x() + player_.size.x() - 1) / 16, (player_position.y() + 0)                    / 16),
-    geometry::Position((player_position.x() + 0)                    / 16, (player_position.y() + player_.size.y() - 1) / 16),
-    geometry::Position((player_position.x() + player_.size.x() - 1) / 16, (player_position.y() + player_.size.y() - 1) / 16)
+    geometry::Position((position.x() + 0)            / 16, (position.y() + 0)            / 16),
+    geometry::Position((position.x() + size.x() - 1) / 16, (position.y() + 0)            / 16),
+    geometry::Position((position.x() + 0)            / 16, (position.y() + size.y() - 1) / 16),
+    geometry::Position((position.x() + size.x() - 1) / 16, (position.y() + size.y() - 1) / 16)
   };
   for (const auto& position : positions)
   {
