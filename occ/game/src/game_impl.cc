@@ -418,34 +418,40 @@ void GameImpl::update_missile()
     }
   }
 
-  // Check current missile (if alive)
+  // Move the missile if it's alive
   if (missile_.alive)
   {
-    // Move it and increase frame number
-    // TODO: We might need to move it 1 pixel at a time and check collision at each pixel
-    //       so that the missile doesn't go through an enemy
-    const auto speed = missile_.frame < missile_speed.size() ? missile_speed[missile_.frame] : missile_speed.back();
-    missile_.position += geometry::Position((missile_.right ? speed : -speed), 0);
-    missile_.frame += 1;
-
-    // Check collision with enemy or wall, after moving it
-    // TODO: This doesn't work 100% since player size is smaller than missile size
-    //       Need to write a collidies() that takes position and size
-    if (collides(missile_.position, missile_size))
+    auto speed = missile_.frame < missile_speed.size() ? missile_speed[missile_.frame] : missile_speed.back();
+    while (speed-- > 0)
     {
-      missile_.alive = false;
+      missile_.position += geometry::Position((missile_.right ? 1 : -1), 0);
+      if (collides(missile_.position, missile_size))
+      {
+        missile_.alive = false;
 
-      explosion_.alive = true;
-      explosion_.frame = 0;
-      explosion_.position = missile_.position;
+        explosion_.alive = true;
+        explosion_.frame = 0;
+        explosion_.position = missile_.position;
+
+        break;
+      }
     }
-    else if (missile_.frame > 30)  // TODO: verify when exactly the missile disappears
+  }
+
+  // Check if missile is alive after movement
+  if (missile_.alive)
+  {
+    missile_.frame += 1;
+    if (missile_.frame > 30)  // TODO: verify when exactly the missile disappears
     {
       missile_.alive = false;
     }
   }
   else if (player_.shooting)
   {
+    // TODO: There is some delay between each missile, verify.
+    //       Perhaps explosion animation needs to complete before next shot
+
     // Player wants to shoot new missile
     if (num_ammo_ > 0)
     {
