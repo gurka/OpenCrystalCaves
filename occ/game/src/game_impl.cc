@@ -13,8 +13,9 @@ static constexpr auto gravity = 8u;
 static constexpr auto jump_velocity = misc::make_array<int>(0, -8, -8, -8, -4, -4, -2, -2, -2, -2, 2, 2, 2, 2, 4, 4);
 static constexpr auto jump_velocity_fall_index = 10u;
 
-static constexpr auto shot_size = geometry::Size(16, 16);
+//static constexpr auto shot_size = geometry::Size(16, 16);
 static constexpr auto shot_speed = misc::make_array(4, 4, 4, 4, 4, 4, 6, 8, 10, 12, 14);
+static constexpr auto explosion_sprites = misc::make_array(28, 29, 30, 31, 30, 29, 28);
 
 const Background Background::INVALID;
 const Tile Tile::INVALID;
@@ -406,22 +407,39 @@ void GameImpl::update_items()
 
 void GameImpl::update_shot()
 {
+  // Check current explosion (if alive)
+  if (explosion_.alive)
+  {
+    explosion_.frame += 1;
+
+    if (explosion_.frame >= explosion_sprites.size())
+    {
+      explosion_.alive = false;
+    }
+  }
+
   // Check current shot (if alive)
   if (shot_.alive)
   {
-    // Check collision with enemy or wall, before moving it
-    // TODO
-
     // Move it and increase frame number
-    const auto speed = shot_.frame < static_cast<int>(shot_speed.size()) ? shot_speed[shot_.frame] : shot_speed.back();
+    // TODO: We might need to move it 1 pixel at a time and check collision at each pixel
+    //       so that the missile doesn't go through an enemy
+    const auto speed = shot_.frame < shot_speed.size() ? shot_speed[shot_.frame] : shot_speed.back();
     shot_.position += geometry::Position((shot_.right ? speed : -speed), 0);
     shot_.frame += 1;
 
     // Check collision with enemy or wall, after moving it
-    // TODO
+    // TODO: This doesn't work 100% since player size is smaller than missile size
+    //       Need to write a collidies() that takes position and size
+    if (player_collides(shot_.position))
+    {
+      shot_.alive = false;
 
-    // Check if outside screen
-    if (shot_.frame > 30)  // TODO: verify
+      explosion_.alive = true;
+      explosion_.frame = 0;
+      explosion_.position = shot_.position;
+    }
+    else if (shot_.frame > 30)  // TODO: verify when exactly the missile disappears
     {
       shot_.alive = false;
     }
@@ -450,6 +468,12 @@ void GameImpl::update_shot()
     {
       // Play "no ammo" sound when we have audio
     }
+  }
+
+  // Add explosion to objects_ if alive
+  if (explosion_.alive)
+  {
+    objects_.emplace_back(explosion_.position, explosion_sprites[explosion_.frame], 1);
   }
 
   // Add shot to objects_ if alive

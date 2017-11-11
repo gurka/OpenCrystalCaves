@@ -22,7 +22,8 @@ class GameImpl : public Game
       score_(0u),
       num_ammo_(0u),
       num_lives_(0u),
-      shot_()
+      shot_(),
+      explosion_()
   {
   }
 
@@ -68,6 +69,7 @@ class GameImpl : public Game
   unsigned num_ammo_;
   unsigned num_lives_;
 
+  // TODO: Move definition to own file
   struct Shot
   {
     Shot()
@@ -79,10 +81,25 @@ class GameImpl : public Game
     }
 
     bool alive;
-    int frame;
+    unsigned frame;
     geometry::Position position;
     bool right;  // Direction...
   } shot_;
+
+  // TODO: Move definition to own file
+  struct Explosion
+  {
+    Explosion()
+      : alive(false),
+        frame(0),
+        position()
+    {
+    }
+
+    bool alive;
+    unsigned frame;
+    geometry::Position position;
+  } explosion_;
 };
 
 #endif  // GAME_IMPL_H_
