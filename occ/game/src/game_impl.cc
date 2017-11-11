@@ -447,12 +447,10 @@ void GameImpl::update_missile()
       missile_.alive = false;
     }
   }
-  else if (player_.shooting)
-  {
-    // TODO: There is some delay between each missile, verify.
-    //       Perhaps explosion animation needs to complete before next shot
 
-    // Player wants to shoot new missile
+  // Player wants to shoot new missile
+  if (player_.shooting && !missile_.alive && !explosion_.alive)
+  {
     if (num_ammo_ > 0)
     {
       missile_.alive = true;
