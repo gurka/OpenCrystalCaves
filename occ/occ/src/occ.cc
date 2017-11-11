@@ -129,7 +129,7 @@ int main()
     Input input;
 
     // Debug information
-    bool debug = false;
+    bool debug_info = false;
 
     // Game loop logic
     auto sdl_tick = sdl->get_tick();
@@ -166,7 +166,11 @@ int main()
         }
         if (input.num_1.pressed && !input.num_1.repeated)
         {
-          debug = !debug;
+          debug_info = !debug_info;
+        }
+        if (input.num_2.pressed && !input.num_2.repeated)
+        {
+          game_renderer.set_debug(!game_renderer.get_debug());
         }
         if (input.enter.pressed && !input.enter.repeated)
         {
@@ -208,8 +212,8 @@ int main()
       auto fps_str = "fps: " + std::to_string(fps);
       window_surface->render_text(geometry::Position(5, 5), fps_str, 12, { 255u, 255u, 255u });
 
-      // Debug
-      if (debug)
+      // Debug information
+      if (debug_info)
       {
         // Get debug information from Game and split on newline
         auto game_debug_info_iss = std::istringstream(game->get_debug_info());

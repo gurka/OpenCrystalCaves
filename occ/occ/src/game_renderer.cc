@@ -21,7 +21,8 @@ GameRenderer::GameRenderer(Game* game, SpriteManager* sprite_manager, Surface* g
                  CAMERA_SIZE.x(),
                  CAMERA_SIZE.y()),
     game_tick_(0u),
-    game_tick_diff_(0u)
+    game_tick_diff_(0u),
+    debug_(false)
 {
 }
 
@@ -430,6 +431,11 @@ void GameRenderer::render_player()
   const geometry::Rectangle dest_rect { player_render_pos.x() - 2, player_render_pos.y(), 16, 16 };
 
   game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
+
+  if (debug_)
+  {
+    game_surface_->render_rectangle(dest_rect, { 255, 0, 0 });
+  }
 }
 
 void GameRenderer::render_tiles(bool in_front)
@@ -497,6 +503,11 @@ void GameRenderer::render_objects()
         object_size.y()
       };
       game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
+
+      if (debug_)
+      {
+        game_surface_->render_rectangle(dest_rect, { 255, 0, 0 });
+      }
     }
   }
 }
