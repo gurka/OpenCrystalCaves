@@ -22,7 +22,7 @@ class GameImpl : public Game
       score_(0u),
       num_ammo_(0u),
       num_lives_(0u),
-      shot_(),
+      missile_(),
       explosion_()
   {
   }
@@ -53,7 +53,7 @@ class GameImpl : public Game
   void update_level();
   void update_player(const PlayerInput& player_input);
   void update_items();
-  void update_shot();
+  void update_missile();
 
   bool collides(const geometry::Position& position, const geometry::Size& size);
   bool player_on_platform(const geometry::Position& player_position);
@@ -70,9 +70,9 @@ class GameImpl : public Game
   unsigned num_lives_;
 
   // TODO: Move definition to own file
-  struct Shot
+  struct Missile
   {
-    Shot()
+    Missile()
       : alive(false),
         frame(0),
         position(),
@@ -84,7 +84,7 @@ class GameImpl : public Game
     unsigned frame;
     geometry::Position position;
     bool right;  // Direction...
-  } shot_;
+  } missile_;
 
   // TODO: Move definition to own file
   struct Explosion

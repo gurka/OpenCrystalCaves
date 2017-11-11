@@ -13,8 +13,8 @@ static constexpr auto gravity = 8u;
 static constexpr auto jump_velocity = misc::make_array<int>(0, -8, -8, -8, -4, -4, -2, -2, -2, -2, 2, 2, 2, 2, 4, 4);
 static constexpr auto jump_velocity_fall_index = 10u;
 
-static constexpr auto shot_size = geometry::Size(16, 16);
-static constexpr auto shot_speed = misc::make_array(4, 4, 4, 4, 4, 4, 6, 8, 10, 12, 14);
+static constexpr auto missile_size = geometry::Size(16, 16);
+static constexpr auto missile_speed = misc::make_array(4, 4, 4, 4, 4, 4, 6, 8, 10, 12, 14);
 static constexpr auto explosion_sprites = misc::make_array(28, 29, 30, 31, 30, 29, 28);
 
 const Background Background::INVALID;
@@ -46,7 +46,7 @@ bool GameImpl::init()
   num_ammo_ = 5u;
   num_lives_ = 3u;
 
-  shot_.alive = false;
+  missile_.alive = false;
 
   return true;
 }
@@ -67,8 +67,8 @@ void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
   // Update items
   update_items();
 
-  // Update shot
-  update_shot();
+  // Update missile
+  update_missile();
 
   // Update enemies
   // ...
@@ -136,8 +136,8 @@ std::string GameImpl::get_debug_info() const
   oss << "player jumping: " << (player_.jumping ? "true" : "false") << "\n";
   oss << "player falling: " << (player_.falling ? "true" : "false") << "\n";
   oss << "player shooting: " << (player_.shooting ? "true" : "false") << "\n";
-  oss << "shot alive: " << (shot_.alive ? "true" : "false") << "\n";
-  oss << "shot position: (" << shot_.position.x() << ", " << shot_.position.y() << ")" << "\n";
+  oss << "missile alive: " << (missile_.alive ? "true" : "false") << "\n";
+  oss << "missile position: (" << missile_.position.x() << ", " << missile_.position.y() << ")" << "\n";
 
   return oss.str();
 }
@@ -405,7 +405,7 @@ void GameImpl::update_items()
   }
 }
 
-void GameImpl::update_shot()
+void GameImpl::update_missile()
 {
   // Check current explosion (if alive)
   if (explosion_.alive)
@@ -418,48 +418,48 @@ void GameImpl::update_shot()
     }
   }
 
-  // Check current shot (if alive)
-  if (shot_.alive)
+  // Check current missile (if alive)
+  if (missile_.alive)
   {
     // Move it and increase frame number
     // TODO: We might need to move it 1 pixel at a time and check collision at each pixel
     //       so that the missile doesn't go through an enemy
-    const auto speed = shot_.frame < shot_speed.size() ? shot_speed[shot_.frame] : shot_speed.back();
-    shot_.position += geometry::Position((shot_.right ? speed : -speed), 0);
-    shot_.frame += 1;
+    const auto speed = missile_.frame < missile_speed.size() ? missile_speed[missile_.frame] : missile_speed.back();
+    missile_.position += geometry::Position((missile_.right ? speed : -speed), 0);
+    missile_.frame += 1;
 
     // Check collision with enemy or wall, after moving it
     // TODO: This doesn't work 100% since player size is smaller than missile size
     //       Need to write a collidies() that takes position and size
-    if (collides(shot_.position, shot_size))
+    if (collides(missile_.position, missile_size))
     {
-      shot_.alive = false;
+      missile_.alive = false;
 
       explosion_.alive = true;
       explosion_.frame = 0;
-      explosion_.position = shot_.position;
+      explosion_.position = missile_.position;
     }
-    else if (shot_.frame > 30)  // TODO: verify when exactly the missile disappears
+    else if (missile_.frame > 30)  // TODO: verify when exactly the missile disappears
     {
-      shot_.alive = false;
+      missile_.alive = false;
     }
   }
   else if (player_.shooting)
   {
-    // Player wants to shoot new shot
+    // Player wants to shoot new missile
     if (num_ammo_ > 0)
     {
-      shot_.alive = true;
-      shot_.frame = 0;
+      missile_.alive = true;
+      missile_.frame = 0;
       if (player_.direction == Player::Direction::right)
       {
-        shot_.right = true;
-        shot_.position = player_.position + geometry::Position(player_.size.x(), 0);
+        missile_.right = true;
+        missile_.position = player_.position + geometry::Position(player_.size.x(), 0);
       }
       else
       {
-        shot_.right = false;
-        shot_.position = player_.position - geometry::Position(player_.size.x(), 0);
+        missile_.right = false;
+        missile_.position = player_.position - geometry::Position(player_.size.x(), 0);
       }
 
       num_ammo_ -= 1;
@@ -476,10 +476,10 @@ void GameImpl::update_shot()
     objects_.emplace_back(explosion_.position, explosion_sprites[explosion_.frame], 1);
   }
 
-  // Add shot to objects_ if alive
-  if (shot_.alive)
+  // Add missile to objects_ if alive
+  if (missile_.alive)
   {
-    objects_.emplace_back(shot_.position, (shot_.right ? 296 : 302), 6);
+    objects_.emplace_back(missile_.position, (missile_.right ? 296 : 302), 6);
   }
 }
 
