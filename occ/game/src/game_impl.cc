@@ -13,14 +13,6 @@ static constexpr auto gravity = 8u;
 static constexpr auto jump_velocity = misc::make_array<int>(0, -8, -8, -8, -4, -4, -2, -2, -2, -2, 2, 2, 2, 2, 4, 4);
 static constexpr auto jump_velocity_fall_index = 10u;
 
-static constexpr auto missile_size = geometry::Size(16, 16);
-static constexpr auto missile_speed = misc::make_array(4, 4, 4, 4, 4, 4, 6, 8, 10, 12, 14);
-static constexpr auto explosion_sprites = misc::make_array(28, 29, 30, 31, 30, 29, 28);
-
-const Background Background::INVALID;
-const Tile Tile::INVALID;
-const Item Item::INVALID;
-
 std::unique_ptr<Game> Game::create()
 {
   return std::make_unique<GameImpl>();
@@ -412,7 +404,7 @@ void GameImpl::update_missile()
   {
     explosion_.frame += 1;
 
-    if (explosion_.frame >= explosion_sprites.size())
+    if (explosion_.frame >= explosion_.sprites.size())
     {
       explosion_.alive = false;
     }
@@ -421,11 +413,11 @@ void GameImpl::update_missile()
   // Move the missile if it's alive
   if (missile_.alive)
   {
-    auto speed = missile_.frame < missile_speed.size() ? missile_speed[missile_.frame] : missile_speed.back();
+    auto speed = missile_.frame < missile_.speed.size() ? missile_.speed[missile_.frame] : missile_.speed.back();
     while (speed-- > 0)
     {
       missile_.position += geometry::Position((missile_.right ? 1 : -1), 0);
-      if (collides(missile_.position, missile_size))
+      if (collides(missile_.position, missile_.size))
       {
         missile_.alive = false;
 
@@ -477,7 +469,7 @@ void GameImpl::update_missile()
   // Add explosion to objects_ if alive
   if (explosion_.alive)
   {
-    objects_.emplace_back(explosion_.position, explosion_sprites[explosion_.frame], 1);
+    objects_.emplace_back(explosion_.position, explosion_.sprites[explosion_.frame], 1);
   }
 
   // Add missile to objects_ if alive

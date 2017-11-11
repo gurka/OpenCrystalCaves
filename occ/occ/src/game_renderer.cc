@@ -79,7 +79,7 @@ void GameRenderer::render_background()
 {
   const auto& background = game_->get_background();
 
-  if (!background.valid)
+  if (!background.valid())
   {
     return;
   }
@@ -97,7 +97,9 @@ void GameRenderer::render_background()
   {
     for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
     {
-      const auto sprite_id = background.sprite_id + (((tile_y + 1) % background.size_in_tiles.y()) * 4) + (tile_x % background.size_in_tiles.x());
+      const auto sprite_id = background.get_sprite() +
+                             (((tile_y + 1) % background.get_size().y()) * 4) +
+                             (tile_x % background.get_size().x());
       const auto src_rect = sprite_manager_->get_rect_for_tile(sprite_id);
       const geometry::Rectangle dest_rect
       {
@@ -136,7 +138,9 @@ void GameRenderer::render_background()
         for (int y = 0; y < 4; y++)
         {
           // The sprite with the bright star (358) seems to be less common...
-          static const auto sprites = misc::make_array(356, 356, 356, 356, 357, 357, 357, 357, 358, 359, 359, 359, 359, 360, 360, 360, 360, 361, 361, 361, 361);
+          static constexpr auto sprites = misc::make_array(356, 356, 356, 356, 357, 357, 357,
+                                                           357, 358, 359, 359, 359, 359, 360,
+                                                           360, 360, 360, 361, 361, 361, 361);
           const auto sprite_index = misc::random<int>(0, sprites.size() - 1);
           space_sprites.emplace_back(sprites[sprite_index]);
         }

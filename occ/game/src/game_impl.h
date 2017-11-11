@@ -10,6 +10,8 @@
 #include "object_manager.h"
 #include "level.h"
 #include "player.h"
+#include "missile.h"
+#include "explosion.h"
 
 class GameImpl : public Game
 {
@@ -69,37 +71,8 @@ class GameImpl : public Game
   unsigned num_ammo_;
   unsigned num_lives_;
 
-  // TODO: Move definition to own file
-  struct Missile
-  {
-    Missile()
-      : alive(false),
-        frame(0),
-        position(),
-        right(false)
-    {
-    }
-
-    bool alive;
-    unsigned frame;
-    geometry::Position position;
-    bool right;  // Direction...
-  } missile_;
-
-  // TODO: Move definition to own file
-  struct Explosion
-  {
-    Explosion()
-      : alive(false),
-        frame(0),
-        position()
-    {
-    }
-
-    bool alive;
-    unsigned frame;
-    geometry::Position position;
-  } explosion_;
+  Missile missile_;
+  Explosion explosion_;
 };
 
 #endif  // GAME_IMPL_H_
