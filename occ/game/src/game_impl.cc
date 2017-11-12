@@ -36,7 +36,8 @@ bool GameImpl::init()
   if (level_->level_id == LevelId::LEVEL_ONE)
   {
     // Spawn enemies
-    enemies_.emplace_back(geometry::Position(14 * 16, 22 * 16), 1);
+    enemies_.emplace_back(geometry::Position(14 * 16, 22 * 16), 2);
+    enemies_.emplace_back(geometry::Position(10 * 16, 17 * 16), 2);
   }
 
   player_.position = level_->player_spawn;
@@ -434,17 +435,30 @@ void GameImpl::update_missile()
 
         break;
       }
-      else if (collides_enemy(missile_.position, missile_.size))
+
+      const auto colliding_enemy_index = collides_enemy(missile_.position, missile_.size);
+      if (colliding_enemy_index != -1)
       {
         missile_.alive = false;
 
-        // TODO: Is it the same kind of explosion when hitting enemies?
-        //       Also, the explosion should be centered on the enemy and not beside the enemy
-        explosion_.alive = true;
-        explosion_.frame = 0;
-        explosion_.position = missile_.position;
+        // Get enemy and decrease health
+        auto& enemy = enemies_[colliding_enemy_index];
+        enemy.health -= 1;
 
-        // TODO: We need to get the actual enemy so that we can decrease health / remove on death...
+        // Check if enemy died
+        if (enemy.health == 0)
+        {
+          // Create explosion where enemy is
+          explosion_.alive = true;
+          explosion_.frame = 0;
+          explosion_.position = enemy.position;
+
+          // Give score (?)
+          score_ += 500;
+
+          // Remove enemy
+          enemies_.erase(enemies_.begin() + colliding_enemy_index);
+        }
 
         break;
       }
@@ -522,17 +536,23 @@ bool GameImpl::collides_solid(const geometry::Position& position, const geometry
   return false;
 }
 
-bool GameImpl::collides_enemy(const geometry::Position& position, const geometry::Size& size)
+/**
+ * Checks if given position and size collides with any enemy.
+ *
+ * If is colliding with an enemy the index in enemies_ to that enemy is returned
+ * otherwise -1 is returned.
+ */
+int GameImpl::collides_enemy(const geometry::Position& position, const geometry::Size& size)
 {
   const auto rect = geometry::Rectangle(position, size);
-  for (const auto& enemy : enemies_)
+  for (auto i = 0u; i < enemies_.size(); i++)
   {
-    if (geometry::isColliding(rect, geometry::Rectangle(enemy.position, 16, 16)))
+    if (geometry::isColliding(rect, geometry::Rectangle(enemies_[i].position, 16, 16)))
     {
-      return true;
+      return i;
     }
   }
-  return false;
+  return -1;
 }
 
 bool GameImpl::player_on_platform(const geometry::Position& player_position)

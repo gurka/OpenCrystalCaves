@@ -19,6 +19,9 @@ struct Missile
   geometry::Position position;
   bool right;  // Direction...
 
+  // TODO: Missile probably does not have height 16
+  //       If we lower it we need to make sure that the missile spawn position
+  //       is a bit lower than player position to compensate
   static constexpr auto size = geometry::Size(16, 16);
   static constexpr auto speed = misc::make_array(4, 4, 4, 4, 4, 4, 6, 8, 10, 12, 14);
 };
