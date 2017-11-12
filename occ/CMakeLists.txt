@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.2)
 
 project(occ)
 
-# debug flags
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fsanitize=leak -fsanitize=undefined")
+# debug flags (-fuse-old=gold is for Travis)
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fsanitize=leak -fsanitize=undefined -fuse-ld=gold")
 
 # sdl_wrapper
 add_subdirectory("sdl_wrapper")
