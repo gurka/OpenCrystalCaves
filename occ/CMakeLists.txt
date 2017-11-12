@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.2)
 
 project(occ)
 
+# debug flags
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fsanitize=leak -fsanitize=undefined")
+
 # sdl_wrapper
 add_subdirectory("sdl_wrapper")
 target_compile_options(sdl_wrapper PRIVATE -Wall -Wextra -Wpedantic -Weffc++)
