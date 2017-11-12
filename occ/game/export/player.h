@@ -8,6 +8,8 @@
 
 struct Player
 {
+  // Note: this is the player's actual size and is used for collision detection
+  //       and other things. The player sprite is still size 16x16.
   static constexpr geometry::Size size = geometry::Size(12, 16);
 
   geometry::Position position = geometry::Position(0, 0);

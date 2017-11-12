@@ -425,7 +425,9 @@ void GameImpl::update_missile()
     while (speed-- > 0)
     {
       missile_.position += geometry::Position((missile_.right ? 1 : -1), 0);
-      if (collides_solid(missile_.position, missile_.size))
+
+      // Adjust position due to collision size being smaller than sprite size
+      if (collides_solid(missile_.position + geometry::Position(0, 3), missile_.size))
       {
         missile_.alive = false;
 
@@ -436,7 +438,8 @@ void GameImpl::update_missile()
         break;
       }
 
-      const auto colliding_enemy_index = collides_enemy(missile_.position, missile_.size);
+      // Adjust position due to collision size being smaller than sprite size
+      const auto colliding_enemy_index = collides_enemy(missile_.position + geometry::Position(0, 3), missile_.size);
       if (colliding_enemy_index != -1)
       {
         missile_.alive = false;
