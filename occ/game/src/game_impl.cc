@@ -384,7 +384,7 @@ void GameImpl::update_items()
       if (item.get_type() == 0)
       {
         LOG_DEBUG("Player took item of type crystal (%d)", item.get_type());
-        score_ += 500;  // TODO: Check how much score a crystal gives
+        score_ += 50;
       }
       else if (item.get_type() == 1)
       {
@@ -445,9 +445,18 @@ void GameImpl::update_missile()
         auto& enemy = enemies_[colliding_enemy_index];
         enemy.health -= 1;
 
+        // TODO: When enemy getting hit and not dying the enemy sprite should turn white for
+        //       some time. All colors except black in the sprite should become white.
+        //       This is applicable for when the player gets hit as well
+        //       Modify the sprite on the fly / some kind of filter, or pre-create white sprites
+        //       for all player and enemy sprite when loading sprites?
+
         // Check if enemy died
         if (enemy.health == 0)
         {
+          // TODO: When an enemy dies there should be another type of explosion
+          //       or bones spawning. The explosion/bones should move during animation
+          //       in the same direction as the missile coming from
           // Create explosion where enemy is
           explosion_.alive = true;
           explosion_.frame = 0;
