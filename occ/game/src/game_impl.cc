@@ -157,7 +157,7 @@ void GameImpl::update_level()
     {
       // Only move player if not colliding with any static objects
       const auto new_player_pos = player_.position + platform_velocity;
-      if (!collides(new_player_pos, player_.size))
+      if (!collides_solid(new_player_pos, player_.size))
       {
         player_.position = new_player_pos;
       }
@@ -224,7 +224,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
   if (player_input.jump &&
       !player_.jumping &&
       !player_.falling &&
-      !collides(player_.position + geometry::Position(0, -1), player_.size))
+      !collides_solid(player_.position + geometry::Position(0, -1), player_.size))
   {
     // Player wants to jump
     player_.jumping = true;
@@ -286,7 +286,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
   {
     const auto new_player_pos = player_.position + geometry::Position(step_x, 0);
 
-    if (collides(new_player_pos, player_.size))
+    if (collides_solid(new_player_pos, player_.size))
     {
       player_.collide_x = true;
       break;
@@ -302,7 +302,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
     const auto new_player_pos = player_.position + geometry::Position(0, step_y);
 
     // If player is falling down (step_y == 1) we need to check for collision with platforms
-    if (collides(new_player_pos, player_.size) ||
+    if (collides_solid(new_player_pos, player_.size) ||
         (step_y == 1 && player_on_platform(new_player_pos)))
     {
       player_.collide_y = true;
@@ -346,7 +346,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
       player_.jumping = false;
     }
     else if (player_.jump_tick != 0 &&
-             collides(player_.position + geometry::Position(0, 1), player_.size))
+             collides_solid(player_.position + geometry::Position(0, 1), player_.size))
     {
       // Player did not actually collide with the ground, but standing directly above it
       // and this isn't the first tick in the jump, so we can consider the jump to have
@@ -359,7 +359,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
   player_.falling = !player_.jumping &&
                     player_.velocity.y() > 0 &&
                     !player_.collide_y &&
-                    !collides(player_.position + geometry::Position(0, 1), player_.size);
+                    !collides_solid(player_.position + geometry::Position(0, 1), player_.size);
 }
 
 void GameImpl::update_items()
@@ -424,13 +424,27 @@ void GameImpl::update_missile()
     while (speed-- > 0)
     {
       missile_.position += geometry::Position((missile_.right ? 1 : -1), 0);
-      if (collides(missile_.position, missile_.size))
+      if (collides_solid(missile_.position, missile_.size))
       {
         missile_.alive = false;
 
         explosion_.alive = true;
         explosion_.frame = 0;
         explosion_.position = missile_.position;
+
+        break;
+      }
+      else if (collides_enemy(missile_.position, missile_.size))
+      {
+        missile_.alive = false;
+
+        // TODO: Is it the same kind of explosion when hitting enemies?
+        //       Also, the explosion should be centered on the enemy and not beside the enemy
+        explosion_.alive = true;
+        explosion_.frame = 0;
+        explosion_.position = missile_.position;
+
+        // TODO: We need to get the actual enemy so that we can decrease health / remove on death...
 
         break;
       }
@@ -486,7 +500,7 @@ void GameImpl::update_missile()
   }
 }
 
-bool GameImpl::collides(const geometry::Position& position, const geometry::Size& size)
+bool GameImpl::collides_solid(const geometry::Position& position, const geometry::Size& size)
 {
   // Note: this function only works with size x and y <= 16
   // With size 16x16 the object can cover at maximum 4 tiles
@@ -501,6 +515,19 @@ bool GameImpl::collides(const geometry::Position& position, const geometry::Size
   for (const auto& position : positions)
   {
     if (get_tile(position.x(), position.y()).is_solid())
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool GameImpl::collides_enemy(const geometry::Position& position, const geometry::Size& size)
+{
+  const auto rect = geometry::Rectangle(position, size);
+  for (const auto& enemy : enemies_)
+  {
+    if (geometry::isColliding(rect, geometry::Rectangle(enemy.position, 16, 16)))
     {
       return true;
     }

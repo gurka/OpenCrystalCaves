@@ -61,7 +61,8 @@ class GameImpl : public Game
   void update_items();
   void update_missile();
 
-  bool collides(const geometry::Position& position, const geometry::Size& size);
+  bool collides_solid(const geometry::Position& position, const geometry::Size& size);
+  bool collides_enemy(const geometry::Position& position, const geometry::Size& size);
   bool player_on_platform(const geometry::Position& player_position);
 
   void remove_item(int tile_x, int tile_y);
