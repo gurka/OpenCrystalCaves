@@ -22,6 +22,7 @@ class GameRenderer
  private:
   void render_background();
   void render_player();
+  void render_enemies();
   void render_tiles(bool in_front);
   void render_objects();
   void render_items();

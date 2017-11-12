@@ -11,6 +11,7 @@
 #include "background.h"
 #include "tile.h"
 #include "item.h"
+#include "enemy.h"
 
 class Game
 {
@@ -32,6 +33,8 @@ class Game
   virtual const Background& get_background() const = 0;
   virtual const Tile& get_tile(int tile_x, int tile_y) const = 0;
   virtual const Item& get_item(int tile_x, int tile_y) const = 0;
+
+  virtual const std::vector<Enemy>& get_enemies() const = 0;
 
   virtual const std::vector<Object>& get_objects() const = 0;
 

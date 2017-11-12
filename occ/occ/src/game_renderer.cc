@@ -71,6 +71,7 @@ void GameRenderer::render_game(unsigned game_tick)
   render_tiles(false);
   render_objects();
   render_player();
+  render_enemies();
   render_tiles(true);
   render_items();
 }
@@ -439,6 +440,32 @@ void GameRenderer::render_player()
   if (debug_)
   {
     game_surface_->render_rectangle(dest_rect, { 255, 0, 0 });
+  }
+}
+
+void GameRenderer::render_enemies()
+{
+  for (const auto& enemy : game_->get_enemies())
+  {
+    static constexpr geometry::Size object_size = geometry::Size(16, 16);
+    if (geometry::isColliding(geometry::Rectangle(enemy.position, object_size), game_camera_))
+    {
+      const auto sprite_id = enemy.sprites[game_tick_ % enemy.sprites.size()];
+      const auto src_rect = sprite_manager_->get_rect_for_tile(sprite_id);
+      const geometry::Rectangle dest_rect
+      {
+        enemy.position.x() - game_camera_.position.x(),
+        enemy.position.y() - game_camera_.position.y(),
+        object_size.x(),
+        object_size.y()
+      };
+      game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
+
+      if (debug_)
+      {
+        game_surface_->render_rectangle(dest_rect, { 255, 0, 0 });
+      }
+    }
   }
 }
 

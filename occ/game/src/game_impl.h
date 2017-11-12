@@ -12,6 +12,7 @@
 #include "player.h"
 #include "missile.h"
 #include "explosion.h"
+#include "enemy.h"
 
 class GameImpl : public Game
 {
@@ -20,6 +21,7 @@ class GameImpl : public Game
     : player_(),
       object_manager_(),
       level_(),
+      enemies_(),
       objects_(),
       score_(0u),
       num_ammo_(0u),
@@ -43,6 +45,8 @@ class GameImpl : public Game
   const Tile& get_tile(int tile_x, int tile_y) const override;
   const Item& get_item(int tile_x, int tile_y) const override;
 
+  const std::vector<Enemy>& get_enemies() const override { return enemies_; }
+
   const std::vector<Object>& get_objects() const override { return objects_; }
 
   unsigned get_score() const override { return score_; }
@@ -65,6 +69,7 @@ class GameImpl : public Game
   Player player_;
   ObjectManager object_manager_;
   std::unique_ptr<Level> level_;
+  std::vector<Enemy> enemies_;
   std::vector<Object> objects_;
 
   unsigned score_;

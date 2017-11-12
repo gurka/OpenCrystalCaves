@@ -4,6 +4,7 @@ project(game)
 
 add_library(game
   "export/background.h"
+  "export/enemy.h"
   "export/game.h"
   "export/item.h"
   "export/level_id.h"
@@ -12,6 +13,7 @@ add_library(game
   "export/player.h"
   "export/tile.h"
   "src/background.cc"
+  "src/enemy.cc"
   "src/explosion.cc"
   "src/explosion.h"
   "src/game_impl.cc"

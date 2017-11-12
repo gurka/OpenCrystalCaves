@@ -32,6 +32,13 @@ bool GameImpl::init()
     return false;
   }
 
+  // TODO: Temporary
+  if (level_->level_id == LevelId::LEVEL_ONE)
+  {
+    // Spawn enemies
+    enemies_.emplace_back(geometry::Position(14 * 16, 22 * 16), 1);
+  }
+
   player_.position = level_->player_spawn;
 
   score_ = 0u;
