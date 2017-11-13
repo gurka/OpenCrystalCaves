@@ -481,7 +481,11 @@ void GameImpl::update_missile()
   if (missile_.alive)
   {
     missile_.frame += 1;
-    if (missile_.frame > 30)  // TODO: verify when exactly the missile disappears
+
+    // TODO: Missile doesn't disappear after a certain number of frames, but rather
+    //       when it's outside of the screen. So we might need to make GameImpl aware
+    //       of the game camera...
+    if (missile_.frame > 27)
     {
       missile_.alive = false;
     }
@@ -497,12 +501,12 @@ void GameImpl::update_missile()
       if (player_.direction == Player::Direction::right)
       {
         missile_.right = true;
-        missile_.position = player_.position + geometry::Position(player_.size.x(), 0);
+        missile_.position = player_.position + geometry::Position(player_.size.x() - 2, 0);
       }
       else
       {
         missile_.right = false;
-        missile_.position = player_.position - geometry::Position(player_.size.x(), 0);
+        missile_.position = player_.position - geometry::Position(player_.size.x() - 2, 0);
       }
 
       num_ammo_ -= 1;

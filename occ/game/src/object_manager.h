@@ -6,6 +6,7 @@
 
 #include "game.h"
 
+// TODO: Refactor/rename Object, ObjectManager, Background, Tile, Item, LevelObject, ...
 class ObjectManager
 {
  public:
