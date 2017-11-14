@@ -53,8 +53,9 @@ bool ObjectManager::load(const std::string& filename)
     }
 
     // Create and add Background
-    backgrounds_.emplace_back(background_json["Sprite"].get<int>(), geometry::Size(background_json["SpriteWidth"].get<int>(),
-                                                                                   background_json["SpriteHeight"].get<int>()));
+    backgrounds_.emplace_back(background_json["Sprite"].get<int>(),
+                              geometry::Size(background_json["SpriteWidth"].get<int>(),
+                                             background_json["SpriteHeight"].get<int>()));
 
     LOG_DEBUG("Loaded background: Sprite: %d SpriteWidth: %d SpriteHeight: %d",
               background_json["Sprite"].get<int>(),
@@ -133,12 +134,12 @@ bool ObjectManager::load(const std::string& filename)
       return false;
     }
 
-    // Create and add Tiles
+    // Create and add Items
     items_.emplace_back(items_json["Sprite"].get<int>(),
                         items_json["Type"].get<int>(),
                         items_json["Amount"].get<int>());
 
-    LOG_DEBUG("Loaded tile: Sprite: %d Type: %d Amount: %d",
+    LOG_DEBUG("Loaded item: Sprite: %d Type: %d Amount: %d",
               items_json["Sprite"].get<int>(),
               items_json["Type"].get<int>(),
               items_json["Amount"].get<int>());

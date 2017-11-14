@@ -37,8 +37,8 @@ struct MovingPlatform
                                   int speed)
   {
     // Hmm...
-    return Vector<int>(start.x() == end.x() ? 0 : (start.x() < end.x() ? (1 * speed) : (-1 * speed)),
-                       start.y() == end.y() ? 0 : (start.y() < end.y() ? (1 * speed) : (-1 * speed)));
+    return Vector<int>(start.x() == end.x() ? 0 : (start.x() < end.x() ? speed : -speed),
+                       start.y() == end.y() ? 0 : (start.y() < end.y() ? speed : -speed));
   }
 };
 
