@@ -100,144 +100,42 @@ int main()
   // Create GameRenderer
   GameRenderer game_renderer(game.get(), &sprite_manager, game_surface.get());
 
-  // Game loop
+  // Create game tick function
+  auto game_tick_func = [&game](SGEngineSettings* settings, unsigned engine_tick, const Input& input)
   {
-    // Game variables
-    bool paused = false;
-    unsigned game_tick = 0u;
-    Input input;
-
-    // Debug information
-    bool debug_info = false;
-
-    // Game loop logic
-    auto engine_tick = engine->get_tick();
-    const auto ms_per_update = 57;  // 17.5~ ticks per second
-    auto tick_last_update = engine_tick;
-    auto lag = 0u;
-
-    // FPS logic
-    auto fps_num_renders = 0u;
-    auto fps_last_calc = engine_tick;
-    auto fps_start_time = engine_tick;
-    auto fps = 0u;
-
-    while (true)
+    if (input.quit)
     {
-      /////////////////////////////////////////////////////////////////////////
-      ///
-      ///  Logic
-      ///
-      /////////////////////////////////////////////////////////////////////////
-      engine_tick = engine->get_tick();
-      auto elapsed_ticks = engine_tick - tick_last_update;
-      tick_last_update = engine_tick;
-      lag += elapsed_ticks;
-      while (lag >= ms_per_update)
-      {
-        // Read input
-        engine->poll_event(&input);
-
-        // Handle input
-        if (input.quit)
-        {
-          return 0;  // Quit ASAP
-        }
-        if (input.num_1.pressed && !input.num_1.repeated)
-        {
-          debug_info = !debug_info;
-        }
-        if (input.num_2.pressed && !input.num_2.repeated)
-        {
-          game_renderer.set_debug(!game_renderer.get_debug());
-        }
-        if (input.enter.pressed && !input.enter.repeated)
-        {
-          paused = !paused;
-        }
-
-        if (!paused || (paused && input.space.pressed && !input.space.repeated))
-        {
-          // Call game loop
-          game->update(game_tick, input_to_player_input(input));
-          game_tick += 1;
-        }
-
-        lag -= ms_per_update;
-      }
-
-      /////////////////////////////////////////////////////////////////////////
-      ///
-      ///  Render
-      ///
-      /////////////////////////////////////////////////////////////////////////
-
-      // Clear window surface
-      window_surface->fill_rect(geometry::Rectangle(0, 0, WINDOW_SIZE), { 33u, 33u, 33u });
-
-      // Render game
-      game_renderer.render_game(game_tick);
-
-      // Render game surface to window surface, centered and scaled
-      window_surface->blit_surface(game_surface.get(),
-                                   geometry::Rectangle(0, 0, CAMERA_SIZE),
-                                   geometry::Rectangle((WINDOW_SIZE - CAMERA_SIZE_SCALED) / 2, CAMERA_SIZE_SCALED),
-                                   BlitType::SCALE);
-
-      // Render statusbar
-      render_statusbar(window_surface.get(), game->get_score(), game->get_num_ammo(), game->get_num_lives());
-
-      // Render FPS
-      auto fps_str = "fps: " + std::to_string(fps);
-      window_surface->render_text(geometry::Position(5, 5), fps_str, 12, { 255u, 255u, 255u });
-
-      // Debug information
-      if (debug_info)
-      {
-        // Get debug information from Game and split on newline
-        auto game_debug_info_iss = std::istringstream(game->get_debug_info());
-        std::string temp;
-        std::vector<std::string> game_debug_infos;
-        while (std::getline(game_debug_info_iss, temp))
-        {
-          game_debug_infos.push_back(std::move(temp));
-        }
-
-        // Put a black box where we're going to the draw the debug text
-        // 20 pixels per line (1 line + Game's lines)
-        window_surface->fill_rect({ 0, 24, 200, 20 + (20 * static_cast<int>(game_debug_infos.size())) }, { 0u, 0u, 0u });
-
-        // Render debug text
-        auto pos_y = 25;
-        const auto& game_camera = game_renderer.get_game_camera();
-        const auto camera_position_str = "camera position: (" + std::to_string(game_camera.position.x()) + ", " + std::to_string(game_camera.position.y()) + ")";
-        window_surface->render_text(geometry::Position(5,  pos_y), camera_position_str, 12, { 255u, 0u, 0u });
-        pos_y += 20;
-
-        for (const auto& game_debug_info : game_debug_infos)
-        {
-          window_surface->render_text(geometry::Position(5,  pos_y), game_debug_info, 12, { 255u, 0u, 0u });
-          pos_y += 20;
-        }
-      }
-
-      // Update screen
-      engine->refresh();
-
-      // Calculate FPS each second
-      fps_num_renders++;
-      if (engine_tick >= (fps_last_calc + 1000))
-      {
-        const auto total_time = engine_tick - fps_start_time;
-        fps = fps_num_renders / (total_time / 1000);
-        fps_last_calc = engine_tick;
-
-        // Reset
-        fps_num_renders = 0;
-        fps_start_time = engine_tick;
-      }
+      settings->quit();
     }
-  }
+    else if (input.num_1.pressed && !input.num_1.repeated)
+    {
+      settings->toggle_show_fps();
+    }
+
+    game->update(engine_tick, input_to_player_input(input));
+  };
+
+  // Create render function
+  auto render_func = [&window_surface, &game_renderer, &game_surface, &game](unsigned engine_tick)
+  {
+    // Clear window surface
+    window_surface->fill_rect(geometry::Rectangle(0, 0, WINDOW_SIZE), { 33u, 33u, 33u });
+
+    // Render game
+    game_renderer.render_game(engine_tick);
+
+    // Render game surface to window surface, centered and scaled
+    window_surface->blit_surface(game_surface.get(),
+                                 geometry::Rectangle(0, 0, CAMERA_SIZE),
+                                 geometry::Rectangle((WINDOW_SIZE - CAMERA_SIZE_SCALED) / 2, CAMERA_SIZE_SCALED),
+                                 BlitType::SCALE);
+
+    // Render statusbar
+    render_statusbar(window_surface.get(), game->get_score(), game->get_num_ammo(), game->get_num_lives());
+  };
+
+  // Run engine
+  engine->run(game_tick_func, render_func);
 
   return 0;
 }

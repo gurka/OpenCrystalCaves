@@ -37,7 +37,6 @@ std::unique_ptr<SGEngine> SGEngine::create(const std::string& window_title, geom
                                                                                                window_size.y(),
                                                                                                SDL_WINDOW_SHOWN),
                                                                               SDL_DestroyWindow);
-
   return std::make_unique<SGEngineImpl>(std::move(sdl_window));
 }
 
@@ -63,16 +62,67 @@ std::unique_ptr<Surface> SGEngineImpl::create_surface(geometry::Size size)
   return std::make_unique<SurfaceImpl>(std::move(sdl_surface));
 }
 
-void SGEngineImpl::refresh()
+void SGEngineImpl::run(const std::function<GameTickFunc>& game_tick_func,
+                       const std::function<RenderFunc>& render_func)
 {
-  SDL_UpdateWindowSurface(sdl_window_.get());
+  Input input;
+  auto engine_tick = SDL_GetTicks();
+  const auto ms_per_update = 57;  // 17.5~ ticks per second
+  auto tick_last_update = engine_tick;
+  auto lag = 0u;
+
+  // FPS logic
+  auto fps_num_renders = 0u;
+  auto fps_last_calc = engine_tick;
+  auto fps_start_time = engine_tick;
+  auto fps = 0u;
+
+  while (!quit_)
+  {
+    engine_tick = SDL_GetTicks();
+    auto elapsed_ticks = engine_tick - tick_last_update;
+    tick_last_update = engine_tick;
+    lag += elapsed_ticks;
+    while (lag >= ms_per_update)
+    {
+      // Read input
+      poll_event(&input);
+
+      // Call game tick function
+      game_tick_func(this, engine_tick_, input);
+
+      lag -= ms_per_update;
+      engine_tick_ += 1;
+    }
+
+    // Call render function
+    render_func(engine_tick_);
+
+    if (show_fps_)
+    {
+      // Render FPS
+      auto fps_str = "fps: " + std::to_string(fps);
+      sdl_window_surface_->render_text(geometry::Position(5, 5), fps_str, 12, { 255u, 255u, 255u });
+    }
+
+    // Update window
+    SDL_UpdateWindowSurface(sdl_window_.get());
+
+    // Calculate FPS each second
+    fps_num_renders++;
+    if (engine_tick >= (fps_last_calc + 1000))
+    {
+      const auto total_time = engine_tick - fps_start_time;
+      fps = fps_num_renders / (total_time / 1000);
+      fps_last_calc = engine_tick;
+
+      // Reset
+      fps_num_renders = 0;
+      fps_start_time = engine_tick;
+    }
+  }
 }
 
-
-unsigned SGEngineImpl::get_tick()
-{
-  return SDL_GetTicks();
-}
 
 void SGEngineImpl::poll_event(Input* input)
 {
