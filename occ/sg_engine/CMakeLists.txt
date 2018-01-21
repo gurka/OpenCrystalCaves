@@ -3,11 +3,9 @@ cmake_minimum_required(VERSION 3.2)
 project(sg_engine)
 
 add_library(sg_engine
-  "export/event.h"
+  "export/input.h"
   "export/graphics.h"
   "export/sg_engine.h"
-  "src/event_impl.cc"
-  "src/event_impl.h"
   "src/graphics_impl.cc"
   "src/graphics_impl.h"
   "src/sg_engine_impl.cc"

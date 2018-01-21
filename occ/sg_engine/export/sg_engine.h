@@ -7,6 +7,7 @@
 #include "geometry.h"
 
 class Surface;
+struct Input;
 
 class SGEngine
 {
@@ -21,6 +22,7 @@ class SGEngine
 
   virtual void refresh() = 0;
   virtual unsigned get_tick() = 0;
+  virtual void poll_event(Input* input) = 0;
 };
 
 #endif  // SG_ENGINE_H_

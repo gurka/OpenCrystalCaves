@@ -17,8 +17,8 @@
 
 // From sg_engine
 #include "sg_engine.h"
-#include "event.h"
 #include "graphics.h"
+#include "input.h"
 
 // From utils
 #include "geometry.h"
@@ -54,33 +54,25 @@ int main()
 {
   LOG_INFO("Starting!");
 
-  // Init SDL wrapper
-  auto sdl = SGEngine::create("OpenCrystalCaves", WINDOW_SIZE);
-  if (!sdl)
+  // Init SGEngine
+  auto engine = SGEngine::create("OpenCrystalCaves", WINDOW_SIZE);
+  if (!engine)
   {
     LOG_CRITICAL("Could not create SGEngine");
     return 1;
   }
 
-  auto window_surface = sdl->get_window_surface();
+  auto window_surface = engine->get_window_surface();
   LOG_INFO("Window created");
 
   // Create game surface
-  std::unique_ptr<Surface> game_surface = sdl->create_surface(CAMERA_SIZE);
+  std::unique_ptr<Surface> game_surface = engine->create_surface(CAMERA_SIZE);
   if (!game_surface)
   {
     LOG_CRITICAL("Could not create game surface");
     return 1;
   }
   LOG_INFO("Game surface created");
-
-  // Create event handler
-  auto event = Event::create();
-  if (!event)
-  {
-    LOG_CRITICAL("Could not create event handler");
-    return 1;
-  }
 
   // Load tileset
   SpriteManager sprite_manager;
@@ -119,15 +111,15 @@ int main()
     bool debug_info = false;
 
     // Game loop logic
-    auto sdl_tick = sdl->get_tick();
+    auto engine_tick = engine->get_tick();
     const auto ms_per_update = 57;  // 17.5~ ticks per second
-    auto tick_last_update = sdl_tick;
+    auto tick_last_update = engine_tick;
     auto lag = 0u;
 
     // FPS logic
     auto fps_num_renders = 0u;
-    auto fps_last_calc = sdl_tick;
-    auto fps_start_time = sdl_tick;
+    auto fps_last_calc = engine_tick;
+    auto fps_start_time = engine_tick;
     auto fps = 0u;
 
     while (true)
@@ -137,14 +129,14 @@ int main()
       ///  Logic
       ///
       /////////////////////////////////////////////////////////////////////////
-      sdl_tick = sdl->get_tick();
-      auto elapsed_ticks = sdl_tick - tick_last_update;
-      tick_last_update = sdl_tick;
+      engine_tick = engine->get_tick();
+      auto elapsed_ticks = engine_tick - tick_last_update;
+      tick_last_update = engine_tick;
       lag += elapsed_ticks;
       while (lag >= ms_per_update)
       {
         // Read input
-        event->poll_event(&input);
+        engine->poll_event(&input);
 
         // Handle input
         if (input.quit)
@@ -230,19 +222,19 @@ int main()
       }
 
       // Update screen
-      sdl->refresh();
+      engine->refresh();
 
       // Calculate FPS each second
       fps_num_renders++;
-      if (sdl_tick >= (fps_last_calc + 1000))
+      if (engine_tick >= (fps_last_calc + 1000))
       {
-        const auto total_time = sdl_tick - fps_start_time;
+        const auto total_time = engine_tick - fps_start_time;
         fps = fps_num_renders / (total_time / 1000);
-        fps_last_calc = sdl_tick;
+        fps_last_calc = engine_tick;
 
         // Reset
         fps_num_renders = 0;
-        fps_start_time = sdl_tick;
+        fps_start_time = engine_tick;
       }
     }
   }

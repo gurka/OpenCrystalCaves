@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
+#include "../../export/input.h"
 #include "sdl_stub.h"
-#include "event.h"
 
 using ::testing::_;
 using ::testing::Return;

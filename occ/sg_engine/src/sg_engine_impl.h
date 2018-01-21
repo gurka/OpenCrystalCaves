@@ -12,6 +12,7 @@
 #include "geometry.h"
 
 class Surface;
+struct Input;
 
 class SGEngineImpl : public SGEngine
 {
@@ -26,6 +27,7 @@ class SGEngineImpl : public SGEngine
 
   void refresh() override;
   unsigned get_tick() override;
+  void poll_event(Input* input) override;
 
  private:
   std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> sdl_window_;
