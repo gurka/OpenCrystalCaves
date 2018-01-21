@@ -55,31 +55,18 @@ int main()
   LOG_INFO("Starting!");
 
   // Init SDL wrapper
-  auto sdl = SDLWrapper::create();
+  auto sdl = SDLWrapper::create("OpenCrystalCaves", WINDOW_SIZE);
   if (!sdl)
   {
     LOG_CRITICAL("Could not create SDLWrapper");
     return 1;
   }
-  if (!sdl->init())
-  {
-    LOG_CRITICAL("Could not initialize SDLWrapper");
-    return 1;
-  }
-  LOG_INFO("SDLWrapper initialized");
 
-  // Create Window
-  auto window = Window::create("OpenCrystalCaves", WINDOW_SIZE);
-  if (!window)
-  {
-    LOG_CRITICAL("Could not create Window");
-    return 1;
-  }
-  auto window_surface = window->get_surface();
+  auto window_surface = sdl->get_window_surface();
   LOG_INFO("Window created");
 
   // Create game surface
-  std::unique_ptr<Surface> game_surface = window->create_surface(CAMERA_SIZE);
+  std::unique_ptr<Surface> game_surface = sdl->create_surface(CAMERA_SIZE);
   if (!game_surface)
   {
     LOG_CRITICAL("Could not create game surface");
@@ -243,7 +230,7 @@ int main()
       }
 
       // Update screen
-      window->refresh();
+      sdl->refresh();
 
       // Calculate FPS each second
       fps_num_renders++;

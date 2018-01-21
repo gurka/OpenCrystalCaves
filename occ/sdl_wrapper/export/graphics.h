@@ -1,31 +1,17 @@
 #ifndef GRAPHICS_H_
 #define GRAPHICS_H_
 
+#include <cstdint>
 #include <string>
 #include <memory>
 
 #include "geometry.h"
-
-class Surface;
 
 struct Color
 {
   std::uint8_t red   = 0u;
   std::uint8_t green = 0u;
   std::uint8_t blue  = 0u;
-};
-
-class Window
-{
- public:
-  static std::unique_ptr<Window> create(const std::string& title, geometry::Size size);
-
-  virtual ~Window() = default;
-
-  virtual std::unique_ptr<Surface> get_surface() = 0;
-  virtual void refresh() = 0;
-
-  virtual std::unique_ptr<Surface> create_surface(geometry::Size size) = 0;
 };
 
 enum class BlitType

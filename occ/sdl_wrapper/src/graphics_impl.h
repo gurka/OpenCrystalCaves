@@ -4,29 +4,12 @@
 #include "graphics.h"
 
 #include <memory>
+#include <string>
 #include <utility>
 
 #include <SDL.h>
-#include <SDL_ttf.h>
 
 #include "geometry.h"
-
-class WindowImpl : public Window
-{
- public:
-  WindowImpl(std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> sdl_window)
-    : sdl_window_(std::move(sdl_window))
-  {
-  }
-
-  std::unique_ptr<Surface> get_surface() override;
-  void refresh() override;
-
-  std::unique_ptr<Surface> create_surface(geometry::Size size) override;
-
- private:
-  std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> sdl_window_;
-};
 
 class SurfaceImpl : public Surface
 {

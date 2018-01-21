@@ -5,47 +5,10 @@
 #include <algorithm>
 #include <utility>
 
+#include <SDL_ttf.h>
+
 #include "logger.h"
 #include "occ_math.h"
-
-std::unique_ptr<Window> Window::create(const std::string& title, geometry::Size size)
-{
-  auto sdl_window = std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)>(SDL_CreateWindow(title.c_str(),
-                                                                                               0,
-                                                                                               0,
-                                                                                               size.x(),
-                                                                                               size.y(),
-                                                                                               SDL_WINDOW_SHOWN),
-                                                                              SDL_DestroyWindow);
-  return std::make_unique<WindowImpl>(std::move(sdl_window));
-}
-
-std::unique_ptr<Surface> WindowImpl::get_surface()
-{
-  auto sdl_surface = std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)>(SDL_GetWindowSurface(sdl_window_.get()),
-                                                                              [](SDL_Surface*){});
-  return std::make_unique<SurfaceImpl>(std::move(sdl_surface));
-}
-
-void WindowImpl::refresh()
-{
-  SDL_UpdateWindowSurface(sdl_window_.get());
-}
-
-std::unique_ptr<Surface> WindowImpl::create_surface(geometry::Size size)
-{
-  auto* window_surface = SDL_GetWindowSurface(sdl_window_.get());
-  auto sdl_surface = std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)>(SDL_CreateRGBSurface(0,
-                                                                                                   size.x(),
-                                                                                                   size.y(),
-                                                                                                   window_surface->format->BitsPerPixel,
-                                                                                                   window_surface->format->Rmask,
-                                                                                                   window_surface->format->Gmask,
-                                                                                                   window_surface->format->Bmask,
-                                                                                                   window_surface->format->Amask),
-                                                                              SDL_FreeSurface);
-  return std::make_unique<SurfaceImpl>(std::move(sdl_surface));
-}
 
 std::unique_ptr<Surface> Surface::from_bmp(const std::string& filename)
 {
