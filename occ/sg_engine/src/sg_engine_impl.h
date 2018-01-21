@@ -1,7 +1,7 @@
-#ifndef SDL_WRAPPER_IMPL_H_
-#define SDL_WRAPPER_IMPL_H_
+#ifndef SG_ENGINE_IMPL_H_
+#define SG_ENGINE_IMPL_H_
 
-#include "sdl_wrapper.h"
+#include "sg_engine.h"
 
 #include <memory>
 #include <string>
@@ -13,10 +13,10 @@
 
 class Surface;
 
-class SDLWrapperImpl : public SDLWrapper
+class SGEngineImpl : public SGEngine
 {
  public:
-  SDLWrapperImpl(std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> sdl_window)
+  SGEngineImpl(std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> sdl_window)
     : sdl_window_(std::move(sdl_window))
   {
   }
@@ -31,4 +31,4 @@ class SDLWrapperImpl : public SDLWrapper
   std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> sdl_window_;
 };
 
-#endif  // SDL_WRAPPER_IMPL_H_
+#endif  // SG_ENGINE_IMPL_H_

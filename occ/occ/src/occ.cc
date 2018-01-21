@@ -15,8 +15,8 @@
 #include "player_input.h"
 #include "player.h"
 
-// From sdl_wrapper
-#include "sdl_wrapper.h"
+// From sg_engine
+#include "sg_engine.h"
 #include "event.h"
 #include "graphics.h"
 
@@ -55,10 +55,10 @@ int main()
   LOG_INFO("Starting!");
 
   // Init SDL wrapper
-  auto sdl = SDLWrapper::create("OpenCrystalCaves", WINDOW_SIZE);
+  auto sdl = SGEngine::create("OpenCrystalCaves", WINDOW_SIZE);
   if (!sdl)
   {
-    LOG_CRITICAL("Could not create SDLWrapper");
+    LOG_CRITICAL("Could not create SGEngine");
     return 1;
   }
 

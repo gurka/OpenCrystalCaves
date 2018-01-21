@@ -5,13 +5,13 @@ project(occ)
 # debug flags (-fuse-old=gold is for Travis)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fsanitize=leak -fsanitize=undefined -fuse-ld=gold")
 
-# sdl_wrapper
-add_subdirectory("sdl_wrapper")
-target_compile_options(sdl_wrapper PRIVATE -Wall -Wextra -Wpedantic -Weffc++)
-target_include_directories(sdl_wrapper PUBLIC
+# sg_engine
+add_subdirectory("sg_engine")
+target_compile_options(sg_engine PRIVATE -Wall -Wextra -Wpedantic -Weffc++)
+target_include_directories(sg_engine PUBLIC
   "utils/export"
 )
-target_include_directories(sdl_wrapper SYSTEM PUBLIC
+target_include_directories(sg_engine SYSTEM PUBLIC
   "/usr/include/SDL2"
 )
 
@@ -33,7 +33,7 @@ target_compile_options(utils PRIVATE -Wall -Wextra -Wpedantic -Weffc++)
 add_subdirectory("occ")
 target_compile_options(occ PRIVATE -Wall -Wextra -Wpedantic -Weffc++)
 target_include_directories(occ PUBLIC
-  "sdl_wrapper/export"
+  "sg_engine/export"
   "game/export"
   "utils/export"
 )
@@ -42,5 +42,5 @@ target_include_directories(occ PUBLIC
 enable_testing()
 add_subdirectory(external/googletest)
 add_test(game game/game_test)
-add_test(sdl_wrapper sdl_wrapper/sdl_wrapper_test)
+add_test(sg_engine sg_engine/sg_engine_test)
 add_test(utils utils/utils_test)

@@ -1,5 +1,5 @@
-#ifndef SDL_WRAPPER_H_
-#define SDL_WRAPPER_H_
+#ifndef SG_ENGINE_H_
+#define SG_ENGINE_H_
 
 #include <memory>
 #include <string>
@@ -8,13 +8,13 @@
 
 class Surface;
 
-class SDLWrapper
+class SGEngine
 {
  public:
-  static std::unique_ptr<SDLWrapper> create(const std::string& window_title,
-                                            geometry::Size window_size);
+  static std::unique_ptr<SGEngine> create(const std::string& window_title,
+                                          geometry::Size window_size);
 
-  virtual ~SDLWrapper() = default;
+  virtual ~SGEngine() = default;
 
   virtual std::unique_ptr<Surface> get_window_surface() = 0;
   virtual std::unique_ptr<Surface> create_surface(geometry::Size size) = 0;
@@ -23,4 +23,4 @@ class SDLWrapper
   virtual unsigned get_tick() = 0;
 };
 
-#endif  // SDL_WRAPPER_H_
+#endif  // SG_ENGINE_H_

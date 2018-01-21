@@ -12,7 +12,7 @@ add_executable(occ
 )
 target_link_libraries(occ
   "utils"
-  "sdl_wrapper"
+  "sg_engine"
   "game"
   "SDL2"
   "SDL2_ttf"
