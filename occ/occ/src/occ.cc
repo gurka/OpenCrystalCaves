@@ -15,8 +15,8 @@
 #include "player_input.h"
 #include "player.h"
 
-// From sg_engine
-#include "sg_engine.h"
+// From sge
+#include "sge.h"
 #include "graphics.h"
 #include "input.h"
 

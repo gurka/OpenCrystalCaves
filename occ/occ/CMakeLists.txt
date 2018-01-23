@@ -12,7 +12,7 @@ add_executable(occ
 )
 target_link_libraries(occ
   "utils"
-  "sg_engine"
+  "sge"
   "game"
   "SDL2"
   "SDL2_ttf"

@@ -1,7 +1,7 @@
 #ifndef SG_ENGINE_IMPL_H_
 #define SG_ENGINE_IMPL_H_
 
-#include "sg_engine.h"
+#include "sge.h"
 
 #include <memory>
 #include <string>
