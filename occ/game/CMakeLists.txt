@@ -35,15 +35,15 @@ target_include_directories(game PUBLIC
 )
 set_property(TARGET game PROPERTY CXX_STANDARD 14)
 
-add_executable(game_test
-  "test/src/game_test.cc"
-)
-target_include_directories(game_test PUBLIC
-  "export"
-)
-target_link_libraries(game_test
-  gtest_main
-  gmock_main
-  game
-)
-set_property(TARGET game_test PROPERTY CXX_STANDARD 14)
+#add_executable(game_test
+#  "test/src/game_test.cc"
+#)
+#target_include_directories(game_test PUBLIC
+#  "export"
+#)
+#target_link_libraries(game_test
+#  gtest_main
+#  gmock_main
+#  game
+#)
+#set_property(TARGET game_test PROPERTY CXX_STANDARD 14)

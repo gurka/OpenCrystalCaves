@@ -39,8 +39,8 @@ target_include_directories(occ PUBLIC
 )
 
 # tests
-enable_testing()
-add_subdirectory(external/googletest)
-add_test(game game/game_test)
-add_test(sge sge/sge_test)
-add_test(sge_utils sge_utils/sge_utils_test)
+#enable_testing()
+#add_subdirectory(external/googletest)
+#add_test(game game/game_test)
+#add_test(sge sge/sge_test)
+#add_test(sge_utils sge_utils/sge_utils_test)
