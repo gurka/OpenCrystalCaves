@@ -20,7 +20,7 @@
 #include "graphics.h"
 #include "input.h"
 
-// From utils
+// From sge_utils
 #include "geometry.h"
 #include "logger.h"
 

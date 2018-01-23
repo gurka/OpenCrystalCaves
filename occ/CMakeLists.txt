@@ -9,7 +9,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fsanitiz
 add_subdirectory("sge")
 target_compile_options(sge PRIVATE -Wall -Wextra -Wpedantic -Weffc++)
 target_include_directories(sge PUBLIC
-  "utils/export"
+  "sge_utils/export"
 )
 target_include_directories(sge SYSTEM PUBLIC
   "/usr/include/SDL2"
@@ -19,15 +19,15 @@ target_include_directories(sge SYSTEM PUBLIC
 add_subdirectory("game")
 target_compile_options(game PRIVATE -Wall -Wextra -Wpedantic -Weffc++)
 target_include_directories(game PUBLIC
-  "utils/export"
+  "sge_utils/export"
 )
 target_include_directories(game SYSTEM PUBLIC
   "external/json/src"
 )
 
-# utils
-add_subdirectory("utils")
-target_compile_options(utils PRIVATE -Wall -Wextra -Wpedantic -Weffc++)
+# sge_utils
+add_subdirectory("sge_utils")
+target_compile_options(sge_utils PRIVATE -Wall -Wextra -Wpedantic -Weffc++)
 
 # occ
 add_subdirectory("occ")
@@ -35,7 +35,7 @@ target_compile_options(occ PRIVATE -Wall -Wextra -Wpedantic -Weffc++)
 target_include_directories(occ PUBLIC
   "sge/export"
   "game/export"
-  "utils/export"
+  "sge_utils/export"
 )
 
 # tests
@@ -43,4 +43,4 @@ enable_testing()
 add_subdirectory(external/googletest)
 add_test(game game/game_test)
 add_test(sge sge/sge_test)
-add_test(utils utils/utils_test)
+add_test(sge_utils sge_utils/sge_utils_test)

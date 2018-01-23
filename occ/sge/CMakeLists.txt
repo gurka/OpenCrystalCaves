@@ -30,6 +30,6 @@ set_property(TARGET sge PROPERTY CXX_STANDARD 14)
 #  gtest_main
 #  gmock_main
 #  sge
-#  utils_stubs
+#  sge_utils_stubs
 #)
 #set_property(TARGET sge_test PROPERTY CXX_STANDARD 14)

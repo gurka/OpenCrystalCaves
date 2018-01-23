@@ -11,7 +11,7 @@ add_executable(occ
   "src/spritemgr.h"
 )
 target_link_libraries(occ
-  "utils"
+  "sge_utils"
   "sge"
   "game"
   "SDL2"
