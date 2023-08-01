@@ -3,7 +3,7 @@
 #include <memory>
 #include <utility>
 
-#include "SDL.h"
+#include <SDL.h>
 
 std::unique_ptr<Event> Event::create()
 {

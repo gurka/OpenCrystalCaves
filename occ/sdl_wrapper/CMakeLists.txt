@@ -15,6 +15,8 @@ add_library(sdl_wrapper
 )
 target_include_directories(sdl_wrapper PUBLIC
   "export"
+  ${SDL2_INCLUDE_DIRS}
+  ${SDL_TTF_INCLUDE_DIR}
 )
 set_property(TARGET sdl_wrapper PROPERTY CXX_STANDARD 14)
 

@@ -3,16 +3,19 @@ cmake_minimum_required(VERSION 3.2)
 project(occ)
 
 # debug flags (-fuse-old=gold is for Travis)
+if(APPLE)
+else()
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fsanitize=leak -fsanitize=undefined -fuse-ld=gold")
+endif()
+
+find_package(SDL2 REQUIRED)
+find_package(SDL2_ttf REQUIRED)
 
 # sdl_wrapper
 add_subdirectory("sdl_wrapper")
 target_compile_options(sdl_wrapper PRIVATE -Wall -Wextra -Wpedantic -Weffc++)
 target_include_directories(sdl_wrapper PUBLIC
   "utils/export"
-)
-target_include_directories(sdl_wrapper SYSTEM PUBLIC
-  "/usr/include/SDL2"
 )
 
 # game

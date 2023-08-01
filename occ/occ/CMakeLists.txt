@@ -14,7 +14,7 @@ target_link_libraries(occ
   "utils"
   "sdl_wrapper"
   "game"
-  "SDL2"
-  "SDL2_ttf"
+  SDL2::SDL2
+  SDL2_ttf::SDL2_ttf
 )
 set_property(TARGET occ PROPERTY CXX_STANDARD 14)
