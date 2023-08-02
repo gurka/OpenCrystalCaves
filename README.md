@@ -17,7 +17,7 @@ Currently the engine can:
 
 - Load sprite, item and level data.
 - Render a level that is selected at compile time.
-- Render items that, both behind and infront of the player, as well as animated items.
+- Render items that, both behind and in front of the player, as well as animated items.
 - Move the player around, jumping, colliding with solid items and moving platforms.
 
 Features that are missing:
@@ -52,7 +52,7 @@ Two files are required and not available in this repository: `DejaVuSansMono.ttf
 `sprites.bmp` can be generated from the original Crystal Caves (episode 1) game files using the Python script `utils/sprite-extractor.py`. The script takes a path to the `CC1.GFX` file and outputs a PNG file that then should be converted to BMP (using e.g. ImageMagick):
 
 ```
-python utils/sprite-extractor.py CC1/CC1.GFX
+python tools/sprite-extractor.py CC1/CC1.GFX
 convert sprites.png sprites.bmp
 ```
 

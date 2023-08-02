@@ -77,7 +77,7 @@ if __name__ == '__main__':
             for sprite in range(num_sprites):
                 # This is where this sprite should be drawn
                 x_start = (sprite_num % 4) * 16
-                y_start = (sprite_num / 4) * 16
+                y_start = (sprite_num // 4) * 16
                 x = x_start
                 y = y_start
 
@@ -99,9 +99,8 @@ if __name__ == '__main__':
 
                             if t == 0:
                                 pixels[x, y] = (0, 0, 0, 0)
-
                             else:
-                                pixels[x, y]  = PALETTE[(i << 3) | (r << 2) | (g << 1) | b]
+                                pixels[x, y] = PALETTE[(i << 3) | (r << 2) | (g << 1) | b]
 
                             x += 1
                             if x == x_start + 16:
