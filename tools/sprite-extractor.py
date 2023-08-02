@@ -113,5 +113,5 @@ if __name__ == '__main__':
             # (sprite_num % 50 == 0)
             sprite_num += 2
 
-    img.save('sprites.png')
-    print("Wrote 'sprites.png'.")
+    img.save('sprites.bmp')
+    print("Wrote 'sprites.bmp'.")

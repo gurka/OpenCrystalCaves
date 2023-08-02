@@ -49,11 +49,10 @@ Two files are required and not available in this repository: `DejaVuSansMono.ttf
 
 `DejaVuSansMono.ttf` can be downloaded for free [here](https://dejavu-fonts.github.io/), or might already be available in your Linux installation. In Debian 9 the font is available at `/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf`
 
-`sprites.bmp` can be generated from the original Crystal Caves (episode 1) game files using the Python script `utils/sprite-extractor.py`. The script takes a path to the `CC1.GFX` file and outputs a PNG file that then should be converted to BMP (using e.g. ImageMagick):
+`sprites.bmp` can be generated from the original Crystal Caves (episode 1) game files using the Python script `utils/sprite-extractor.py`. The script takes a path to the `CC1.GFX` file and outputs a BMP file:
 
 ```
 python tools/sprite-extractor.py CC1/CC1.GFX
-convert sprites.png sprites.bmp
 ```
 
 With these two files inside the `media/` directory it's just matter of running the executable.
