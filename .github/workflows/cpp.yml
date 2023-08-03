@@ -26,7 +26,13 @@ jobs:
       uses: Homebrew/actions/setup-homebrew@master
     - name: Install SDL via homebrew
       # Because ubuntu 22 doesn't have the latest SDL libs
-      run: brew install sdl2 sdl2_ttf
+      run: brew install sdl2
+      # sdl2_ttf
+    - name: Install packages
+      # Linux homebrew sdl2_ttf doesn't define the necessary INCLUDE macros
+      run: |
+        sudo apt-get update
+        sudo apt install libsdl2-ttf-dev
     - name: Configure CMake
       run: |
         mkdir ${{ matrix.build_type }}
