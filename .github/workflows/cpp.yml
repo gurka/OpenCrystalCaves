@@ -19,6 +19,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      with:
+        submodules: true
     - name: Set up Homebrew
       id: set-up-homebrew
       uses: Homebrew/actions/setup-homebrew@master
@@ -31,5 +33,5 @@ jobs:
         cmake -B ${{ matrix.build_type }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} occ
     - name: Build
       run: cmake --build ${{ matrix.build_type }} --config ${{ matrix.build_type }}
-
-    # TODO: tests, checks
+    - name: Test
+      run: ctest -V
