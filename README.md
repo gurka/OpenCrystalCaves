@@ -1,4 +1,4 @@
-
+[![C/C++ CI](https://github.com/gurka/OpenCrystalCaves/actions/workflows/cpp.yml/badge.svg)](https://github.com/gurka/OpenCrystalCaves/actions/workflows/cpp.yml)
 
 # OpenCrystalCaves
 OCC is an unofficial open source engine reimplementation of the game trilogy [Crystal Caves](https://en.wikipedia.org/wiki/Crystal_Caves).
