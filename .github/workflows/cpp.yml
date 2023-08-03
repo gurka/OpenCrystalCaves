@@ -28,9 +28,8 @@ jobs:
     - name: Configure CMake
       run: |
         mkdir ${{ matrix.build_type }}
-        cd ${{ matrix.build_type }}
-        cmake -B ../occ -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} .
+        cmake -B ${{ matrix.build_type }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} occ
     - name: Build
-      run: cmake --build . --config ${{ matrix.build_type }}
+      run: cmake --build ${{ matrix.build_type }} --config ${{ matrix.build_type }}
 
     # TODO: tests, checks
