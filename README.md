@@ -3,7 +3,7 @@
 # OpenCrystalCaves
 OCC is an unofficial open source engine reimplementation of the game trilogy [Crystal Caves](https://en.wikipedia.org/wiki/Crystal_Caves).
 
-**Note that the sprites are not available in this repository. You need to own the original Crystal Caves to be able to extract the sprites and use this engine, see below. The original Crystal Caves can be purchased at [Steam](http://store.steampowered.com/app/358260/Crystal_Caves/) or [GoG](https://www.gog.com/game/crystal_caves).**
+**Note that the sprites are not available in this repository. You need a copy of the original Crystal Caves, shareware or retail, to be able to extract the sprites and use this engine, see below. The shareware Crystal Caves can be found online; the full, retail version can be purchased at [Steam](http://store.steampowered.com/app/358260/Crystal_Caves/) or [GoG](https://www.gog.com/game/crystal_caves).**
 
 Current state of OCC:
 
@@ -45,7 +45,7 @@ make
 The binary will be available at `OpenCrystalCaves/debug/occ/occ`
 
 ## Running OCC
-The file `media/sprites.bmp` is required and not available in this repository. It can be generated from the original Crystal Caves (episode 1) game files using the Python script `tools/sprite-extractor.py`. The script takes a path to the `CC1.GFX` file and outputs a BMP file:
+The file `media/sprites.bmp` is required and not available in this repository. It can be generated from the original Crystal Caves (any episode) game files using the Python script `tools/sprite-extractor.py`. The script takes a path to the `CC1.GFX` file and outputs a BMP file:
 
 ```
 python tools/sprite-extractor.py CC1/CC1.GFX
