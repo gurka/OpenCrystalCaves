@@ -9,7 +9,13 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fsanitiz
 endif()
 
 find_package(SDL2 REQUIRED)
-find_package(SDL2_ttf REQUIRED)
+# Linux apt package can't be found with find_package
+if(UNIX)
+  include(FindPkgConfig)
+  pkg_search_module(SDL2TTF REQUIRED SDL2_ttf>=2.0.0)
+else()
+  find_package(SDL2_ttf REQUIRED)
+endif()
 
 # sdl_wrapper
 add_subdirectory("sdl_wrapper")
