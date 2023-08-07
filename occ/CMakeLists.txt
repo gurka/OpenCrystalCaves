@@ -12,7 +12,7 @@ find_package(SDL2 REQUIRED)
 # Linux apt package can't be found with find_package
 if(UNIX)
   include(FindPkgConfig)
-  pkg_search_module(SDL2TTF REQUIRED)
+  pkg_search_module(SDL2TTF REQUIRED SDL2_ttf>=2.0.0)
 else()
   find_package(SDL2_ttf REQUIRED)
 endif()
