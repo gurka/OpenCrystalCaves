@@ -20,6 +20,8 @@ class WindowImpl : public Window
   }
   void set_text_sprite_filename(const std::string& text_sprite_filename);
 
+  void set_render_target(Surface* surface) override;
+  std::unique_ptr<Surface> create_target_surface(geometry::Size size) override;
   void refresh() override;
   void fill_rect(const geometry::Rectangle& rect, const Color& color) override;
   void render_text(const geometry::Position& pos, const std::string& text, unsigned font_size, const Color& color) override;
@@ -38,19 +40,21 @@ class WindowImpl : public Window
 class SurfaceImpl : public Surface
 {
  public:
-  SurfaceImpl(std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> sdl_surface, std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)> sdl_texture, SDL_Renderer* sdl_renderer)
-	: sdl_surface_(std::move(sdl_surface)), sdl_texture_(std::move(sdl_texture)), sdl_renderer_(sdl_renderer)
+  SurfaceImpl(const int w, const int h, std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)> sdl_texture, SDL_Renderer* sdl_renderer)
+	: w_(w), h_(h), sdl_texture_(std::move(sdl_texture)), sdl_renderer_(sdl_renderer)
   {
   }
 
-  int width() const override { return sdl_surface_->w; }
-  int height() const override { return sdl_surface_->h; }
+  int width() const override { return w_; }
+  int height() const override { return h_; }
 
   void blit_surface(const geometry::Rectangle& source,
                     const geometry::Rectangle& dest) const override;
+  void set_render_target();
 	
  private:
-  std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> sdl_surface_;
+  int w_;
+  int h_;
   std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)> sdl_texture_;
   SDL_Renderer* sdl_renderer_;
 };

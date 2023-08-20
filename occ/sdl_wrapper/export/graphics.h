@@ -22,6 +22,8 @@ class Window
 
   virtual ~Window() = default;
 
+  virtual void set_render_target(Surface* surface) = 0;
+  virtual std::unique_ptr<Surface> create_target_surface(geometry::Size size) = 0;
   virtual void refresh() = 0;
   virtual void fill_rect(const geometry::Rectangle& rect, const Color& color) = 0;
   virtual void render_text(const geometry::Position& pos, const std::string& text, unsigned font_size, const Color& color) = 0;

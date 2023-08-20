@@ -77,6 +77,15 @@ int main()
   }
   LOG_INFO("Window created");
 
+  // Create game surface
+  std::unique_ptr<Surface> game_surface = window->create_target_surface(CAMERA_SIZE);
+  if (!game_surface)
+  {
+	LOG_CRITICAL("Could not create game surface");
+	return 1;
+  }
+  LOG_INFO("Game surface created");
+
   // Create event handler
   auto event = Event::create();
   if (!event)
@@ -109,7 +118,7 @@ int main()
   LOG_INFO("Game initialized");
 
   // Create GameRenderer
-  GameRenderer game_renderer(game.get(), &sprite_manager, *window);
+  GameRenderer game_renderer(game.get(), &sprite_manager, game_surface.get(), *window);
 
   // Game loop
   {
@@ -188,6 +197,10 @@ int main()
 
       // Render game
       game_renderer.render_game(game_tick);
+
+	  // Render game surface to window surface, centered and scaled
+	  game_surface->blit_surface(geometry::Rectangle(0, 0, CAMERA_SIZE),
+								 geometry::Rectangle((WINDOW_SIZE - CAMERA_SIZE_SCALED) / 2, CAMERA_SIZE_SCALED));
 
       // Render statusbar
       render_statusbar(*window, game->get_score(), game->get_num_ammo(), game->get_num_lives());

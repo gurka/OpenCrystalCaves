@@ -46,6 +46,34 @@ void WindowImpl::set_text_sprite_filename(const std::string& text_sprite_filenam
   font_.BuildFromFile(sdl_renderer_.get(), text_sprite_filename.c_str(), char_rgb);
 }
 
+void WindowImpl::set_render_target(Surface* surface)
+{
+  if (surface)
+  {
+	static_cast<SurfaceImpl*>(surface)->set_render_target();
+  }
+  else
+  {
+	SDL_SetRenderTarget(sdl_renderer_.get(), nullptr);
+  }
+}
+
+std::unique_ptr<Surface> WindowImpl::create_target_surface(geometry::Size size)
+{
+  auto sdl_texture = std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)>(SDL_CreateTexture(sdl_renderer_.get(),
+																								   SDL_PIXELFORMAT_RGBA8888,
+																								   SDL_TEXTUREACCESS_TARGET,
+																								   size.x(),
+																								   size.y()),
+																				 SDL_DestroyTexture);
+  if (!sdl_texture)
+  {
+	LOG_CRITICAL("Could not get texture: %s", SDL_GetError());
+	return std::unique_ptr<Surface>();
+  }
+  return std::make_unique<SurfaceImpl>(size.x(), size.y(), std::move(sdl_texture), sdl_renderer_.get());
+}
+
 void WindowImpl::refresh()
 {
   SDL_RenderPresent(sdl_renderer_.get());
@@ -125,7 +153,7 @@ std::unique_ptr<Surface> Surface::from_bmp(const std::string& filename, Window& 
 	LOG_CRITICAL("Could not get texture: %s", SDL_GetError());
 	return std::unique_ptr<Surface>();
   }
-  return std::make_unique<SurfaceImpl>(std::move(sdl_surface), std::move(sdl_texture), sdl_renderer);
+  return std::make_unique<SurfaceImpl>(sdl_surface->w, sdl_surface->h, std::move(sdl_texture), sdl_renderer);
 }
 
 void SurfaceImpl::blit_surface(const geometry::Rectangle& source,
@@ -135,4 +163,9 @@ void SurfaceImpl::blit_surface(const geometry::Rectangle& source,
   auto dest_rect = to_sdl_rect(dest);
   // TODO: check error
   SDL_RenderCopy(sdl_renderer_, sdl_texture_.get(), &src_rect, &dest_rect);
+}
+
+void SurfaceImpl::set_render_target()
+{
+  SDL_SetRenderTarget(sdl_renderer_, sdl_texture_.get());
 }

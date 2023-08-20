@@ -8,9 +8,10 @@
 #include "occ_math.h"
 #include "misc.h"
 
-GameRenderer::GameRenderer(Game* game, SpriteManager* sprite_manager, Window& window)
+GameRenderer::GameRenderer(Game* game, SpriteManager* sprite_manager, Surface* game_surface, Window& window)
   : game_(game),
     sprite_manager_(sprite_manager),
+	game_surface_(game_surface),
     window_(window),
     game_camera_(math::clamp(game_->get_player().position.x() + (game_->get_player().size.x() / 2) - (CAMERA_SIZE.x() / 2),
                              0,
@@ -64,9 +65,9 @@ void GameRenderer::render_game(unsigned game_tick)
                                                            (game_->get_tile_height() * 16) - CAMERA_SIZE.y()));
   }
 
+  window_.set_render_target(game_surface_);
   // Clear game surface (background now)
   window_.fill_rect(geometry::Rectangle(0, 0, CAMERA_SIZE), { 33u, 33u, 33u });
-
   render_background();
   render_tiles(false);
   render_objects();
@@ -74,6 +75,7 @@ void GameRenderer::render_game(unsigned game_tick)
   render_enemies();
   render_tiles(true);
   render_items();
+  window_.set_render_target(nullptr);
 }
 
 void GameRenderer::render_background()
