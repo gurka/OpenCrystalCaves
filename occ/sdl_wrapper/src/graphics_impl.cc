@@ -24,7 +24,7 @@ std::unique_ptr<Window> Window::create(const std::string& title, geometry::Size 
                                                                               SDL_DestroyWindow);
   if (!sdl_window)
   {
-	return NULL;
+	return nullptr;
   }
   auto sdl_renderer = std::unique_ptr<SDL_Renderer, decltype(&SDL_DestroyRenderer)>(SDL_CreateRenderer(sdl_window.get(),
 																									   -1,
@@ -32,7 +32,7 @@ std::unique_ptr<Window> Window::create(const std::string& title, geometry::Size 
 																					SDL_DestroyRenderer);
   if (!sdl_renderer)
   {
-	return NULL;
+	return nullptr;
   }
   auto window = std::make_unique<WindowImpl>(std::move(sdl_window), std::move(sdl_renderer));
   window->set_text_sprite_filename(text_sprite_filename);
