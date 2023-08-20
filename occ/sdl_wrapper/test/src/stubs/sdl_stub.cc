@@ -3,7 +3,6 @@
 #include <functional>
 
 #include <SDL.h>
-#include <SDL_ttf.h>
 
 std::unique_ptr<SDLStub> SDLStub::stub;
 
@@ -106,24 +105,4 @@ int SDL_FillRect(SDL_Surface* dst, const SDL_Rect* rect, Uint32 color)
 int SDL_PollEvent(SDL_Event* event)
 {
   return SDLStub::get().SDL_PollEvent(event);
-}
-
-int TTF_Init()
-{
-  return SDLStub::get().TTF_Init();
-}
-
-TTF_Font* TTF_OpenFont(const char* file, int ptsize)
-{
-  return SDLStub::get().TTF_OpenFont(file, ptsize);
-}
-
-void TTF_CloseFont(TTF_Font* font)
-{
-  // Do not mock this since TTF_CloseFont is called in static destructor (on exit)
-}
-
-SDL_Surface* TTF_RenderText_Solid(TTF_Font* font, const char* text, SDL_Color fg)
-{
-  return SDLStub::get().TTF_RenderText_Solid(font, text, fg);
 }

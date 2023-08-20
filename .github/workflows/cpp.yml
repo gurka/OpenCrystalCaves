@@ -31,16 +31,6 @@ jobs:
     - name: Install SDL via homebrew
       # Because ubuntu 22 doesn't have the latest SDL libs
       run: brew install sdl2
-      # sdl2_ttf
-    - name: Install SDL via homebrew (macOS)
-      if: matrix.os == 'macos-latest'
-      run: brew install sdl2_ttf
-    - name: Install packages (Linux)
-      # Linux homebrew sdl2_ttf doesn't define the necessary INCLUDE macros
-      if: matrix.os == 'ubuntu-latest'
-      run: |
-        sudo apt-get update
-        sudo apt install libsdl2-ttf-dev
     - name: Configure CMake
       run: |
         mkdir ${{ matrix.build_type }}

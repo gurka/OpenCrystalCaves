@@ -6,11 +6,12 @@
 class Game;
 class SpriteManager;
 class Surface;
+class Window;
 
 class GameRenderer
 {
  public:
-  GameRenderer(Game* game, SpriteManager* sprite_manager, Surface* game_surface);
+  GameRenderer(Game* game, SpriteManager* sprite_manager, Window& window);
 
   void render_game(unsigned game_tick);
 
@@ -29,7 +30,7 @@ class GameRenderer
 
   Game* game_;
   SpriteManager* sprite_manager_;
-  Surface* game_surface_;
+  Window& window_;
 
   geometry::Rectangle game_camera_;
 

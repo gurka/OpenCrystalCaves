@@ -30,7 +30,7 @@ Features that are missing:
 
 ## Compiling OCC
 
-OCC is built using C++14 and requires three external libraries: [SDL 2.0](https://www.libsdl.org/), [SDL 2.0 TTF](https://www.libsdl.org/projects/SDL_ttf/) and [nlohmann's JSON](https://nlohmann.github.io/json/). The SDL libraries must be installed and available in `/usr/include/SDL2` and the JSON library is included in this repository as a git submodule. Additionally the build system `cmake` must be installed.
+OCC is built using C++14 and requires external libraries: [SDL 2.0](https://www.libsdl.org/) and [nlohmann's JSON](https://nlohmann.github.io/json/). SDL2 must be installed and available in `/usr/include/SDL2` and the JSON library is included in this repository as a git submodule. Additionally the build system `cmake` must be installed.
 
 Steps to compile:
 ```

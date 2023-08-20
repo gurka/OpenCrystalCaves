@@ -19,7 +19,6 @@ TEST_F(SDLWrapperTest, init_ok)
   ASSERT_TRUE(wrapper.get() != nullptr);
 
   EXPECT_CALL(SDLStub::get(), SDL_Init(_));
-  EXPECT_CALL(SDLStub::get(), TTF_Init());
   EXPECT_TRUE(wrapper->init());
 }
 

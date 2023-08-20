@@ -1,6 +1,5 @@
 #include <gmock/gmock.h>
 #include <SDL.h>
-#include <SDL_ttf.h>
 
 class SDLStub
 {
@@ -25,11 +24,6 @@ class SDLStub
   MOCK_METHOD3(SDL_FillRect, int(SDL_Surface*, const SDL_Rect*, Uint32));
 
   MOCK_METHOD1(SDL_PollEvent, int(SDL_Event*));
-
-  MOCK_METHOD0(TTF_Init, int());
-  MOCK_METHOD2(TTF_OpenFont, TTF_Font*(const char*, int));
-  MOCK_METHOD1(TTF_CloseFont, void(TTF_Font*));
-  MOCK_METHOD3(TTF_RenderText_Solid, SDL_Surface*(TTF_Font*, const char*, SDL_Color));
 
  private:
   SDLStub() = default;

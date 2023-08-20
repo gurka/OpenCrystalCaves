@@ -7,52 +7,52 @@
 #include <utility>
 
 #include <SDL.h>
-#include <SDL_ttf.h>
+#include <SDLBitmapFont.h>
 
 #include "geometry.h"
 
 class WindowImpl : public Window
 {
  public:
-  WindowImpl(std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> sdl_window)
-    : sdl_window_(std::move(sdl_window))
+  WindowImpl(std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> sdl_window, std::unique_ptr<SDL_Renderer, decltype(&SDL_DestroyRenderer)> sdl_renderer)
+    : sdl_window_(std::move(sdl_window)), sdl_renderer_(std::move(sdl_renderer))
   {
   }
+  void set_text_sprite_filename(const std::string& text_sprite_filename);
 
-  std::unique_ptr<Surface> get_surface() override;
   void refresh() override;
+  void fill_rect(const geometry::Rectangle& rect, const Color& color) override;
+  void render_text(const geometry::Position& pos, const std::string& text, unsigned font_size, const Color& color) override;
+  void render_line(const geometry::Position& from, const geometry::Position& to, const Color& color) override;
+  void render_rectangle(const geometry::Rectangle& rect, const Color& color) override;
 
-  std::unique_ptr<Surface> create_surface(geometry::Size size) override;
+  SDL_Renderer* get_renderer() const { return sdl_renderer_.get(); }
 
  private:
   std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> sdl_window_;
+  std::unique_ptr<SDL_Renderer, decltype(&SDL_DestroyRenderer)> sdl_renderer_;
+  SDLBitmapFont font_;
+  std::unique_ptr<Surface> text_surface_;
 };
 
 class SurfaceImpl : public Surface
 {
  public:
-  SurfaceImpl(std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> sdl_surface)
-    : sdl_surface_(std::move(sdl_surface))
+  SurfaceImpl(std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> sdl_surface, std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)> sdl_texture, SDL_Renderer* sdl_renderer)
+	: sdl_surface_(std::move(sdl_surface)), sdl_texture_(std::move(sdl_texture)), sdl_renderer_(sdl_renderer)
   {
   }
 
   int width() const override { return sdl_surface_->w; }
   int height() const override { return sdl_surface_->h; }
 
-  void blit_surface(const Surface* surface,
-                    const geometry::Rectangle& source,
-                    const geometry::Rectangle& dest,
-                    BlitType blit_type) override;
-  void fill_rect(const geometry::Rectangle& rect, const Color& color) override;
-  void render_text(const geometry::Position& pos, const std::string& text, unsigned font_size, const Color& color) override;
-  void render_line(const geometry::Position& from, const geometry::Position& to, const Color& color) override;
-  void render_rectangle(const geometry::Rectangle& rect, const Color& color) override;
-
+  void blit_surface(const geometry::Rectangle& source,
+                    const geometry::Rectangle& dest) const override;
+	
  private:
-  SDL_Rect to_sdl_rect(const geometry::Rectangle& rect) const;
-  SDL_Color to_sdl_color(const Color& color) const;
-
   std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> sdl_surface_;
+  std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)> sdl_texture_;
+  SDL_Renderer* sdl_renderer_;
 };
 
 #endif  // GRAPHICS_IMPL_H_

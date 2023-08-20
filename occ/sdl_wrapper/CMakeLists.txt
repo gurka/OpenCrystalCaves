@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.2)
 
 project(sdl_wrapper)
 
+file(GLOB SDLBITMAPFONT_HDRS "../external/SDLBitmapFont/*.h")
+file(GLOB SDLBITMAPFONT_SRCS "../external/SDLBitmapFont/*.cpp")
 add_library(sdl_wrapper
   "export/event.h"
   "export/graphics.h"
@@ -12,12 +14,12 @@ add_library(sdl_wrapper
   "src/graphics_impl.h"
   "src/sdl_wrapper_impl.cc"
   "src/sdl_wrapper_impl.h"
+  ${SDLBITMAPFONT_HDRS} ${SDLBITMAPFONT_SRCS}
 )
 target_include_directories(sdl_wrapper PUBLIC
   "export"
   ${SDL2_INCLUDE_DIRS}
-  ${SDL_TTF_INCLUDE_DIR}
-  ${SDL2TTF_INCLUDE_DIRS}
+  "../external/SDLBitmapFont"
 )
 set_property(TARGET sdl_wrapper PROPERTY CXX_STANDARD 14)
 

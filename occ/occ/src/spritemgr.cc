@@ -2,7 +2,7 @@
 
 #include "logger.h"
 
-bool SpriteManager::load_tileset(const std::string& filename)
+bool SpriteManager::load_tileset(const std::string& filename, Window& window)
 {
   // Check if tileset already loaded
   if (sprite_surface_)
@@ -11,7 +11,7 @@ bool SpriteManager::load_tileset(const std::string& filename)
   }
 
   // Load tileset
-  sprite_surface_ = Surface::from_bmp(filename.c_str());
+  sprite_surface_ = Surface::from_bmp(filename.c_str(), window);
   if (!sprite_surface_)
   {
     LOG_CRITICAL("Could not load '%s'", filename.c_str());
