@@ -16,11 +16,5 @@ target_link_libraries(occ
   "game"
   SDL2::SDL2
 )
-# Linux apt doesn't have the latest SDL libs
-if(UNIX)
-  target_link_libraries(occ ${SDL2TTF_LIBRARIES})
-else()
-  target_link_libraries(occ SDL2_ttf::SDL2_ttf)
-endif()
 
 set_property(TARGET occ PROPERTY CXX_STANDARD 14)

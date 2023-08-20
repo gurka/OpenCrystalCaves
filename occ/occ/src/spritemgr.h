@@ -17,7 +17,7 @@ class SpriteManager
   {
   }
 
-  bool load_tileset(const std::string& filename);
+  bool load_tileset(const std::string& filename, Window& window);
   int number_of_tiles() const;
   const Surface* get_surface() const;
   geometry::Rectangle get_rect_for_tile(int sprite) const;

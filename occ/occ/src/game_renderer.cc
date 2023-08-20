@@ -8,10 +8,11 @@
 #include "occ_math.h"
 #include "misc.h"
 
-GameRenderer::GameRenderer(Game* game, SpriteManager* sprite_manager, Surface* game_surface)
+GameRenderer::GameRenderer(Game* game, SpriteManager* sprite_manager, Surface* game_surface, Window& window)
   : game_(game),
     sprite_manager_(sprite_manager),
-    game_surface_(game_surface),
+	game_surface_(game_surface),
+    window_(window),
     game_camera_(math::clamp(game_->get_player().position.x() + (game_->get_player().size.x() / 2) - (CAMERA_SIZE.x() / 2),
                              0,
                              (game_->get_tile_width() * 16) - CAMERA_SIZE.x()),
@@ -64,9 +65,9 @@ void GameRenderer::render_game(unsigned game_tick)
                                                            (game_->get_tile_height() * 16) - CAMERA_SIZE.y()));
   }
 
+  window_.set_render_target(game_surface_);
   // Clear game surface (background now)
-  game_surface_->fill_rect(geometry::Rectangle(0, 0, CAMERA_SIZE), { 33u, 33u, 33u });
-
+  window_.fill_rect(geometry::Rectangle(0, 0, CAMERA_SIZE), { 33u, 33u, 33u });
   render_background();
   render_tiles(false);
   render_objects();
@@ -74,6 +75,7 @@ void GameRenderer::render_game(unsigned game_tick)
   render_enemies();
   render_tiles(true);
   render_items();
+  window_.set_render_target(nullptr);
 }
 
 void GameRenderer::render_background()
@@ -109,7 +111,7 @@ void GameRenderer::render_background()
         16,
         16
       };
-      game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
+	  sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
     }
   }
 
@@ -226,7 +228,7 @@ void GameRenderer::render_background()
             16,
             16
           };
-          game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
+		  sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
         }
         else if (tile_y == 4)
         {
@@ -240,7 +242,7 @@ void GameRenderer::render_background()
             16,
             16
           };
-          game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
+		  sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
         }
       }
     }
@@ -261,7 +263,7 @@ void GameRenderer::render_background()
           16,
           16
         };
-        game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
+		sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
       }
       if (geometry::isColliding(game_camera_, earth_rect))
       {
@@ -273,7 +275,7 @@ void GameRenderer::render_background()
           16,
           16
         };
-        game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
+	    sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
       }
     }
     else
@@ -289,7 +291,7 @@ void GameRenderer::render_background()
           16,
           16
         };
-        game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
+		sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
       }
       if (geometry::isColliding(game_camera_, moon_rect))
       {
@@ -301,7 +303,7 @@ void GameRenderer::render_background()
           16,
           16
         };
-        game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
+		sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
       }
     }
 
@@ -319,7 +321,7 @@ void GameRenderer::render_background()
           16,
           16
         };
-        game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
+		sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
       }
       if (start_tile_x <= 30 && end_tile_x >= 30)
       {
@@ -332,7 +334,7 @@ void GameRenderer::render_background()
           16,
           16
         };
-        game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
+		sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
       }
     }
   }
@@ -435,11 +437,11 @@ void GameRenderer::render_player()
   // the player is rendered
   const geometry::Rectangle dest_rect { player_render_pos.x() - 2, player_render_pos.y(), 16, 16 };
 
-  game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
+  sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
 
   if (debug_)
   {
-    game_surface_->render_rectangle(dest_rect, { 255, 0, 0 });
+	window_.render_rectangle(dest_rect, { 255, 0, 0 });
   }
 }
 
@@ -459,11 +461,11 @@ void GameRenderer::render_enemies()
         object_size.x(),
         object_size.y()
       };
-      game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
+	  sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
 
       if (debug_)
       {
-        game_surface_->render_rectangle(dest_rect, { 255, 0, 0 });
+        window_.render_rectangle(dest_rect, { 255, 0, 0 });
       }
     }
   }
@@ -512,7 +514,7 @@ void GameRenderer::render_tiles(bool in_front)
         16,
         16
       };
-      game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
+	  sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
     }
   }
 }
@@ -533,11 +535,11 @@ void GameRenderer::render_objects()
         object_size.x(),
         object_size.y()
       };
-      game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
+	  sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
 
       if (debug_)
       {
-        game_surface_->render_rectangle(dest_rect, { 255, 0, 0 });
+        window_.render_rectangle(dest_rect, { 255, 0, 0 });
       }
     }
   }
@@ -569,7 +571,7 @@ void GameRenderer::render_items()
         16,
         16
       };
-      game_surface_->blit_surface(sprite_manager_->get_surface(), src_rect, dest_rect, BlitType::CROP);
+	  sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
     }
   }
 }

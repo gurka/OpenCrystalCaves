@@ -34,7 +34,7 @@ PlayerInput input_to_player_input(const Input& input)
   return pi;
 }
 
-void render_statusbar(Surface* surface, unsigned score, unsigned num_ammo, unsigned num_lives)
+void render_statusbar(Window& window, unsigned score, unsigned num_ammo, unsigned num_lives)
 {
   constexpr auto statusbar_height = WINDOW_SIZE.y() / 12 / 2;
   constexpr auto statusbar_rect = geometry::Rectangle(0, WINDOW_SIZE.y() - statusbar_height,
@@ -43,11 +43,11 @@ void render_statusbar(Surface* surface, unsigned score, unsigned num_ammo, unsig
   char statusbar_text[64];
   snprintf(statusbar_text, 64, "Score: %8u Ammo: %2u Life: %u", score, num_ammo, num_lives);
 
-  surface->fill_rect(statusbar_rect, { 0u, 0u, 0u });
-  surface->render_text(statusbar_rect.position + geometry::Position(32, 0),
-                       statusbar_text,
-                       24,
-                       { 255u, 255u, 255u });
+  window.fill_rect(statusbar_rect, { 0u, 0u, 0u });
+  window.render_text(statusbar_rect.position + geometry::Position(32, 0),
+					 statusbar_text,
+					 24,
+					 { 255u, 255u, 255u });
 }
 
 int main()
@@ -69,21 +69,20 @@ int main()
   LOG_INFO("SDLWrapper initialized");
 
   // Create Window
-  auto window = Window::create("OpenCrystalCaves", WINDOW_SIZE);
+  auto window = Window::create("OpenCrystalCaves", WINDOW_SIZE, "media/VP16Font.bmp");
   if (!window)
   {
     LOG_CRITICAL("Could not create Window");
     return 1;
   }
-  auto window_surface = window->get_surface();
   LOG_INFO("Window created");
 
   // Create game surface
-  std::unique_ptr<Surface> game_surface = window->create_surface(CAMERA_SIZE);
+  std::unique_ptr<Surface> game_surface = window->create_target_surface(CAMERA_SIZE);
   if (!game_surface)
   {
-    LOG_CRITICAL("Could not create game surface");
-    return 1;
+	LOG_CRITICAL("Could not create game surface");
+	return 1;
   }
   LOG_INFO("Game surface created");
 
@@ -97,7 +96,7 @@ int main()
 
   // Load tileset
   SpriteManager sprite_manager;
-  if (!sprite_manager.load_tileset("media/sprites.bmp"))
+  if (!sprite_manager.load_tileset("media/sprites.bmp", *window))
   {
     LOG_CRITICAL("Could not load tileset");
     return 1;
@@ -119,7 +118,7 @@ int main()
   LOG_INFO("Game initialized");
 
   // Create GameRenderer
-  GameRenderer game_renderer(game.get(), &sprite_manager, game_surface.get());
+  GameRenderer game_renderer(game.get(), &sprite_manager, game_surface.get(), *window);
 
   // Game loop
   {
@@ -194,23 +193,21 @@ int main()
       /////////////////////////////////////////////////////////////////////////
 
       // Clear window surface
-      window_surface->fill_rect(geometry::Rectangle(0, 0, WINDOW_SIZE), { 33u, 33u, 33u });
+      window->fill_rect(geometry::Rectangle(0, 0, WINDOW_SIZE), { 33u, 33u, 33u });
 
       // Render game
       game_renderer.render_game(game_tick);
 
-      // Render game surface to window surface, centered and scaled
-      window_surface->blit_surface(game_surface.get(),
-                                   geometry::Rectangle(0, 0, CAMERA_SIZE),
-                                   geometry::Rectangle((WINDOW_SIZE - CAMERA_SIZE_SCALED) / 2, CAMERA_SIZE_SCALED),
-                                   BlitType::SCALE);
+	  // Render game surface to window surface, centered and scaled
+	  game_surface->blit_surface(geometry::Rectangle(0, 0, CAMERA_SIZE),
+								 geometry::Rectangle((WINDOW_SIZE - CAMERA_SIZE_SCALED) / 2, CAMERA_SIZE_SCALED));
 
       // Render statusbar
-      render_statusbar(window_surface.get(), game->get_score(), game->get_num_ammo(), game->get_num_lives());
+      render_statusbar(*window, game->get_score(), game->get_num_ammo(), game->get_num_lives());
 
       // Render FPS
       auto fps_str = "fps: " + std::to_string(fps);
-      window_surface->render_text(geometry::Position(5, 5), fps_str, 12, { 255u, 255u, 255u });
+	  window->render_text(geometry::Position(5, 5), fps_str, 12, { 255u, 255u, 255u });
 
       // Debug information
       if (debug_info)
@@ -226,18 +223,18 @@ int main()
 
         // Put a black box where we're going to the draw the debug text
         // 20 pixels per line (1 line + Game's lines)
-        window_surface->fill_rect({ 0, 24, 200, 20 + (20 * static_cast<int>(game_debug_infos.size())) }, { 0u, 0u, 0u });
+        window->fill_rect({ 0, 24, 200, 20 + (20 * static_cast<int>(game_debug_infos.size())) }, { 0u, 0u, 0u });
 
         // Render debug text
         auto pos_y = 25;
         const auto& game_camera = game_renderer.get_game_camera();
         const auto camera_position_str = "camera position: (" + std::to_string(game_camera.position.x()) + ", " + std::to_string(game_camera.position.y()) + ")";
-        window_surface->render_text(geometry::Position(5,  pos_y), camera_position_str, 12, { 255u, 0u, 0u });
+        window->render_text(geometry::Position(5,  pos_y), camera_position_str, 12, { 255u, 0u, 0u });
         pos_y += 20;
 
         for (const auto& game_debug_info : game_debug_infos)
         {
-          window_surface->render_text(geometry::Position(5,  pos_y), game_debug_info, 12, { 255u, 0u, 0u });
+          window->render_text(geometry::Position(5,  pos_y), game_debug_info, 12, { 255u, 0u, 0u });
           pos_y += 20;
         }
       }
