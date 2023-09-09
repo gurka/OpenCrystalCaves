@@ -32,13 +32,26 @@ Features that are missing:
 
 OCC is built using C++14 and requires external libraries: [SDL 2.0](https://www.libsdl.org/) and [nlohmann's JSON](https://nlohmann.github.io/json/). SDL2 must be installed and available in `/usr/include/SDL2` and the JSON library is included in this repository as a git submodule. Additionally the build system `cmake` must be installed.
 
-Steps to compile:
+Steps to compile (Linux, macOS):
 ```
 git clone --recursive https://github.com/gurka/OpenCrystalCaves.git
 cd OpenCrystalCaves
 mkdir debug
 cd debug
 cmake ../occ -DCMAKE_BUILD_TYPE=debug
+make
+```
+
+Or in Windows (with [vcpkg](https://vcpkg.io)):
+```
+# In vcpkg dir
+./vcpkg install --triplet x64-windows sdl2 --recurse
+# In your projects dir
+git clone --recursive https://github.com/gurka/OpenCrystalCaves.git
+cd OpenCrystalCaves
+mkdir debug
+cd debug
+cmake -B debug -DCMAKE_BUILD_TYPE=debug -DCMAKE_TOOLCHAIN_FILE=C:/path/to/vcpkg/scripts/buildsystems/vcpkg.cmake ../occ -A x64
 make
 ```
 

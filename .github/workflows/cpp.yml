@@ -18,6 +18,8 @@ jobs:
             build_type: release
           - os: macos-latest
             build_type: release
+          - os: windows-latest
+            build_type: release
           - os: ubuntu-latest
             build_type: debug
 
@@ -25,12 +27,17 @@ jobs:
     - uses: actions/checkout@v3
       with:
         submodules: true
-    - name: Set up Homebrew
+    - name: Set up Homebrew (Linux, macOS)
       id: set-up-homebrew
+      if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
       uses: Homebrew/actions/setup-homebrew@master
-    - name: Install SDL via homebrew
+    - name: Install SDL via homebrew (Linux, macOS)
       # Because ubuntu 22 doesn't have the latest SDL libs
+      if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
       run: brew install sdl2
+    - name: Install dependencies (Windows)
+      if: matrix.os == 'windows-latest'
+      run: C:\vcpkg\vcpkg.exe install --triplet x64-windows sdl2 --recurse
     - name: Configure CMake
       run: |
         mkdir ${{ matrix.build_type }}

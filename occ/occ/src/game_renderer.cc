@@ -144,7 +144,7 @@ void GameRenderer::render_background()
           static constexpr auto sprites = misc::make_array(356, 356, 356, 356, 357, 357, 357,
                                                            357, 358, 359, 359, 359, 359, 360,
                                                            360, 360, 360, 361, 361, 361, 361);
-          const auto sprite_index = misc::random<int>(0, sprites.size() - 1);
+          const auto sprite_index = misc::random<size_t>(0, sprites.size() - 1);
           space_sprites.emplace_back(sprites[sprite_index]);
         }
       }
@@ -153,7 +153,7 @@ void GameRenderer::render_background()
       for (int x = 0; x < game_->get_tile_width(); x++)
       {
         static const auto sprites = misc::make_array(240, 247, 248, 249, 250);
-        const auto sprite_index = misc::random<int>(0, sprites.size() - 1);
+        const auto sprite_index = misc::random<size_t>(0, sprites.size() - 1);
         horizon_sprites.emplace_back(sprites[sprite_index]);
       }
 

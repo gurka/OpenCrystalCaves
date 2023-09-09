@@ -43,7 +43,7 @@ void Logger::log(const char* full_filename, int line, Level level, ...)
   auto now = time(0);
   tm time_struct{};
   char time_str[32];
-  localtime_r(&now, &time_struct);
+  localtime_s(&time_struct, &now);
   strftime(time_str, sizeof(time_str), "%Y-%m-%d %X", &time_struct);
 
   // Extract variadic function arguments

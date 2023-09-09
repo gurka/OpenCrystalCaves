@@ -6,7 +6,7 @@
 #include <vector>
 
 enum class LevelId;
-class Level;
+struct Level;
 class Item;
 
 namespace LevelLoader

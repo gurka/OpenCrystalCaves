@@ -95,12 +95,12 @@ class Vector
 
   constexpr Vector operator*(double d) const
   {
-    return Vector(x_ * d, y_ * d);
+    return Vector((int)(x_ * d), (int)(y_ * d));
   }
 
   constexpr Vector operator/(double d) const
   {
-    return Vector(x_ / d, y_ / d);
+    return Vector((int)(x_ / d), (int)(y_ / d));
   }
 
   constexpr bool operator==(const Vector& other) const
