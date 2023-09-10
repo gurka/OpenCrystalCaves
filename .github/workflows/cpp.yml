@@ -13,15 +13,13 @@ jobs:
 
     strategy:
       matrix:
-        include:
-          - os: ubuntu-latest
-            build_type: release
-          - os: macos-latest
-            build_type: release
-          - os: windows-latest
-            build_type: release
-          - os: ubuntu-latest
-            build_type: debug
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+        build_type:
+          - debug
+          - release
 
     steps:
     - uses: actions/checkout@v3
