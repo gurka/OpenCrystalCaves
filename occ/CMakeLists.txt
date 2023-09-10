@@ -48,10 +48,12 @@ target_include_directories(occ PUBLIC
 # tests
 enable_testing()
 add_subdirectory(external/googletest)
-target_compile_options(gmock PRIVATE /D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
-target_compile_options(gmock_main PRIVATE /D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
-target_compile_options(gtest PRIVATE /D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
-target_compile_options(gtest_main PRIVATE /D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
+if(MSVC)
+  target_compile_options(gmock PRIVATE /D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
+  target_compile_options(gmock_main PRIVATE /D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
+  target_compile_options(gtest PRIVATE /D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
+  target_compile_options(gtest_main PRIVATE /D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
+endif()
 # Match CRT used by googletest
 if(MSVC)
   set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
