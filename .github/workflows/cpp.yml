@@ -13,28 +13,37 @@ jobs:
 
     strategy:
       matrix:
-        include:
-          - os: ubuntu-latest
-            build_type: release
-          - os: macos-latest
-            build_type: release
-          - os: ubuntu-latest
-            build_type: debug
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+        build_type:
+          - debug
+          - release
 
     steps:
     - uses: actions/checkout@v3
       with:
         submodules: true
-    - name: Set up Homebrew
+    - name: Set up Homebrew (Linux, macOS)
       id: set-up-homebrew
+      if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
       uses: Homebrew/actions/setup-homebrew@master
-    - name: Install SDL via homebrew
+    - name: Install SDL via homebrew (Linux, macOS)
       # Because ubuntu 22 doesn't have the latest SDL libs
+      if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
       run: brew install sdl2
+    - name: Install dependencies (Windows)
+      if: matrix.os == 'windows-latest'
+      run: C:\vcpkg\vcpkg.exe install --triplet x64-windows sdl2 --recurse
     - name: Configure CMake
+      if: matrix.os != 'windows-latest'
       run: |
         mkdir ${{ matrix.build_type }}
         cmake -B ${{ matrix.build_type }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} occ
+    - name: Configure CMake (Windows)
+      if: matrix.os == 'windows-latest'
+      run: cmake -B ${{ matrix.build_type }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows occ
     - name: Build
       run: cmake --build ${{ matrix.build_type }} --config ${{ matrix.build_type }}
     - name: Test

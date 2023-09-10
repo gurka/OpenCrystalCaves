@@ -542,9 +542,9 @@ bool GameImpl::collides_solid(const geometry::Position& position, const geometry
     geometry::Position((position.x() + 0)            / 16, (position.y() + size.y() - 1) / 16),
     geometry::Position((position.x() + size.x() - 1) / 16, (position.y() + size.y() - 1) / 16)
   };
-  for (const auto& position : positions)
+  for (const auto& p : positions)
   {
-    if (get_tile(position.x(), position.y()).is_solid())
+    if (get_tile(p.x(), p.y()).is_solid())
     {
       return true;
     }
