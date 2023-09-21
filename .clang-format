@@ -1,0 +1,17 @@
+# Format Style Options - Created with Clang Power Tools
+---
+BasedOnStyle: Mozilla
+AccessModifierOffset: -1
+AlignOperands: DontAlign
+AllowAllConstructorInitializersOnNextLine: false
+AlwaysBreakAfterDefinitionReturnType: None
+AlwaysBreakAfterReturnType: None
+BreakBeforeBraces: Allman
+BreakConstructorInitializers: BeforeColon
+ColumnLimit: 140
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+Cpp11BracedListStyle: true
+KeepEmptyLinesAtTheStartOfBlocks: false
+MaxEmptyLinesToKeep: 2
+SpacesBeforeTrailingComments: 2
+...
