@@ -55,7 +55,7 @@ int main()
 			std::string pixels(size, '\0');
 			input.read(&pixels[0], size);
 			uint8_t* pp = (uint8_t*)(&pixels[0]);
-			for (int i = 0; i < header.count; i++)
+			for (int c = 0; c < header.count; c++)
 			{
 				for (int h = 0; h < header.height; h++)
 				{
@@ -79,7 +79,7 @@ int main()
 								const bool g = (g_plane >> bit) & 1;
 								const bool r = (r_plane >> bit) & 1;
 								const bool i = (i_plane >> bit) & 1;
-								std::cout << colors[(i << 3) | (r << 2) | (g << 1) | b];
+								std::cout << colors[((int)i << 3) | ((int)r << 2) | ((int)g << 1) | (int)b];
 							}
 						}
 					}
