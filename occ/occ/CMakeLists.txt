@@ -17,4 +17,4 @@ target_link_libraries(occ
   SDL2::SDL2
 )
 
-set_property(TARGET occ PROPERTY CXX_STANDARD 14)
+target_compile_features(occ PRIVATE cxx_std_17)

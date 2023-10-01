@@ -21,7 +21,7 @@ target_include_directories(sdl_wrapper PUBLIC
   ${SDL2_INCLUDE_DIRS}
   "../external/SDLBitmapFont"
 )
-set_property(TARGET sdl_wrapper PROPERTY CXX_STANDARD 14)
+target_compile_features(sdl_wrapper PRIVATE cxx_std_17)
 
 add_executable(sdl_wrapper_test
   "test/src/stubs/sdl_stub.cc"
@@ -39,4 +39,4 @@ target_link_libraries(sdl_wrapper_test
   sdl_wrapper
   utils_stubs
 )
-set_property(TARGET sdl_wrapper_test PROPERTY CXX_STANDARD 14)
+target_compile_features(sdl_wrapper_test PRIVATE cxx_std_17)

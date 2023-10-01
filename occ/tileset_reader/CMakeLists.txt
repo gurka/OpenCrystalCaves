@@ -1,7 +1,7 @@
 add_executable(tileset_reader
   "tileset_reader.cc"
 )
-set_property(TARGET tileset_reader PROPERTY CXX_STANDARD 14)
+target_compile_features(tileset_reader PRIVATE cxx_std_17)
 target_include_directories(tileset_reader PUBLIC
   ${SDL2_INCLUDE_DIRS}
 )

@@ -33,7 +33,7 @@ add_library(game
 target_include_directories(game PUBLIC
   "export"
 )
-set_property(TARGET game PROPERTY CXX_STANDARD 14)
+target_compile_features(game PRIVATE cxx_std_17)
 
 add_executable(game_test
   "test/src/game_test.cc"
@@ -46,4 +46,4 @@ target_link_libraries(game_test
   gmock_main
   game
 )
-set_property(TARGET game_test PROPERTY CXX_STANDARD 14)
+target_compile_features(game_test PRIVATE cxx_std_17)
