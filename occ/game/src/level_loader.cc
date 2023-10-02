@@ -4,7 +4,7 @@
 #include <fstream>
 #include <unordered_map>
 #include <utility>
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 
 #include "logger.h"
 #include "level.h"

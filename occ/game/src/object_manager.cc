@@ -1,6 +1,6 @@
 #include <fstream>
 #include <limits>
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 
 #include "logger.h"
 #include "object_manager.h"
@@ -54,8 +54,7 @@ bool ObjectManager::load(const std::string& filename)
 
     // Create and add Background
     backgrounds_.emplace_back(background_json["Sprite"].get<int>(),
-                              geometry::Size(background_json["SpriteWidth"].get<int>(),
-                                             background_json["SpriteHeight"].get<int>()));
+                              geometry::Size(background_json["SpriteWidth"].get<int>(), background_json["SpriteHeight"].get<int>()));
 
     LOG_DEBUG("Loaded background: Sprite: %d SpriteWidth: %d SpriteHeight: %d",
               background_json["Sprite"].get<int>(),
@@ -94,9 +93,7 @@ bool ObjectManager::load(const std::string& filename)
     }
 
     // Create and add Tiles
-    tiles_.emplace_back(tiles_json["Sprite"].get<int>(),
-                        tiles_json["SpriteCount"].get<int>(),
-                        tiles_json["Flags"].get<int>());
+    tiles_.emplace_back(tiles_json["Sprite"].get<int>(), tiles_json["SpriteCount"].get<int>(), tiles_json["Flags"].get<int>());
 
     LOG_DEBUG("Loaded tile: Sprite: %d SpriteCount: %d Flags: %d",
               tiles_json["Sprite"].get<int>(),
@@ -135,9 +132,7 @@ bool ObjectManager::load(const std::string& filename)
     }
 
     // Create and add Items
-    items_.emplace_back(items_json["Sprite"].get<int>(),
-                        items_json["Type"].get<int>(),
-                        items_json["Amount"].get<int>());
+    items_.emplace_back(items_json["Sprite"].get<int>(), items_json["Type"].get<int>(), items_json["Amount"].get<int>());
 
     LOG_DEBUG("Loaded item: Sprite: %d Type: %d Amount: %d",
               items_json["Sprite"].get<int>(),

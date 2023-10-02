@@ -13,3 +13,4 @@ CMakeScripts/
 CTestTestfile.cmake
 *.xcodeproj/
 build/
+generated/

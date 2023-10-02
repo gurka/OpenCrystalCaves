@@ -29,7 +29,7 @@ target_include_directories(game PUBLIC
   "utils/export"
 )
 target_include_directories(game SYSTEM PUBLIC
-  "external/json/src"
+  "external/json/include"
 )
 
 # utils
