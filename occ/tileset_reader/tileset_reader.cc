@@ -43,17 +43,18 @@ const Uint32 colors[] = {
   0xFFFFFFFF, // "⬜",
 };
 
-int read_sprite_count(const std::filesystem::path& path)
+int read_sprite_count(std::ifstream& input)
 {
-	std::ifstream input{path, std::ios::binary};
 	Header header;
 	int count = 0;
 	while (input.read(reinterpret_cast<char*>(&header), sizeof header))
 	{
 		count += header.count;
 		const auto size = header.count * header.width * header.height * 5;
-		input.seekg(size, std::ios_base::seekdir::cur);
+		input.seekg(size, std::ios_base::cur);
 	}
+	input.clear();
+	input.seekg(0, std::ios_base::beg);
 	return count;
 }
 
@@ -77,7 +78,8 @@ int main()
     / "game"
 #endif
     / "CC1.GFX";
-	const int count = read_sprite_count(path);
+	std::ifstream input{path, std::ios::binary};
+	const int count = read_sprite_count(input);
 	std::cout << count << " sprites total\n";
 
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -92,7 +94,6 @@ int main()
    return 1;
  }
 	SDL_LockSurface(sdl_surface);
-	std::ifstream input{path, std::ios::binary};
   Header header;
 	int index = 0;
   while (input.read(reinterpret_cast<char*>(&header), sizeof header))
