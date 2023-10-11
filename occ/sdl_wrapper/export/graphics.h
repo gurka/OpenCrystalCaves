@@ -41,6 +41,7 @@ class Surface
 {
  public:
   static std::unique_ptr<Surface> from_bmp(const std::string& filename, Window& window);
+	static std::unique_ptr<Surface> from_pixels(const int w, const int h, const uint32_t* pixels, Window& window);
 
   virtual ~Surface() = default;
 

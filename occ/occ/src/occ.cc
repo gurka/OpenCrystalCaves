@@ -96,7 +96,7 @@ int main()
 
   // Load tileset
   SpriteManager sprite_manager;
-  if (!sprite_manager.load_tileset("media/sprites.bmp", *window))
+  if (!sprite_manager.load_tileset(*window))
   {
     LOG_CRITICAL("Could not load tileset");
     return 1;

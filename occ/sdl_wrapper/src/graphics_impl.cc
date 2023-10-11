@@ -135,14 +135,13 @@ void WindowImpl::render_line(const geometry::Position& from,
   SDL_RenderDrawLine(sdl_renderer_.get(), from.x(), from.y(), to.x(), to.y());
 }
 
-std::unique_ptr<Surface> Surface::from_bmp(const std::string& filename, Window& window)
+std::unique_ptr<Surface> create_surface(SDL_Surface* surface, Window& window)
 {
-  auto sdl_surface = std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)>(SDL_LoadBMP(filename.c_str()),
-                                                                              SDL_FreeSurface);
+  auto sdl_surface = std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)>(surface, SDL_FreeSurface);
   if (!sdl_surface)
   {
-    LOG_CRITICAL("Could not load BMP: %s", SDL_GetError());
-    return std::unique_ptr<Surface>();
+	LOG_CRITICAL("Could not load BMP: %s", SDL_GetError());
+	return std::unique_ptr<Surface>();
   }
   auto sdl_renderer = static_cast<WindowImpl&>(window).get_renderer();
   auto sdl_texture = std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)>(SDL_CreateTextureFromSurface(sdl_renderer,
@@ -154,6 +153,20 @@ std::unique_ptr<Surface> Surface::from_bmp(const std::string& filename, Window& 
 	return std::unique_ptr<Surface>();
   }
   return std::make_unique<SurfaceImpl>(sdl_surface->w, sdl_surface->h, std::move(sdl_texture), sdl_renderer);
+}
+
+std::unique_ptr<Surface> Surface::from_bmp(const std::string& filename, Window& window)
+{
+	return create_surface(SDL_LoadBMP(filename.c_str()), window);
+}
+
+std::unique_ptr<Surface> Surface::from_pixels(const int w, const int h, const uint32_t* pixels, Window& window)
+{
+	auto sdl_surface = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_ARGB8888);
+	SDL_LockSurface(sdl_surface);
+	memcpy(sdl_surface->pixels, pixels, w*h*sizeof(*pixels));
+	SDL_UnlockSurface(sdl_surface);
+	return create_surface(sdl_surface, window);
 }
 
 void SurfaceImpl::blit_surface(const geometry::Rectangle& source,

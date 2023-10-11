@@ -40,6 +40,7 @@ target_compile_options(utils PRIVATE ${COMPILE_OPTIONS})
 add_subdirectory("occ")
 target_compile_options(occ PRIVATE ${COMPILE_OPTIONS})
 target_include_directories(occ PUBLIC
+  "external/find_steam_game"
   "sdl_wrapper/export"
   "game/export"
   "utils/export"

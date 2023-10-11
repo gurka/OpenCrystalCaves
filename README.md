@@ -59,8 +59,4 @@ cmake -B debug -DCMAKE_BUILD_TYPE=debug -DCMAKE_TOOLCHAIN_FILE=C:/path/to/vcpkg/
 The Visual Studio project will be available at `OpenCrystalCaves/debug`
 
 ## Running OCC
-The file `media/sprites.bmp` is required and not available in this repository. It can be generated from the original Crystal Caves (any episode) game files using the Python script `tools/sprite-extractor.py`. The script takes a path to the `CC1.GFX` file and outputs a BMP file:
-
-```
-python tools/sprite-extractor.py CC1/CC1.GFX
-```
+OCC requires data files from the original Crystal Caves (any episode). Either install it via Steam or GoG, or copy the game data to the same folder as OCC (such as `CC1.GFX`).
