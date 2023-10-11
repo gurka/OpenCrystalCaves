@@ -20,6 +20,7 @@ class WindowImpl : public Window
   }
   void set_text_sprite_filename(const std::string& text_sprite_filename);
 
+	void set_size(geometry::Size size) override;
   void set_render_target(Surface* surface) override;
   std::unique_ptr<Surface> create_target_surface(geometry::Size size) override;
   void refresh() override;
@@ -50,6 +51,7 @@ class SurfaceImpl : public Surface
 
   void blit_surface(const geometry::Rectangle& source,
                     const geometry::Rectangle& dest) const override;
+	void blit_surface() const override;
   void set_render_target();
 	
  private:

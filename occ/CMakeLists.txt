@@ -50,6 +50,9 @@ add_subdirectory("tileset_reader")
 target_compile_options(tileset_reader PRIVATE ${COMPILE_OPTIONS})
 target_include_directories(tileset_reader SYSTEM PUBLIC
   "external/find_steam_game"
+  "occ/occ/src"
+  "sdl_wrapper/export"
+  "utils/export"
 )
 
 # tests

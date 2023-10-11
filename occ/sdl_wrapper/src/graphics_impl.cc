@@ -35,7 +35,10 @@ std::unique_ptr<Window> Window::create(const std::string& title, geometry::Size 
 	return nullptr;
   }
   auto window = std::make_unique<WindowImpl>(std::move(sdl_window), std::move(sdl_renderer));
-  window->set_text_sprite_filename(text_sprite_filename);
+	if (!text_sprite_filename.empty())
+	{
+		window->set_text_sprite_filename(text_sprite_filename);
+	}
   return window;
 }
 
@@ -44,6 +47,12 @@ void WindowImpl::set_text_sprite_filename(const std::string& text_sprite_filenam
   text_surface_ = std::unique_ptr<Surface>(Surface::from_bmp(text_sprite_filename, *this));
 	SDL_Color char_rgb = {0xFF, 0xFF, 0xFF, 0xFF};
   font_.BuildFromFile(sdl_renderer_.get(), text_sprite_filename.c_str(), char_rgb);
+}
+
+void WindowImpl::set_size(geometry::Size size)
+{
+	// TODO: check error
+	SDL_SetWindowSize(sdl_window_.get(), size.x(), size.y());
 }
 
 void WindowImpl::set_render_target(Surface* surface)
@@ -176,6 +185,12 @@ void SurfaceImpl::blit_surface(const geometry::Rectangle& source,
   auto dest_rect = to_sdl_rect(dest);
   // TODO: check error
   SDL_RenderCopy(sdl_renderer_, sdl_texture_.get(), &src_rect, &dest_rect);
+}
+
+void SurfaceImpl::blit_surface() const
+{
+	// TODO: check error
+	SDL_RenderCopy(sdl_renderer_, sdl_texture_.get(), nullptr, nullptr);
 }
 
 void SurfaceImpl::set_render_target()

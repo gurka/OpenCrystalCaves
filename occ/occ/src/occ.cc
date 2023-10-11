@@ -78,7 +78,7 @@ int main()
   LOG_INFO("Window created");
 
   // Create game surface
-  std::unique_ptr<Surface> game_surface = window->create_target_surface(CAMERA_SIZE);
+  auto game_surface = window->create_target_surface(CAMERA_SIZE);
   if (!game_surface)
   {
 	LOG_CRITICAL("Could not create game surface");

@@ -22,6 +22,7 @@ class Window
 
   virtual ~Window() = default;
 
+	virtual void set_size(geometry::Size size) = 0;
   virtual void set_render_target(Surface* surface) = 0;
   virtual std::unique_ptr<Surface> create_target_surface(geometry::Size size) = 0;
   virtual void refresh() = 0;
@@ -47,9 +48,11 @@ class Surface
 
   virtual int width() const = 0;
   virtual int height() const = 0;
+	geometry::Size size() const { return geometry::Size(width(), height()); }
 
   virtual void blit_surface(const geometry::Rectangle& source,
                             const geometry::Rectangle& dest) const = 0;
+	virtual void blit_surface() const = 0;
 };
 
 #endif  // GRAPHICS_H_
