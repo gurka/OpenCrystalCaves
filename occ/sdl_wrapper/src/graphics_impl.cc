@@ -172,6 +172,7 @@ std::unique_ptr<Surface> Surface::from_bmp(const std::string& filename, Window& 
 std::unique_ptr<Surface> Surface::from_pixels(const int w, const int h, const uint32_t* pixels, Window& window)
 {
 	auto sdl_surface = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_ARGB8888);
+	// TODO: check error
 	SDL_LockSurface(sdl_surface);
 	memcpy(sdl_surface->pixels, pixels, w*h*sizeof(*pixels));
 	SDL_UnlockSurface(sdl_surface);

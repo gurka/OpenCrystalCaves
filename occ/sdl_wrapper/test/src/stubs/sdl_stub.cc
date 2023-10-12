@@ -61,6 +61,11 @@ void SDL_DestroyRenderer(SDL_Renderer* renderer)
   SDLStub::get().SDL_DestroyRenderer(renderer);
 }
 
+void SDL_SetWindowSize(SDL_Window* window, int w, int h)
+{
+  SDLStub::get().SDL_SetWindowSize(window, w, h);
+}
+
 void SDL_RenderPresent(SDL_Renderer* renderer)
 {
   SDLStub::get().SDL_RenderPresent(renderer);
@@ -91,6 +96,16 @@ SDL_Surface* SDL_ConvertSurfaceFormat(SDL_Surface* src, Uint32 pixel_format, Uin
   return SDLStub::get().SDL_ConvertSurfaceFormat(src, pixel_format, flags);
 }
 
+int SDL_LockSurface(SDL_Surface* surface)
+{
+  SDLStub::get().SDL_LockSurface(surface);
+}
+
+void SDL_UnlockSurface(SDL_Surface* surface)
+{
+  SDLStub::get().SDL_UnlockSurface(surface);
+}
+
 void SDL_FreeSurface(SDL_Surface* surface)
 {
   SDLStub::get().SDL_FreeSurface(surface);
@@ -105,6 +120,11 @@ SDL_Surface* SDL_CreateRGBSurface(Uint32 flags, int width, int height, int depth
                                   Uint32 Rmask, Uint32 Gmask, Uint32 Bmask, Uint32 Amask)
 {
   return SDLStub::get().SDL_CreateRGBSurface(flags, width, height, depth, Rmask, Gmask, Bmask, Amask);
+}
+
+SDL_Surface* SDL_CreateRGBSurfaceWithFormat(Uint32 flags, int width, int height, int depth, Uint32 format)
+{
+  return SDLStub::get().SDL_CreateRGBSurfaceWithFormat(flags, width, height, depth, format);
 }
 
 SDL_Surface* SDL_LoadBMP_RW(SDL_RWops* src, int freesrc)
