@@ -46,6 +46,15 @@ target_include_directories(occ PUBLIC
   "utils/export"
 )
 
+add_subdirectory("sound_player")
+target_compile_options(sound_player PRIVATE ${COMPILE_OPTIONS})
+target_include_directories(sound_player SYSTEM PUBLIC
+  "external/find_steam_game"
+  "occ/occ/src"
+  "sdl_wrapper/export"
+  "utils/export"
+)
+
 add_subdirectory("sprite_viewer")
 target_compile_options(sprite_viewer PRIVATE ${COMPILE_OPTIONS})
 target_include_directories(sprite_viewer SYSTEM PUBLIC

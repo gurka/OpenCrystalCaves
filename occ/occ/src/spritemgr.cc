@@ -62,11 +62,15 @@ std::filesystem::path get_graphics_path()
 	);
 	if (buf[0])
 	{
-		return std::filesystem::path(buf)
-#ifdef __APPLE__
-	/ "game"
-#endif
-	/ GFX_FILENAME;
+		const auto gogfilename = std::filesystem::path(buf)
+  #ifdef __APPLE__
+		/ "game"
+  #endif
+		/ GFX_FILENAME;
+		if (std::filesystem::exists(gogfilename))
+		{
+		  return std::filesystem::path(gogfilename);
+		}
 	}
 	// TODO: Try steam
 	return std::filesystem::path();
