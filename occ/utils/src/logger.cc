@@ -1,29 +1,34 @@
 #include "logger.h"
 
-#include <cstdio>
-#include <ctime>
 #include <cstdarg>
+#include <cstdio>
 #include <cstring>
+#include <ctime>
 
 namespace
 {
-  const char* level_to_string(Logger::Level level)
-  {
-    static const char* error    = "ERROR";
-    static const char* critical = "CRITICAL";
-    static const char* info     = "INFO";
-    static const char* debug    = "DEBUG";
-    static const char* invalid  = "INVALID_LOG_LEVEL";
+const char* level_to_string(Logger::Level level)
+{
+  static const char* error = "ERROR";
+  static const char* critical = "CRITICAL";
+  static const char* info = "INFO";
+  static const char* debug = "DEBUG";
+  static const char* invalid = "INVALID_LOG_LEVEL";
 
-    switch (level)
-    {
-      case Logger::Level::ERROR:    return error;
-      case Logger::Level::CRITICAL: return critical;
-      case Logger::Level::INFO:     return info;
-      case Logger::Level::DEBUG:    return debug;
-      default:                      return invalid;
-    }
+  switch (level)
+  {
+    case Logger::Level::LOG_ERROR:
+      return error;
+    case Logger::Level::LOG_CRITICAL:
+      return critical;
+    case Logger::Level::LOG_INFO:
+      return info;
+    case Logger::Level::LOG_DEBUG:
+      return debug;
+    default:
+      return invalid;
   }
+}
 }
 
 void Logger::log(const char* full_filename, int line, Level level, ...)
