@@ -4,6 +4,7 @@ https://moddingwiki.shikadi.net/wiki/Crystal_Caves_Sound_format
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <string>
 
 #include <find_steam_game.h>
 

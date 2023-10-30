@@ -98,7 +98,7 @@ SDL_Surface* SDL_ConvertSurfaceFormat(SDL_Surface* src, Uint32 pixel_format, Uin
 
 int SDL_LockSurface(SDL_Surface* surface)
 {
-  SDLStub::get().SDL_LockSurface(surface);
+  return SDLStub::get().SDL_LockSurface(surface);
 }
 
 void SDL_UnlockSurface(SDL_Surface* surface)
