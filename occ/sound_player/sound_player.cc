@@ -7,10 +7,15 @@ https://moddingwiki.shikadi.net/wiki/Crystal_Caves_Sound_format
 #include <string>
 
 #include <find_steam_game.h>
+#include <SDL.h>
 
 #define SND_FILENAME_FMT "CC1-{}.SND"
 #define GOG_ID "1207665273"
 #define GAME_NAME "Crystal Caves"
+
+#define SAMPLE_RATE 44100
+#define AUDIO_FMT AUDIO_S16
+#define AUDIO_CHANNELS 2
 
 struct Sound
 {
@@ -55,6 +60,27 @@ std::filesystem::path get_sound_path(const int idx)
   return std::filesystem::path();
 }
 
+struct SoundData {
+	SDL_AudioSpec spec;
+};
+
+void callback(void* userdata, Uint8* stream, int len)
+{
+	const SoundData* sdata = reinterpret_cast<const SoundData*>(userdata);
+	for (int i = 0; i < len; i++)
+	{
+		// Square wave
+		if ((i % 512) < 256)
+		{
+			stream[i] = 0;
+		}
+		else
+		{
+			stream[i] = 64;
+		}
+	}
+}
+
 int main()
 {
 	std::vector<Sound> sounds;
@@ -75,6 +101,48 @@ int main()
 		}
 	}
 	std::cout << "Read " << sounds.size() << " sounds\n";
+	
+	if (SDL_Init(SDL_INIT_AUDIO) < 0)
+	{
+		std::cout << "Could not initialize SDL: " << SDL_GetError() << "\n";
+		return 1;
+	}
+	
+	SoundData sdata;
+	SDL_AudioSpec want;
+	want.freq = SAMPLE_RATE;
+	want.format = AUDIO_FMT;
+	want.channels = AUDIO_CHANNELS;
+	want.samples = 4096;
+	want.callback = callback;
+	want.userdata = &sdata;
+	const auto device = SDL_OpenAudioDevice(nullptr,
+		   0,
+		   &want,
+		   &sdata.spec, SDL_AUDIO_ALLOW_FORMAT_CHANGE);
+	if (device == 0)
+	{
+		std::cout << "Could open audio: " << SDL_GetError() << "\n";
+		return 1;
+	}
+	
+	SDL_PauseAudioDevice(device, 0);
+	
+	bool quit = false;
+	while (!quit)
+	{
+		SDL_Event event;
+		while (SDL_PollEvent(&event) != 0)
+		{
+			if (event.type == SDL_QUIT)
+			{
+				quit = true;
+			}
+		}
+		SDL_Delay(10);
+	}
+	
+	SDL_CloseAudioDevice(device);
 
   return 0;
 }
