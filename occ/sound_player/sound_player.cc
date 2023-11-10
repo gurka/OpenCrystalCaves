@@ -62,28 +62,87 @@ std::filesystem::path get_sound_path(const int idx)
 
 struct SoundData {
 	SDL_AudioSpec spec;
+	std::vector<Sound> sounds;
+	int sound_index = 0;
+	int counter = 0;
+	int freq_counter = 0;
+	int index = -1;
+	int dc = 64;
+	
+	const Sound& sound() const
+	{
+		return sounds[sound_index];
+	}
+	
+	const int16_t freq() const
+	{
+		return sound().data[index];
+	}
+
+	const int16_t amp() const
+	{
+		if (freq() == 0)
+		{
+			return 0;
+		}
+		return dc;
+	}
+	
+	void tick()
+	{
+		if (counter == 0)
+		{
+			nextfreq();
+		}
+		else
+		{
+			if (freq_counter == 0)
+			{
+				freq_counter = sound().data[index];
+				dc *= -1;
+			}
+			counter--;
+			freq_counter--;
+		}
+	}
+
+	void nextfreq()
+	{
+		if (is_end())
+		{
+			sound_index++;
+			if (sound_index == (int)sounds.size())
+			{
+				sound_index = 0;
+			}
+			std::cout << "Playing sound " << sound_index << "\n";
+			index = -1;
+		}
+		index++;
+		freq_counter = 0;
+		counter = 1000;
+	}
+
+	bool is_end() const
+	{
+		return index >= 300 || counter == -1;
+	}
 };
 
 void callback(void* userdata, Uint8* stream, int len)
 {
-	const SoundData* sdata = reinterpret_cast<const SoundData*>(userdata);
+	SoundData* sdata = reinterpret_cast<SoundData*>(userdata);
 	for (int i = 0; i < len; i++)
 	{
-		// Square wave
-		if ((i % 512) < 256)
-		{
-			stream[i] = 0;
-		}
-		else
-		{
-			stream[i] = 64;
-		}
+		sdata->tick();
+		// Generate square wave at frequency
+		stream[i] = sdata->amp();
 	}
 }
 
 int main()
 {
-	std::vector<Sound> sounds;
+	SoundData sdata;
 	for (int i = 0; ; i++)
 	{
 		const auto path = get_sound_path(i);
@@ -97,10 +156,10 @@ int main()
 		while (input.read(reinterpret_cast<char*>(&sound), sizeof sound))
 		{
 			std::cout << +sound.priority << "," << +sound.vibrate << "," << +sound.unknown << "," << +sound.unknown2 << "\n";
-			sounds.push_back(sound);
+			sdata.sounds.push_back(sound);
 		}
 	}
-	std::cout << "Read " << sounds.size() << " sounds\n";
+	std::cout << "Read " << sdata.sounds.size() << " sounds\n";
 	
 	if (SDL_Init(SDL_INIT_AUDIO) < 0)
 	{
@@ -108,7 +167,7 @@ int main()
 		return 1;
 	}
 	
-	SoundData sdata;
+	// TODO: select sound
 	SDL_AudioSpec want;
 	want.freq = SAMPLE_RATE;
 	want.format = AUDIO_FMT;
