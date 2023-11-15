@@ -63,7 +63,7 @@ std::filesystem::path get_sound_path(const int idx)
 struct SoundData {
 	SDL_AudioSpec spec;
 	std::vector<Sound> sounds;
-	int sound_index = 0;
+	int sound_index = -1;
 	int counter = 0;
 	int freq_counter = 0;
 	int index = -1;
@@ -74,14 +74,14 @@ struct SoundData {
 		return sounds[sound_index];
 	}
 	
-	const int16_t freq() const
+	int16_t freq() const
 	{
 		return sound().data[index];
 	}
 
-	const int16_t amp() const
+	int16_t amp() const
 	{
-		if (freq() == 0)
+		if (freq() == 0 || (index % sound().vibrate) == 0)
 		{
 			return 0;
 		}
@@ -110,22 +110,25 @@ struct SoundData {
 	{
 		if (is_end())
 		{
-			sound_index++;
-			if (sound_index == (int)sounds.size())
-			{
-				sound_index = 0;
-			}
-			std::cout << "Playing sound " << sound_index << "\n";
-			index = -1;
+			return;
 		}
 		index++;
 		freq_counter = 0;
-		counter = 1000;
+		counter = 1400;
 	}
 
 	bool is_end() const
 	{
-		return index >= 300 || counter == -1;
+		return sound_index == -1 || index >= 299 || counter == -1;
+	}
+
+	void play(const int _sound_index)
+	{
+		sound_index = _sound_index;
+		std::cout << "Playing sound " << sound_index << "\n";
+		index = -1;
+		freq_counter = 0;
+		counter = 1400;
 	}
 };
 
@@ -138,6 +141,43 @@ void callback(void* userdata, Uint8* stream, int len)
 		// Generate square wave at frequency
 		stream[i] = sdata->amp();
 	}
+}
+
+char itoc(int i)
+{
+	if (i < 10)
+	{
+		return (char)('0' + i);
+	}
+	i -= 10;
+	if (i < 26)
+	{
+		return (char)('a' + i);
+	}
+	i -= 26;
+	if (i < 26)
+	{
+		return (char)('A' + i);
+	}
+	return '?';
+}
+int keytoi(const SDL_Keycode c, const bool shift)
+{
+	int d = 0;
+	if (c >= SDLK_0 && c <= SDLK_9)
+	{
+		return c - SDLK_0 + d;
+	}
+	d += 10;
+	if (shift)
+	{
+		d += 26;
+	}
+	if (c >= SDLK_a && c <= SDLK_z)
+	{
+		return c - SDLK_a + d;
+	}
+	return -1;
 }
 
 int main()
@@ -161,7 +201,7 @@ int main()
 	}
 	std::cout << "Read " << sdata.sounds.size() << " sounds\n";
 	
-	if (SDL_Init(SDL_INIT_AUDIO) < 0)
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
 	{
 		std::cout << "Could not initialize SDL: " << SDL_GetError() << "\n";
 		return 1;
@@ -187,7 +227,10 @@ int main()
 	
 	SDL_PauseAudioDevice(device, 0);
 	
+	std::cout << "Play sound by pressing 0 - " << itoc((int)sdata.sounds.size()) << "\n";
+
 	bool quit = false;
+	bool keydown = false;
 	while (!quit)
 	{
 		SDL_Event event;
@@ -196,6 +239,20 @@ int main()
 			if (event.type == SDL_QUIT)
 			{
 				quit = true;
+			}
+			else if (!keydown && event.type == SDL_KEYDOWN)
+			{
+				keydown = true;
+				const bool shift = !!(SDL_GetModState() & KMOD_SHIFT);
+				const int index = keytoi(event.key.keysym.sym, shift);
+				if (index >= 0 && index < (int)sdata.sounds.size())
+				{
+					sdata.play(index);
+				}
+			}
+			else if (event.type == SDL_KEYUP)
+			{
+				keydown = false;
 			}
 		}
 		SDL_Delay(10);
