@@ -5,6 +5,7 @@ https://moddingwiki.shikadi.net/wiki/Crystal_Caves_Sound_format
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include <find_steam_game.h>
 #include <SDL.h>
@@ -20,9 +21,10 @@ https://moddingwiki.shikadi.net/wiki/Crystal_Caves_Sound_format
 struct Sound
 {
 	uint16_t priority;
-	uint16_t unknown;
+	uint16_t unknown0;
 	uint16_t vibrate;
-	uint32_t unknown2;
+	uint16_t unknown1;
+	uint16_t unknown2;
 	int16_t data[300];
 };
 
@@ -69,6 +71,12 @@ struct SoundData {
 	int index = -1;
 	int dc = 64;
 	
+	// Bytes per sample
+	int bps() const
+	{
+		return (spec.format & 0xFF) * spec.channels / 8;
+	}
+
 	const Sound& sound() const
 	{
 		return sounds[sound_index];
@@ -83,7 +91,7 @@ struct SoundData {
 	{
 		if (freq() == 0 || (index % sound().vibrate) == 0)
 		{
-			return 0;
+			return spec.silence;
 		}
 		return dc;
 	}
@@ -114,33 +122,38 @@ struct SoundData {
 		}
 		index++;
 		freq_counter = 0;
-		counter = 1400;
+		counter = 256;
 	}
 
 	bool is_end() const
 	{
-		return sound_index == -1 || index >= 299 || counter == -1;
+		return sound_index == -1 || index >= 300 || counter == -1 || freq() == -1;
 	}
 
 	void play(const int _sound_index)
 	{
 		sound_index = _sound_index;
-		std::cout << "Playing sound " << sound_index << "\n";
+		std::cout << "Playing sound " << sound_index << " vibrate=" << std::hex << sound().vibrate << " unknown0=" << sound().unknown0 << " unknown1=" << sound().unknown1 << " unknown2=" << sound().unknown2 << std::dec << "\n";
 		index = -1;
 		freq_counter = 0;
-		counter = 1400;
+		counter = 256;
 	}
 };
 
 void callback(void* userdata, Uint8* stream, int len)
 {
 	SoundData* sdata = reinterpret_cast<SoundData*>(userdata);
-	for (int i = 0; i < len; i++)
+	int i = 0;
+	do
 	{
 		sdata->tick();
 		// Generate square wave at frequency
-		stream[i] = sdata->amp();
+		for (int j = 0; j < sdata->bps() && i < len; j++, i++)
+		{
+			stream[i] = sdata->amp();
+		}
 	}
+	while (i < len);
 }
 
 char itoc(int i)
@@ -195,7 +208,6 @@ int main()
 		Sound sound;
 		while (input.read(reinterpret_cast<char*>(&sound), sizeof sound))
 		{
-			std::cout << +sound.priority << "," << +sound.vibrate << "," << +sound.unknown << "," << +sound.unknown2 << "\n";
 			sdata.sounds.push_back(sound);
 		}
 	}
@@ -206,8 +218,7 @@ int main()
 		std::cout << "Could not initialize SDL: " << SDL_GetError() << "\n";
 		return 1;
 	}
-	
-	// TODO: select sound
+
 	SDL_AudioSpec want;
 	want.freq = SAMPLE_RATE;
 	want.format = AUDIO_FMT;
@@ -242,6 +253,10 @@ int main()
 			}
 			else if (!keydown && event.type == SDL_KEYDOWN)
 			{
+				if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+				{
+					quit = true;
+				}
 				keydown = true;
 				const bool shift = !!(SDL_GetModState() & KMOD_SHIFT);
 				const int index = keytoi(event.key.keysym.sym, shift);
