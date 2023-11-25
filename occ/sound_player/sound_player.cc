@@ -70,11 +70,11 @@ struct SoundData {
 	int freq_counter = 0;
 	int index = -1;
 	int dc = 64;
-	
-	// Bytes per sample
+
+	// Bytes per sample (single channel)
 	int bps() const
 	{
-		return (spec.format & 0xFF) * spec.channels / 8;
+		return (spec.format & 0xFF) / 8;
 	}
 
 	const Sound& sound() const
@@ -87,7 +87,7 @@ struct SoundData {
 		return sound().data[index];
 	}
 
-	int16_t amp() const
+	int amp() const
 	{
 		if (freq() == 0 || (index % sound().vibrate) == 0)
 		{
@@ -148,9 +148,12 @@ void callback(void* userdata, Uint8* stream, int len)
 	{
 		sdata->tick();
 		// Generate square wave at frequency
-		for (int j = 0; j < sdata->bps() && i < len; j++, i++)
+		for (int c = 0; c < sdata->spec.channels; c++)
 		{
-			stream[i] = sdata->amp();
+			for (int b = 0; b < sdata->bps() && i < len; b++, i++)
+			{
+				stream[i] = sdata->amp();
+			}
 		}
 	}
 	while (i < len);
