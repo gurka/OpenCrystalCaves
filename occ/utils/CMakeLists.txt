@@ -7,11 +7,14 @@ add_library(utils
   "export/logger.h"
   "export/occ_math.h"
   "export/misc.h"
+  "export/path.h"
   "export/vector.h"
   "src/logger.cc"
+  "src/path.cc"
 )
 target_include_directories(utils PUBLIC
   "export"
+  "../external/find_steam_game"
 )
 target_compile_features(utils PRIVATE cxx_std_17)
 

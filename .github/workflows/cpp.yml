@@ -32,10 +32,10 @@ jobs:
     - name: Install SDL via homebrew (Linux, macOS)
       # Because ubuntu 22 doesn't have the latest SDL libs
       if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
-      run: brew install sdl2
+      run: brew install sdl2 sdl2_image
     - name: Install dependencies (Windows)
       if: matrix.os == 'windows-latest'
-      run: C:\vcpkg\vcpkg.exe install --triplet x64-windows sdl2 --recurse
+      run: C:\vcpkg\vcpkg.exe install --triplet x64-windows sdl2 sdl2-image --recurse
     - name: Configure CMake
       if: matrix.os != 'windows-latest'
       run: |

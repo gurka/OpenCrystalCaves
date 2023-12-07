@@ -8,6 +8,7 @@ if(UNIX AND NOT APPLE)
 endif()
 
 find_package(SDL2 REQUIRED)
+find_package(SDL2_image REQUIRED)
 
 if(MSVC)
   set(COMPILE_OPTIONS -MP -W4 -WX -wd\"4090\" -wd\"4996\" -wd\"4204\" /D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
@@ -40,9 +41,16 @@ target_compile_options(utils PRIVATE ${COMPILE_OPTIONS})
 add_subdirectory("occ")
 target_compile_options(occ PRIVATE ${COMPILE_OPTIONS})
 target_include_directories(occ PUBLIC
-  "external/find_steam_game"
   "sdl_wrapper/export"
   "game/export"
+  "utils/export"
+)
+
+add_subdirectory("image_viewer")
+target_compile_options(image_viewer PRIVATE ${COMPILE_OPTIONS})
+target_include_directories(image_viewer SYSTEM PUBLIC
+  "occ/occ/src"
+  "sdl_wrapper/export"
   "utils/export"
 )
 
@@ -58,7 +66,6 @@ target_include_directories(sound_player SYSTEM PUBLIC
 add_subdirectory("sprite_viewer")
 target_compile_options(sprite_viewer PRIVATE ${COMPILE_OPTIONS})
 target_include_directories(sprite_viewer SYSTEM PUBLIC
-  "external/find_steam_game"
   "occ/occ/src"
   "sdl_wrapper/export"
   "utils/export"

@@ -6,13 +6,10 @@ https://moddingwiki.shikadi.net/wiki/ProGraphx_Toolbox_tileset_format
 #include <filesystem>
 #include <fstream>
 
-#include <find_steam_game.h>
-
 #include "logger.h"
+#include "path.h"
 
 #define GFX_FILENAME "CC1.GFX"
-#define GOG_ID "1207665273"
-#define GAME_NAME "Crystal Caves"
 #define STRIDE 52
 #define FILLER 2
 #define SPRITE_W 16
@@ -43,38 +40,6 @@ const uint32_t colors[] = {
   0xFFFFFFAA, // "🟨",
   0xFFFFFFFF, // "⬜",
 };
-
-std::filesystem::path get_graphics_path()
-{
-	// Try CWD first
-	if (std::filesystem::exists(GFX_FILENAME))
-	{
-		return std::filesystem::path(GFX_FILENAME);
-	}
-	// Try GoG
-	char buf[4096];
-	fsg_get_gog_game_path(buf,
-  #ifdef _WIN32
-						  GOG_ID
-  #else
-						  GAME_NAME
-  #endif
-	);
-	if (buf[0])
-	{
-		const auto gogfilename = std::filesystem::path(buf)
-  #ifdef __APPLE__
-		/ "game"
-  #endif
-		/ GFX_FILENAME;
-		if (std::filesystem::exists(gogfilename))
-		{
-		  return std::filesystem::path(gogfilename);
-		}
-	}
-	// TODO: Try steam
-	return std::filesystem::path();
-}
 
 int read_sprite_count(std::ifstream& input)
 {
@@ -167,7 +132,7 @@ bool SpriteManager::load_tileset(Window& window)
   }
 
   // Load tileset
-	const auto path = get_graphics_path();
+	const auto path = get_data_path(GFX_FILENAME);
 	if (path.empty())
 	{
 		LOG_CRITICAL("Could not find game data!");

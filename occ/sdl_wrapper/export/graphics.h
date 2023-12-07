@@ -1,6 +1,7 @@
 #ifndef GRAPHICS_H_
 #define GRAPHICS_H_
 
+#include <filesystem>
 #include <string>
 #include <memory>
 
@@ -41,7 +42,8 @@ enum class BlitType
 class Surface
 {
  public:
-  static std::unique_ptr<Surface> from_bmp(const std::string& filename, Window& window);
+  static std::unique_ptr<Surface> from_bmp(const std::filesystem::path& filename, Window& window);
+	static std::unique_ptr<Surface> from_image(const std::filesystem::path& filename, Window& window);
 	static std::unique_ptr<Surface> from_pixels(const int w, const int h, const uint32_t* pixels, Window& window);
 
   virtual ~Surface() = default;

@@ -21,6 +21,13 @@ target_include_directories(sdl_wrapper PUBLIC
   ${SDL2_INCLUDE_DIRS}
   "../external/SDLBitmapFont"
 )
+if(APPLE)
+# Workaround for macOS frameworks not being able to look
+# at another framework for the headers
+target_include_directories(sdl_wrapper PUBLIC
+  ${SDL2_image_DIR}/../../Headers
+)
+endif()
 target_compile_features(sdl_wrapper PRIVATE cxx_std_17)
 
 add_executable(sdl_wrapper_test

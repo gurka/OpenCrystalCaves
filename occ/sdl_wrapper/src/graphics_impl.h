@@ -7,6 +7,7 @@
 #include <utility>
 
 #include <SDL.h>
+#include <SDL_image.h>
 #include <SDLBitmapFont.h>
 
 #include "geometry.h"
