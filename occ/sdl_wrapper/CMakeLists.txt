@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.5)
 
 project(sdl_wrapper)
 
+include_directories(${SDL2_INCLUDE_DIRS})
+
 file(GLOB SDLBITMAPFONT_HDRS "../external/SDLBitmapFont/*.h")
 file(GLOB SDLBITMAPFONT_SRCS "../external/SDLBitmapFont/*.cpp")
 add_library(sdl_wrapper
@@ -21,13 +23,7 @@ target_include_directories(sdl_wrapper PUBLIC
   ${SDL2_INCLUDE_DIRS}
   "../external/SDLBitmapFont"
 )
-if(APPLE)
-# Workaround for macOS frameworks not being able to look
-# at another framework for the headers
-target_include_directories(sdl_wrapper PUBLIC
-  ${SDL2_image_DIR}/../../Headers
-)
-endif()
+target_link_libraries(sdl_wrapper SDL2::SDL2 SDL2_image::SDL2_image)
 target_compile_features(sdl_wrapper PRIVATE cxx_std_17)
 
 add_executable(sdl_wrapper_test
