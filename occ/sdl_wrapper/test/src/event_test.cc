@@ -45,27 +45,27 @@ TEST_F(EventTest, poll_event)
   Input input;
   event->poll_event(&input);
 
-  EXPECT_TRUE(input.up.pressed);
-  EXPECT_TRUE(input.right.pressed);
-  EXPECT_TRUE(input.z.pressed);
-  EXPECT_TRUE(input.enter.pressed);
+  EXPECT_TRUE(input.up.down);
+  EXPECT_TRUE(input.right.down);
+  EXPECT_TRUE(input.z.down);
+  EXPECT_TRUE(input.enter.down);
 
   EXPECT_FALSE(input.up.repeated);
   EXPECT_FALSE(input.right.repeated);
   EXPECT_FALSE(input.z.repeated);
   EXPECT_FALSE(input.enter.repeated);
 
-  EXPECT_FALSE(input.down.pressed);
+  EXPECT_FALSE(input.down.down);
   EXPECT_FALSE(input.down.repeated);
-  EXPECT_FALSE(input.left.pressed);
+  EXPECT_FALSE(input.left.down);
   EXPECT_FALSE(input.left.repeated);
-  EXPECT_FALSE(input.x.pressed);
+  EXPECT_FALSE(input.x.down);
   EXPECT_FALSE(input.x.repeated);
-  EXPECT_FALSE(input.num_1.pressed);
+  EXPECT_FALSE(input.num_1.down);
   EXPECT_FALSE(input.num_1.repeated);
-  EXPECT_FALSE(input.num_2.pressed);
+  EXPECT_FALSE(input.num_2.down);
   EXPECT_FALSE(input.num_2.repeated);
-  EXPECT_FALSE(input.space.pressed);
+  EXPECT_FALSE(input.space.down);
   EXPECT_FALSE(input.space.repeated);
 
   EXPECT_FALSE(input.quit);
@@ -91,8 +91,8 @@ TEST_F(EventTest, poll_event_repeated)
   Input input;
   event->poll_event(&input);
 
-  EXPECT_TRUE(input.up.pressed);
-  EXPECT_TRUE(input.right.pressed);
+  EXPECT_TRUE(input.up.down);
+  EXPECT_TRUE(input.right.down);
 
   EXPECT_FALSE(input.up.repeated);
   EXPECT_FALSE(input.right.repeated);
@@ -110,8 +110,8 @@ TEST_F(EventTest, poll_event_repeated)
 
   event->poll_event(&input);
 
-  EXPECT_TRUE(input.up.pressed);
-  EXPECT_FALSE(input.right.pressed);
+  EXPECT_TRUE(input.up.down);
+  EXPECT_FALSE(input.right.down);
 
   EXPECT_TRUE(input.up.repeated);
   EXPECT_FALSE(input.right.repeated);
@@ -134,7 +134,7 @@ TEST_F(EventTest, poll_event_early_quit)
 
   Input input;
   event->poll_event(&input);
-  EXPECT_TRUE(input.up.pressed);
+  EXPECT_TRUE(input.up.down);
   EXPECT_FALSE(input.up.repeated);
   EXPECT_TRUE(input.quit);
 
@@ -149,7 +149,7 @@ TEST_F(EventTest, poll_event_early_quit)
                                                                Return(1)));
 
   event->poll_event(&input);
-  EXPECT_FALSE(input.up.pressed);
+  EXPECT_FALSE(input.up.down);
   EXPECT_FALSE(input.up.repeated);
   EXPECT_TRUE(input.quit);
 }

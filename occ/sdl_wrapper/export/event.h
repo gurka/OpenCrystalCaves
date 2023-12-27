@@ -19,8 +19,10 @@ struct Input
 {
   struct Button
   {
-    bool pressed  = false;
+    bool down  = false;
     bool repeated = false;
+	  
+	  bool pressed() const { return down && !repeated; }
   };
 
   Button up    = Button();

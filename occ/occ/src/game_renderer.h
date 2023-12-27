@@ -13,7 +13,8 @@ class GameRenderer
  public:
   GameRenderer(Game* game, SpriteManager* sprite_manager, Surface* game_surface, Window& window);
 
-  void render_game(unsigned game_tick);
+	void update(unsigned game_tick);
+  void render_game() const;
 
   const geometry::Rectangle& get_game_camera() const { return game_camera_; }
 
@@ -21,12 +22,12 @@ class GameRenderer
   void set_debug(bool debug) { debug_ = debug; }
 
  private:
-  void render_background();
-  void render_player();
-  void render_enemies();
-  void render_tiles(bool in_front);
-  void render_objects();
-  void render_items();
+  void render_background() const;
+  void render_player() const;
+  void render_enemies() const;
+  void render_tiles(bool in_front) const;
+  void render_objects() const;
+  void render_items() const;
 
   Game* game_;
   SpriteManager* sprite_manager_;

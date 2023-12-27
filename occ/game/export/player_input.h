@@ -1,5 +1,4 @@
-#ifndef PLAYERINPUT_H_
-#define PLAYERINPUT_H_
+#pragma once
 
 struct PlayerInput
 {
@@ -7,6 +6,8 @@ struct PlayerInput
   bool right = false;
   bool jump  = false;
   bool shoot = false;
+	bool leftPressed = false;
+	bool rightPressed = false;
+	bool jumpPressed = false;
+	bool shootPressed = false;
 };
-
-#endif  // PLAYERINPUT_H_

@@ -52,7 +52,7 @@ int main()
   while (!input.quit)
   {
     event->poll_event(&input);
-	  if ((input.left.pressed && !input.left.repeated) || (input.up.pressed && !input.up.repeated))
+	  if (input.left.pressed() || input.up.pressed())
 	  {
 		  index--;
 		  if (index < 0)
@@ -71,7 +71,7 @@ int main()
 			  index = (int)surfaces.size() - 1;
 		  }
 	  }
-	  else if ((input.right.pressed && !input.right.repeated) || (input.down.pressed && !input.down.repeated))
+	  else if (input.right.pressed() || input.down.pressed())
 	  {
 		  index++;
 		  if (index == (int)surfaces.size())

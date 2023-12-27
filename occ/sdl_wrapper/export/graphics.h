@@ -51,6 +51,7 @@ class Surface
   virtual int width() const = 0;
   virtual int height() const = 0;
 	geometry::Size size() const { return geometry::Size(width(), height()); }
+	virtual void set_alpha(const uint8_t alpha) = 0;
 
   virtual void blit_surface(const geometry::Rectangle& source,
                             const geometry::Rectangle& dest) const = 0;

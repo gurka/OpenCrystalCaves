@@ -53,7 +53,7 @@ bool ImageManager::load_images(Window& window)
 	bool end = false;
 	for (int episode = 1; !end; episode++)
 	{
-		std::array<std::vector<std::unique_ptr<Surface>>, 4> episode_surfaces;
+		std::array<std::vector<std::unique_ptr<Surface>>, 4> episode_surfaces{};
 		int loaded = 0;
 		for (int image = IMAGE_APOGEE; image <= IMAGE_END; image++)
 		{

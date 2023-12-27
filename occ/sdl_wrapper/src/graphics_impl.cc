@@ -178,10 +178,13 @@ std::unique_ptr<Surface> Surface::from_image(const std::filesystem::path& filena
 std::unique_ptr<Surface> Surface::from_pixels(const int w, const int h, const uint32_t* pixels, Window& window)
 {
 	auto sdl_surface = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_ARGB8888);
-	// TODO: check error
-	SDL_LockSurface(sdl_surface);
-	memcpy(sdl_surface->pixels, pixels, w*h*sizeof(*pixels));
-	SDL_UnlockSurface(sdl_surface);
+	if (pixels)
+	{
+		// TODO: check error
+		SDL_LockSurface(sdl_surface);
+		memcpy(sdl_surface->pixels, pixels, w*h*sizeof(*pixels));
+		SDL_UnlockSurface(sdl_surface);
+	}
 	return create_surface(sdl_surface, window);
 }
 
@@ -203,4 +206,9 @@ void SurfaceImpl::blit_surface() const
 void SurfaceImpl::set_render_target()
 {
   SDL_SetRenderTarget(sdl_renderer_, sdl_texture_.get());
+}
+
+void SurfaceImpl::set_alpha(const uint8_t alpha)
+{
+	SDL_SetTextureAlphaMod(sdl_texture_.get(), alpha);
 }

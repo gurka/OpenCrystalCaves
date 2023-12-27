@@ -11,6 +11,8 @@ add_executable(occ
   "src/occ.cc"
   "src/spritemgr.cc"
   "src/spritemgr.h"
+  "src/state.cc"
+  "src/state.h"
 )
 target_link_libraries(occ
   "utils"

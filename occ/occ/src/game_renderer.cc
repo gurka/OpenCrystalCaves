@@ -27,44 +27,47 @@ GameRenderer::GameRenderer(Game* game, SpriteManager* sprite_manager, Surface* g
 {
 }
 
-void GameRenderer::render_game(unsigned game_tick)
+void GameRenderer::update(unsigned game_tick)
 {
-  game_tick_diff_ = game_tick - game_tick_;
-  game_tick_ = game_tick;
+	game_tick_diff_ = game_tick - game_tick_;
+	game_tick_ = game_tick;
+	
+	// Update game camera
+	// Note: this isn't exactly how the Crystal Caves camera work, but it's good enough
+	const geometry::Position player_camera_relative_position {(game_->get_player().position + (game_->get_player().size / 2)) - (game_camera_.position + (game_camera_.size / 2))};
+	if (player_camera_relative_position.x() < -4)
+	{
+		game_camera_.position = geometry::Position(math::clamp(game_camera_.position.x() + player_camera_relative_position.x() + 4,
+															   0,
+															   (game_->get_tile_width() * 16) - CAMERA_SIZE.x()),
+												   game_camera_.position.y());
+	}
+	else if (player_camera_relative_position.x() > 20)
+	{
+		game_camera_.position = geometry::Position(math::clamp(game_camera_.position.x() + player_camera_relative_position.x() - 20,
+															   0,
+															   (game_->get_tile_width() * 16) - CAMERA_SIZE.x()),
+												   game_camera_.position.y());
+	}
+	
+	if (player_camera_relative_position.y() < -10)
+	{
+		game_camera_.position = geometry::Position(game_camera_.position.x(),
+												   math::clamp(game_camera_.position.y() + player_camera_relative_position.y() + 10,
+															   0,
+															   (game_->get_tile_height() * 16) - CAMERA_SIZE.y()));
+	}
+	else if (player_camera_relative_position.y() > 32)
+	{
+		game_camera_.position = geometry::Position(game_camera_.position.x(),
+												   math::clamp(game_camera_.position.y() + player_camera_relative_position.y() - 32,
+															   0,
+															   (game_->get_tile_height() * 16) - CAMERA_SIZE.y()));
+	}
+}
 
-  // Update game camera
-  // Note: this isn't exactly how the Crystal Caves camera work, but it's good enough
-  const geometry::Position player_camera_relative_position {(game_->get_player().position + (game_->get_player().size / 2)) - (game_camera_.position + (game_camera_.size / 2))};
-  if (player_camera_relative_position.x() < -4)
-  {
-    game_camera_.position = geometry::Position(math::clamp(game_camera_.position.x() + player_camera_relative_position.x() + 4,
-                                                           0,
-                                                           (game_->get_tile_width() * 16) - CAMERA_SIZE.x()),
-                                               game_camera_.position.y());
-  }
-  else if (player_camera_relative_position.x() > 20)
-  {
-    game_camera_.position = geometry::Position(math::clamp(game_camera_.position.x() + player_camera_relative_position.x() - 20,
-                                                           0,
-                                                           (game_->get_tile_width() * 16) - CAMERA_SIZE.x()),
-                                               game_camera_.position.y());
-  }
-
-  if (player_camera_relative_position.y() < -10)
-  {
-    game_camera_.position = geometry::Position(game_camera_.position.x(),
-                                               math::clamp(game_camera_.position.y() + player_camera_relative_position.y() + 10,
-                                                           0,
-                                                           (game_->get_tile_height() * 16) - CAMERA_SIZE.y()));
-  }
-  else if (player_camera_relative_position.y() > 32)
-  {
-    game_camera_.position = geometry::Position(game_camera_.position.x(),
-                                               math::clamp(game_camera_.position.y() + player_camera_relative_position.y() - 32,
-                                                           0,
-                                                           (game_->get_tile_height() * 16) - CAMERA_SIZE.y()));
-  }
-
+void GameRenderer::render_game() const
+{
   window_.set_render_target(game_surface_);
   // Clear game surface (background now)
   window_.fill_rect(geometry::Rectangle(0, 0, CAMERA_SIZE), { 33u, 33u, 33u });
@@ -78,7 +81,7 @@ void GameRenderer::render_game(unsigned game_tick)
   window_.set_render_target(nullptr);
 }
 
-void GameRenderer::render_background()
+void GameRenderer::render_background() const
 {
   const auto& background = game_->get_background();
 
@@ -340,7 +343,7 @@ void GameRenderer::render_background()
   }
 }
 
-void GameRenderer::render_player()
+void GameRenderer::render_player() const
 {
   // Player sprite ids
   static constexpr int sprite_standing_right = 260;
@@ -445,7 +448,7 @@ void GameRenderer::render_player()
   }
 }
 
-void GameRenderer::render_enemies()
+void GameRenderer::render_enemies() const
 {
   for (const auto& enemy : game_->get_enemies())
   {
@@ -471,7 +474,7 @@ void GameRenderer::render_enemies()
   }
 }
 
-void GameRenderer::render_tiles(bool in_front)
+void GameRenderer::render_tiles(bool in_front) const
 {
   const auto start_tile_x = game_camera_.position.x() > 0 ? game_camera_.position.x() / 16 : 0;
   const auto start_tile_y = game_camera_.position.y() > 0 ? game_camera_.position.y() / 16 : 0;
@@ -519,7 +522,7 @@ void GameRenderer::render_tiles(bool in_front)
   }
 }
 
-void GameRenderer::render_objects()
+void GameRenderer::render_objects() const
 {
   for (const auto& object : game_->get_objects())
   {
@@ -545,7 +548,7 @@ void GameRenderer::render_objects()
   }
 }
 
-void GameRenderer::render_items()
+void GameRenderer::render_items() const
 {
   const auto start_tile_x = game_camera_.position.x() > 0 ? game_camera_.position.x() / 16 : 0;
   const auto start_tile_y = game_camera_.position.y() > 0 ? game_camera_.position.y() / 16 : 0;

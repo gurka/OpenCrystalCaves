@@ -54,6 +54,7 @@ class SurfaceImpl : public Surface
                     const geometry::Rectangle& dest) const override;
 	void blit_surface() const override;
   void set_render_target();
+	void set_alpha(const uint8_t alpha) override;
 	
  private:
   int w_;
