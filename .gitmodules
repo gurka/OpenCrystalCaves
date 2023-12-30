@@ -10,3 +10,6 @@
 [submodule "occ/external/find_steam_game"]
 	path = occ/external/find_steam_game
 	url = https://github.com/cxong/find_steam_game.git
+[submodule "occ/external/AHEasing"]
+	path = occ/external/AHEasing
+	url = https://github.com/warrenm/AHEasing.git

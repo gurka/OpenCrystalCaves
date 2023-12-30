@@ -102,7 +102,9 @@ bool ImageManager::load_images(Window& window)
 std::vector<Surface*> ImageManager::get_images(size_t episode, CCImage image) const
 {
 	std::vector<Surface*> images;
-	for (auto&& surface : episode_images_[episode - 1][image])
+	const auto& episode_images = episode_images_[episode - 1];
+	const auto& type_images = episode_images[image];
+	for (auto&& surface : type_images)
 	{
 		images.push_back(surface.get());
 	}

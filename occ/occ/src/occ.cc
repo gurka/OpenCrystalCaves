@@ -99,7 +99,7 @@ int main()
 	auto title_images = image_manager.get_images(1, CCImage::IMAGE_TITLE);
 	auto credits_images = image_manager.get_images(1, CCImage::IMAGE_CREDITS);
 	title_images.insert( title_images.end(), credits_images.begin(), credits_images.end() );
-	TitleState title{title_images};
+	TitleState title{title_images, *window};
 	splash.set_next(title);
 	GameState game_state(*game, sprite_manager, *game_surface, *window);
 	title.set_next(game_state);
@@ -143,10 +143,10 @@ int main()
         {
           return 0;  // Quit ASAP
         }
-		  auto new_state = state->update(input);
+		  state->update(input);
+		  auto new_state = state->next_state();
 		  if (new_state != state)
 		  {
-			  state->finish();
 			  new_state->reset();
 			  state = new_state;
 		  }

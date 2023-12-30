@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.5)
 
 project(occ)
 
+file(GLOB AHEASING_HDRS "../external/AHEasing/AHEasing/*.h")
+file(GLOB AHEASING_SRCS "../external/AHEasing/AHEasing/*.c")
 add_executable(occ
   "src/constants.h"
   "src/game_renderer.cc"
@@ -13,6 +15,10 @@ add_executable(occ
   "src/spritemgr.h"
   "src/state.cc"
   "src/state.h"
+  ${AHEASING_HDRS} ${AHEASING_SRCS}
+)
+target_include_directories(occ PUBLIC
+  "../external/AHEasing/AHEasing"
 )
 target_link_libraries(occ
   "utils"

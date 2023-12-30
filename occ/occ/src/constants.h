@@ -3,6 +3,8 @@
 
 #include "geometry.h"
 
+static constexpr geometry::Size SCREEN_SIZE = geometry::Size(320, 200);
+
 // The size of the game camera
 static constexpr geometry::Size CAMERA_SIZE = geometry::Size(320, 192);
 

@@ -2,17 +2,48 @@
 
 #include <sstream>
 
+#include <easing.h>
+
 #include "constants.h"
 
+static constexpr int FADE_TICKS = 15;
 
+State::State(const unsigned fade_in_ticks, const unsigned fade_out_ticks, Window& window) : overlay_(std::unique_ptr<Surface>(Surface::from_pixels(SCREEN_SIZE.x(), SCREEN_SIZE.y(), nullptr, window))),
+	fade_in_ticks_(fade_in_ticks), fade_out_ticks_(fade_out_ticks)
+{
+	uint32_t pixels = 0xff000000;
+	overlay_ = std::unique_ptr<Surface>(Surface::from_pixels(1, 1, &pixels, window));
+}
 State::~State() {}
 
 
-State* State::update(const Input& input)
+void State::update(const Input& input)
 {
 	(void)input;
 	ticks_++;
-	return this;
+}
+
+void State::draw(Window& window) const
+{
+	(void)window;
+	// Draw black shade overlay
+	float dd = 0;
+	if (ticks_ < fade_in_ticks_)
+	{
+		const auto d = (float)ticks_ / fade_in_ticks_;
+		dd = 1.0f - ExponentialEaseIn(d);
+	}
+	else if (fade_out_start_ticks_ > 0)
+	{
+		const float d = (float)(ticks_ - fade_out_start_ticks_) / fade_out_ticks_;
+		dd = ExponentialEaseIn(d);
+	}
+	if (dd > 0)
+	{
+		overlay_->set_alpha(dd * 255);
+		overlay_->blit_surface(geometry::Rectangle(0, 0, 1, 1),
+							  geometry::Rectangle(0, 0, CAMERA_SIZE_SCALED));
+	}
 }
 
 
@@ -30,37 +61,30 @@ PlayerInput input_to_player_input(const Input& input)
   return pi;
 }
 
-State* SkipState::update(const Input& input)
+void SkipState::update(const Input& input)
 {
-	auto next = State::update(input);
+	State::update(input);
 	if (ticks_ > grace_ticks_)
 	{
 		auto pinput = input_to_player_input(input);
 		if(pinput.jumpPressed || pinput.shootPressed)
 		{
-			return next_state_;
+			finish();
 		}
 	}
-	return next;
 }
 
-SplashState::SplashState(std::vector<Surface*>& images, Window& window) : images_(images), overlay_(std::unique_ptr<Surface>(Surface::from_pixels(images[0]->width(), images[0]->height(), nullptr, window))) {
-	uint32_t pixels = 0xff000000;
-	overlay_ = std::unique_ptr<Surface>(Surface::from_pixels(1, 1, &pixels, window));
+SplashState::SplashState(std::vector<Surface*>& images, Window& window) : State(FADE_TICKS, 0, window), images_(images) {
 }
 
 void SplashState::draw(Window& window) const
 {
-	(void)window;
 	images_[0]->blit_surface(geometry::Rectangle(0, 0, images_[0]->size()),
 							geometry::Rectangle((WINDOW_SIZE - CAMERA_SIZE_SCALED) / 2, CAMERA_SIZE_SCALED));
-	// Draw black shade that becomes more transparent over time
-	if (ticks_ < grace_ticks_)
-	{
-		overlay_->set_alpha((grace_ticks_ - ticks_) * 256 / grace_ticks_);
-		overlay_->blit_surface(geometry::Rectangle(0, 0, 1, 1),
-							  geometry::Rectangle(0, 0, CAMERA_SIZE_SCALED));
-	}
+	State::draw(window);
+}
+
+TitleState::TitleState(std::vector<Surface*>& images, Window& window) : State(FADE_TICKS, FADE_TICKS, window), images_(images) {
 }
 
 void TitleState::draw(Window& window) const
@@ -104,15 +128,16 @@ void TitleState::draw(Window& window) const
 			y += CAMERA_SIZE_SCALED.y();
 		}
 	}
+	State::draw(window);
 }
 
 
-GameState::GameState(Game& game, SpriteManager& sprite_manager, Surface& game_surface, Window& window) : game_(game), game_surface_(game_surface), game_renderer_(&game, &sprite_manager, &game_surface, window)
+GameState::GameState(Game& game, SpriteManager& sprite_manager, Surface& game_surface, Window& window) : State(FADE_TICKS, FADE_TICKS, window), game_(game), game_surface_(game_surface), game_renderer_(&game, &sprite_manager, &game_surface, window)
 {}
 
-State* GameState::update(const Input& input)
+void GameState::update(const Input& input)
 {
-	auto next = State::update(input);
+	State::update(input);
 	if (input.num_1.pressed())
 	{
 		debug_info_ = !debug_info_;
@@ -133,7 +158,6 @@ State* GameState::update(const Input& input)
 		game_tick_ += 1;
 	}
 	game_renderer_.update(game_tick_);
-	return next;
 }
 
 void render_statusbar(Window& window, unsigned score, unsigned num_ammo, unsigned num_lives)
