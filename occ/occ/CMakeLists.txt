@@ -20,6 +20,7 @@ add_executable(occ
 target_include_directories(occ PUBLIC
   "../external/AHEasing/AHEasing"
 )
+target_compile_definitions(occ PRIVATE AH_EASING_USE_DBL_PRECIS _USE_MATH_DEFINES)
 target_link_libraries(occ
   "utils"
   "sdl_wrapper"
