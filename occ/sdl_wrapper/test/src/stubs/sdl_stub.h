@@ -44,6 +44,7 @@ class SDLStub
 
   MOCK_METHOD1(SDL_PollEvent, int(SDL_Event*));
   MOCK_METHOD5(SDL_MapRGBA, Uint32(const SDL_PixelFormat*, Uint8, Uint8, Uint8, Uint8));
+  MOCK_METHOD1(SDL_GetKeyboardState, const Uint8*(int*));
 
  private:
   SDLStub() = default;

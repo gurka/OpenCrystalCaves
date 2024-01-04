@@ -32,6 +32,8 @@ struct Player
   bool falling = false;
 
   bool shooting = false;
+
+  bool noclip = false;
 };
 
 #endif  // PLAYER_H_

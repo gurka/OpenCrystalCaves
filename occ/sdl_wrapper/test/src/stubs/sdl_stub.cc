@@ -116,8 +116,7 @@ void SDL_DestroyTexture(SDL_Texture* texture)
   SDLStub::get().SDL_DestroyTexture(texture);
 }
 
-SDL_Surface* SDL_CreateRGBSurface(Uint32 flags, int width, int height, int depth,
-                                  Uint32 Rmask, Uint32 Gmask, Uint32 Bmask, Uint32 Amask)
+SDL_Surface* SDL_CreateRGBSurface(Uint32 flags, int width, int height, int depth, Uint32 Rmask, Uint32 Gmask, Uint32 Bmask, Uint32 Amask)
 {
   return SDLStub::get().SDL_CreateRGBSurface(flags, width, height, depth, Rmask, Gmask, Bmask, Amask);
 }
@@ -132,17 +131,14 @@ SDL_Surface* SDL_LoadBMP_RW(SDL_RWops* src, int freesrc)
   return SDLStub::get().SDL_LoadBMP_RW(src, freesrc);
 }
 
-SDL_Texture* SDL_CreateTexture(SDL_Renderer* renderer,
-							   Uint32 format,
-							   int access, int w,
-							   int h)
+SDL_Texture* SDL_CreateTexture(SDL_Renderer* renderer, Uint32 format, int access, int w, int h)
 {
   return SDLStub::get().SDL_CreateTexture(renderer, format, access, w, h);
 }
 
 SDL_Texture* SDL_CreateTextureFromSurface(SDL_Renderer* renderer, SDL_Surface* surface)
 {
-	return SDLStub::get().SDL_CreateTextureFromSurface(renderer, surface);
+  return SDLStub::get().SDL_CreateTextureFromSurface(renderer, surface);
 }
 
 SDL_RWops* SDL_RWFromFile(const char* file, const char* mode)
@@ -203,6 +199,11 @@ int SDL_RenderCopy(SDL_Renderer* renderer, SDL_Texture* texture, const SDL_Rect*
 int SDL_PollEvent(SDL_Event* event)
 {
   return SDLStub::get().SDL_PollEvent(event);
+}
+
+const Uint8* SDL_GetKeyboardState(int* numkeys)
+{
+  return SDLStub::get().SDL_GetKeyboardState(numkeys);
 }
 
 Uint32 SDL_MapRGBA(const SDL_PixelFormat* format, Uint8 r, Uint8 g, Uint8 b, Uint8 a)

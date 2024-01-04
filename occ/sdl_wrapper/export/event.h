@@ -19,18 +19,18 @@ struct Input
 {
   struct Button
   {
-    bool down  = false;
+    bool down = false;
     bool repeated = false;
-	  
-	  bool pressed() const { return down && !repeated; }
+
+    bool pressed() const { return down && !repeated; }
   };
 
-  Button up    = Button();
-  Button down  = Button();
-  Button left  = Button();
+  Button up = Button();
+  Button down = Button();
+  Button left = Button();
   Button right = Button();
-  Button z     = Button();
-  Button x     = Button();
+  Button z = Button();
+  Button x = Button();
 
   Button num_1 = Button();
   Button num_2 = Button();
@@ -38,7 +38,10 @@ struct Input
   Button enter = Button();
   Button space = Button();
 
-  bool quit    = false;
+  // Cheat code buttons
+  Button noclip = Button();
+
+  bool quit = false;
 };
 
 #endif  // EVENT_H_

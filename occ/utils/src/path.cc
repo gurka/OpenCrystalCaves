@@ -22,7 +22,6 @@ std::filesystem::path get_data_path(const std::filesystem::path& filename)
     {
       return std::filesystem::path(steamfilename);
     }
-    // TODO: apple
   }
   // Try GoG
   fsg_get_gog_game_path(buf,
@@ -44,6 +43,5 @@ std::filesystem::path get_data_path(const std::filesystem::path& filename)
       return std::filesystem::path(gogfilename);
     }
   }
-  // TODO: Try steam
   return std::filesystem::path();
 }
