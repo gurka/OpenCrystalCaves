@@ -41,6 +41,8 @@ struct Input
   // Cheat code buttons
   Button noclip = Button();
   Button ammo = Button();
+  Button godmode = Button();
+  Button reverse_gravity = Button();
 
   bool quit = false;
 };

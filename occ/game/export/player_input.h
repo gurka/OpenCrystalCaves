@@ -8,10 +8,12 @@ struct PlayerInput
   bool down = false;
   bool jump = false;
   bool shoot = false;
-  bool leftPressed = false;
-  bool rightPressed = false;
-  bool jumpPressed = false;
-  bool shootPressed = false;
-  bool noclipPressed = false;
-  bool ammoPressed = false;
+  bool left_pressed = false;
+  bool right_pressed = false;
+  bool jump_pressed = false;
+  bool shoot_pressed = false;
+  bool noclip_pressed = false;
+  bool ammo_pressed = false;
+  bool godmode_pressed = false;
+  bool reverse_gravity_pressed = false;
 };

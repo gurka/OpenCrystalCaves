@@ -34,7 +34,8 @@ struct Player
   bool shooting = false;
 
   bool noclip = false;
-  bool ammo = false;
+  bool godmode = false;
+  bool reverse_gravity = false;
 };
 
 #endif  // PLAYER_H_

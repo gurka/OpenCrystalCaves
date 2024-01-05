@@ -25,6 +25,8 @@ void EventImpl::poll_event(Input* input)
   input->space.repeated = input->space.down;
   input->noclip.repeated = input->noclip.down;
   input->ammo.repeated = input->ammo.down;
+  input->godmode.repeated = input->godmode.down;
+  input->reverse_gravity.repeated = input->reverse_gravity.down;
 
   // Read 
   const auto keys = SDL_GetKeyboardState(nullptr);
@@ -77,6 +79,10 @@ void EventImpl::poll_event(Input* input)
             input->x.repeated = false;
           break;
 
+        case SDLK_g:
+          input->reverse_gravity.down = event.type == SDL_KEYDOWN;
+	      break;
+
         case SDLK_1:
           input->num_1.down = event.type == SDL_KEYDOWN;
           if (!input->num_1.down)
@@ -112,4 +118,5 @@ void EventImpl::poll_event(Input* input)
   }
   input->noclip.down = keys[SDL_SCANCODE_I] && keys[SDL_SCANCODE_L] && keys[SDL_SCANCODE_M];
   input->ammo.down = keys[SDL_SCANCODE_X] && keys[SDL_SCANCODE_T] && keys[SDL_SCANCODE_R] && keys[SDL_SCANCODE_A];
+  input->godmode.down = keys[SDL_SCANCODE_Z] && keys[SDL_SCANCODE_E] && keys[SDL_SCANCODE_U] && keys[SDL_SCANCODE_S];
 }

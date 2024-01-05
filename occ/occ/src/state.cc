@@ -56,12 +56,14 @@ PlayerInput input_to_player_input(const Input& input)
   pi.down = input.down.down;
   pi.jump = input.z.down;
   pi.shoot = input.x.down;
-  pi.leftPressed = input.left.pressed();
-  pi.rightPressed = input.right.pressed();
-  pi.jumpPressed = input.z.pressed();
-  pi.shootPressed = input.x.pressed();
-  pi.noclipPressed = input.noclip.pressed();
-  pi.ammoPressed = input.ammo.pressed();
+  pi.left_pressed = input.left.pressed();
+  pi.right_pressed = input.right.pressed();
+  pi.jump_pressed = input.z.pressed();
+  pi.shoot_pressed = input.x.pressed();
+  pi.noclip_pressed = input.noclip.pressed();
+  pi.ammo_pressed = input.ammo.pressed();
+  pi.godmode_pressed = input.godmode.pressed();
+  pi.reverse_gravity_pressed = input.reverse_gravity.pressed();
   return pi;
 }
 
@@ -71,7 +73,7 @@ void SkipState::update(const Input& input)
   if (ticks_ > grace_ticks_)
   {
     auto pinput = input_to_player_input(input);
-    if (pinput.jumpPressed || pinput.shootPressed)
+    if (pinput.jump_pressed || pinput.shoot_pressed)
     {
       finish();
     }

@@ -201,17 +201,32 @@ void GameImpl::update_player(const PlayerInput& player_input)
    */
 
   // Check cheat codes
-  if (player_input.noclipPressed)
+  if (player_input.noclip_pressed)
   {
     player_.noclip = !player_.noclip;
     player_.falling = true;
     player_.velocity = Vector<int>(0, 0);
     LOG_DEBUG("Player noclip %s", player_.noclip ? "ON" : "OFF");
   }
-  if (player_input.ammoPressed)
+  if (player_input.ammo_pressed)
   {
     num_ammo_ = 40;
     LOG_DEBUG("Extra ammo");
+  }
+  if (player_input.godmode_pressed)
+  {
+    player_.godmode = !player_.godmode;
+    LOG_DEBUG("God mode %s", player_.godmode ? "ON" : "OFF");
+    if (!player_.godmode && player_.reverse_gravity)
+	{
+      player_.reverse_gravity = false;
+      LOG_DEBUG("Reverse gravity OFF");
+    }
+  }
+  if (player_input.reverse_gravity_pressed && player_.godmode)
+  {
+    player_.reverse_gravity = !player_.reverse_gravity;
+    LOG_DEBUG("Reverse gravity %s", player_.reverse_gravity ? "ON" : "OFF");
   }
 
   // Check left / right
@@ -257,7 +272,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
   if (!player_.noclip)
   {
     if (player_input.jump && !player_.jumping && !player_.falling &&
-        !collides_solid(player_.position + geometry::Position(0, -1), player_.size))
+        !collides_solid(player_.position + geometry::Position(0, player_.reverse_gravity ? 1 : -1), player_.size))
     {
       // Player wants to jump
       player_.jumping = true;
@@ -287,6 +302,10 @@ void GameImpl::update_player(const PlayerInput& player_input)
     else
     {
       player_.velocity = Vector<int>(player_.velocity.x(), gravity);
+    }
+    if (player_.reverse_gravity)
+	{
+      player_.velocity = Vector<int>(player_.velocity.x(), -player_.velocity.y());
     }
   }
 
@@ -364,7 +383,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
     // Check if player hit something while jumping
     if (player_.collide_y)
     {
-      if (player_.velocity.y() < 0)
+      if (player_.reverse_gravity ? player_.velocity.y() > 0 : player_.velocity.y() < 0)
       {
         // Player hit something while jumping up
         // Skip to "falling down" velocity
@@ -381,7 +400,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
       // Player jump ended
       player_.jumping = false;
     }
-    else if (player_.jump_tick != 0 && collides_solid(player_.position + geometry::Position(0, 1), player_.size))
+    else if (player_.jump_tick != 0 && collides_solid(player_.position + geometry::Position(0, player_.reverse_gravity ? -1 : 1), player_.size))
     {
       // Player did not actually collide with the ground, but standing directly above it
       // and this isn't the first tick in the jump, so we can consider the jump to have
