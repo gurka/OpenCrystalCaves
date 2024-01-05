@@ -40,6 +40,7 @@ struct Input
 
   // Cheat code buttons
   Button noclip = Button();
+  Button ammo = Button();
 
   bool quit = false;
 };

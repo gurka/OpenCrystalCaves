@@ -208,6 +208,11 @@ void GameImpl::update_player(const PlayerInput& player_input)
     player_.velocity = Vector<int>(0, 0);
     LOG_DEBUG("Player noclip %s", player_.noclip ? "ON" : "OFF");
   }
+  if (player_input.ammoPressed)
+  {
+    num_ammo_ = 40;
+    LOG_DEBUG("Extra ammo");
+  }
 
   // Check left / right
   if ((player_input.left && player_input.right) || (!player_input.left && !player_input.right))

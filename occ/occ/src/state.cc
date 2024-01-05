@@ -61,6 +61,7 @@ PlayerInput input_to_player_input(const Input& input)
   pi.jumpPressed = input.z.pressed();
   pi.shootPressed = input.x.pressed();
   pi.noclipPressed = input.noclip.pressed();
+  pi.ammoPressed = input.ammo.pressed();
   return pi;
 }
 

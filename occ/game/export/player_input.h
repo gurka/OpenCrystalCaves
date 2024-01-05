@@ -13,4 +13,5 @@ struct PlayerInput
   bool jumpPressed = false;
   bool shootPressed = false;
   bool noclipPressed = false;
+  bool ammoPressed = false;
 };

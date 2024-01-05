@@ -24,6 +24,7 @@ void EventImpl::poll_event(Input* input)
   input->enter.repeated = input->enter.down;
   input->space.repeated = input->space.down;
   input->noclip.repeated = input->noclip.down;
+  input->ammo.repeated = input->ammo.down;
 
   // Read 
   const auto keys = SDL_GetKeyboardState(nullptr);
@@ -110,4 +111,5 @@ void EventImpl::poll_event(Input* input)
     }
   }
   input->noclip.down = keys[SDL_SCANCODE_I] && keys[SDL_SCANCODE_L] && keys[SDL_SCANCODE_M];
+  input->ammo.down = keys[SDL_SCANCODE_X] && keys[SDL_SCANCODE_T] && keys[SDL_SCANCODE_R] && keys[SDL_SCANCODE_A];
 }
