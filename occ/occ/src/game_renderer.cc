@@ -365,6 +365,7 @@ void GameRenderer::render_player() const
   const geometry::Rectangle src_rect = [this]()
   {
     const auto& player = game_->get_player();
+	int sprite = 0;
 
     // Sprite selection priority: (currently 'shooting' means pressing shoot button without ammo)
     // If walking:
@@ -381,26 +382,26 @@ void GameRenderer::render_player() const
       {
         if (player.jumping || player.falling)
         {
-          return sprite_manager_->get_rect_for_tile(sprite_jumping_right);
+		  sprite = sprite_jumping_right;
         }
         else
         {
-          return sprite_manager_->get_rect_for_tile(sprite_walking_right[player.walk_tick % sprite_walking_right.size()]);
+		  sprite = sprite_walking_right[player.walk_tick % sprite_walking_right.size()];
         }
       }
       else
       {
         if (player.shooting)
         {
-          return sprite_manager_->get_rect_for_tile(sprite_shooting_right);
+			sprite = sprite_shooting_right;
         }
         else if (player.jumping || player.falling)
         {
-          return sprite_manager_->get_rect_for_tile(sprite_jumping_right);
+			sprite = sprite_jumping_right;
         }
         else
         {
-          return sprite_manager_->get_rect_for_tile(sprite_standing_right);
+			sprite = sprite_standing_right;
         }
       }
     }
@@ -410,29 +411,34 @@ void GameRenderer::render_player() const
       {
         if (player.jumping || player.falling)
         {
-          return sprite_manager_->get_rect_for_tile(sprite_jumping_left);
+			sprite = sprite_jumping_left;
         }
         else
         {
-          return sprite_manager_->get_rect_for_tile(sprite_walking_left[player.walk_tick % sprite_walking_left.size()]);
+			sprite = sprite_walking_left[player.walk_tick % sprite_walking_left.size()];
         }
       }
       else
       {
         if (player.shooting)
         {
-          return sprite_manager_->get_rect_for_tile(sprite_shooting_left);
+			sprite = sprite_shooting_left;
         }
         else if (player.jumping || player.falling)
         {
-          return sprite_manager_->get_rect_for_tile(sprite_jumping_left);
+			sprite = sprite_jumping_left;
         }
         else
         {
-          return sprite_manager_->get_rect_for_tile(sprite_standing_left);
+			sprite = sprite_standing_left;
         }
       }
     }
+	  if (player.reverse_gravity)
+	  {
+		  sprite += 104;
+	  }
+	  return sprite_manager_->get_rect_for_tile(sprite);
   }();
   const auto player_render_pos = game_->get_player().position - game_camera_.position;
 
