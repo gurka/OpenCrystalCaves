@@ -7,19 +7,20 @@ https://moddingwiki.shikadi.net/wiki/ProGraphx_Toolbox_tileset_format
 #include <fstream>
 
 #include "logger.h"
+#include "misc.h"
 #include "occ_math.h"
 #include "path.h"
 
-#define GFX_FILENAME_FMT "CC{}.GFX"
-// TODO: multiple font files
-#define CHAR_FILENAME_FMT "CC{}-F1.MNI"
+#define GFX_FILENAME_FMT "CC%d.GFX"
+#define FONT_FILENAME_FMT "CC%d-F%d.MNI"
+#define SPL_FILENAME_FMT "CC%d-SPL.MNI"
 #define FILLER 2
 #define SPRITE_W 16
 #define SPRITE_H 16
 #define SPRITE_STRIDE 52
 #define CHAR_W 8
 #define CHAR_H 8
-#define CHAR_STRIDE 50
+#define CHAR_STRIDE 84
 
 struct Header
 {
@@ -66,22 +67,17 @@ int read_sprite_count(std::ifstream& input, const int filler)
 	return count;
 }
 
-std::unique_ptr<Surface> load_surface(const std::filesystem::path& path, Window& window, const int sprite_w, const int sprite_h, const int stride, const int filler)
+std::string load_pixels(const std::filesystem::path& path, const int sprite_w, const int sprite_h, const int stride, const int filler, int& sheet_w, int& sheet_h)
 {
-	if (path.empty())
-	{
-		LOG_CRITICAL("Could not find game data!");
-		return nullptr;
-	}
 	std::ifstream input{path, std::ios::binary};
 	const int count = read_sprite_count(input, filler);
 	if (count == 0)
 	{
 		LOG_CRITICAL("Could not load any sprites!");
-		return nullptr;
+		return "";
 	}
-	const int sheet_w =stride*sprite_w;
-	const int sheet_h = math::round_up(count*sprite_h/stride, sprite_h);
+	sheet_w =stride*sprite_w;
+	sheet_h = math::round_up(count*sprite_h/stride, sprite_h);
 	std::string all_pixels(sheet_w*sheet_h*sizeof(uint32_t), '\0');
   Header header;
 	int index = 0;
@@ -138,6 +134,22 @@ std::unique_ptr<Surface> load_surface(const std::filesystem::path& path, Window&
 		  index += filler;
 	}
   }
+	return all_pixels;
+}
+
+std::unique_ptr<Surface> load_surface(const std::filesystem::path& path, Window& window, const int sprite_w, const int sprite_h, const int stride, const int filler)
+{
+	if (path.empty())
+	{
+		LOG_CRITICAL("Could not find game data!");
+		return nullptr;
+	}
+	int sheet_w, sheet_h;
+	const auto all_pixels = load_pixels(path, sprite_w, sprite_h, stride, filler, sheet_w, sheet_h);
+	if (all_pixels.empty())
+	{
+		return nullptr;
+	}
 	auto surface = Surface::from_pixels(sheet_w, sheet_h, (uint32_t*)all_pixels.data(), window);
 	if (!surface)
 	{
@@ -149,17 +161,55 @@ std::unique_ptr<Surface> load_surface(const std::filesystem::path& path, Window&
 std::unique_ptr<Surface> load_tiles(Window& window, const int episode)
 {
 	// Load tileset
-  // TODO: use <format> in C++20
-  const auto path = get_data_path(std::string(GFX_FILENAME_FMT).replace(std::string(GFX_FILENAME_FMT).find("{}"), std::string("{}").length(), std::to_string(episode)));
+  const auto path = get_data_path(misc::string_format(GFX_FILENAME_FMT, episode));
   return load_surface(path, window,SPRITE_W, SPRITE_H, SPRITE_STRIDE, FILLER);
+}
+
+bool try_load_char_pixels(const std::filesystem::path& path, std::string& all_pixels, int& all_sheet_w, int& all_sheet_h)
+{
+	if (path.empty())
+	{
+		return false;
+	}
+	int sheet_w, sheet_h;
+	const auto pixels = load_pixels(path, CHAR_W, CHAR_H, CHAR_STRIDE, 0, sheet_w, sheet_h);
+	if (pixels.empty())
+	{
+		return false;
+	}
+	all_pixels += pixels;
+	all_sheet_w = sheet_w;
+	all_sheet_h += sheet_h;
+	return true;
 }
 								  
 std::unique_ptr<Surface> load_chars(Window& window, const int episode)
 {
   // Load fonts/characters
-// TODO: use <format> in C++20
-const auto path = get_data_path(std::string(CHAR_FILENAME_FMT).replace(std::string(CHAR_FILENAME_FMT).find("{}"), std::string("{}").length(), std::to_string(episode)));
-return load_surface(path, window,CHAR_W, CHAR_H, CHAR_STRIDE, 0);
+	std::string all_pixels = "";
+	int all_sheet_w = 0;
+	int all_sheet_h = 0;
+	for (int i = 1; ; i++)
+	{
+		const auto path = get_data_path(misc::string_format(FONT_FILENAME_FMT, episode, i));
+		if (!try_load_char_pixels(path, all_pixels, all_sheet_w, all_sheet_h))
+		{
+			break;
+		}
+	}
+	const auto spl_path = get_data_path(misc::string_format(SPL_FILENAME_FMT, episode));
+	try_load_char_pixels(spl_path, all_pixels, all_sheet_w, all_sheet_h);
+	if (all_pixels.empty())
+	{
+		LOG_CRITICAL("Could not load font files");
+		return nullptr;
+	}
+	auto surface = Surface::from_pixels(all_sheet_w, all_sheet_h, (uint32_t*)all_pixels.data(), window);
+	if (!surface)
+	{
+	  LOG_CRITICAL("Could not load font surface");
+	}
+	return surface;
 }
 
 bool SpriteManager::load_tilesets(Window& window, const int episode)

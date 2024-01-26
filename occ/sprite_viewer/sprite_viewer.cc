@@ -11,8 +11,13 @@ https://moddingwiki.shikadi.net/wiki/ProGraphx_Toolbox_tileset_format
 #include "logger.h"
 #include "sdl_wrapper.h"
 
-int main()
+int main(int argc, char *argv[])
 {
+	int episode = 1;
+	if (argc > 1)
+	{
+		episode = atoi(argv[1]);
+	}
   auto sdl = SDLWrapper::create();
   if (!sdl)
   {
@@ -31,7 +36,7 @@ int main()
     return 1;
   }
   SpriteManager sprite_manager;
-  if (!sprite_manager.load_tilesets(*window))
+  if (!sprite_manager.load_tilesets(*window, episode))
   {
     LOG_CRITICAL("Could not load tilesets");
     return 1;

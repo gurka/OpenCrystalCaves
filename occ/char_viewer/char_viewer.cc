@@ -11,10 +11,13 @@ https://moddingwiki.shikadi.net/wiki/ProGraphx_Toolbox_tileset_format
 #include "logger.h"
 #include "sdl_wrapper.h"
 
-int main()
+int main(int argc, char* argv[])
 {
-	// TODO: multiple episodes
-	const int episode = 1;
+	int episode = 1;
+	if (argc > 1)
+	{
+		episode = atoi(argv[1]);
+	}
   auto sdl = SDLWrapper::create();
   if (!sdl)
   {
