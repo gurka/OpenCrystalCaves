@@ -59,12 +59,15 @@ int main()
     LOG_CRITICAL("Could not create event handler");
     return 1;
   }
+	
+	// TODO: select episode
+	const int episode = 1;
 
   // Load tileset
   SpriteManager sprite_manager;
-  if (!sprite_manager.load_tileset(*window))
+  if (!sprite_manager.load_tilesets(*window, episode))
   {
-    LOG_CRITICAL("Could not load tileset");
+    LOG_CRITICAL("Could not load tilesets");
     return 1;
   }
   LOG_INFO("Tileset loaded");

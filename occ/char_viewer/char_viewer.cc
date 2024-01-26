@@ -13,6 +13,8 @@ https://moddingwiki.shikadi.net/wiki/ProGraphx_Toolbox_tileset_format
 
 int main()
 {
+	// TODO: multiple episodes
+	const int episode = 1;
   auto sdl = SDLWrapper::create();
   if (!sdl)
   {
@@ -31,12 +33,12 @@ int main()
     return 1;
   }
   SpriteManager sprite_manager;
-  if (!sprite_manager.load_tilesets(*window))
+  if (!sprite_manager.load_tilesets(*window, episode))
   {
     LOG_CRITICAL("Could not load tilesets");
     return 1;
   }
-  const auto surface = sprite_manager.get_surface();
+  const auto surface = sprite_manager.get_char_surface();
   window->set_size(surface->size());
   auto event = Event::create();
   if (!event)

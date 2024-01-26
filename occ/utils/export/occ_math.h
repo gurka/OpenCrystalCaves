@@ -4,24 +4,17 @@
 namespace math
 {
 
-// euclidean modulus
-constexpr int mod(int a, int b)
-{
-  return a % b >= 0 ? a % b : (a % b) + b;
-}
-
-// constexpr abs
-constexpr int abs(int a)
-{
-  return a < 0 ? -a : a;
-}
-
 // constexpr clamp
 constexpr int clamp(int v, int min, int max)
 {
-  return v >= min ? (v <= max ? v : max) : min;
+	return v >= min ? (v <= max ? v : max) : min;
+}
+
+constexpr int round_up(const int n, const int m)
+{
+	const int remainder = n % m;
+	return remainder == 0 ? n : n + m - remainder;
 }
 
 }
-
 #endif  // MATH_H_

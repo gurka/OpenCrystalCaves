@@ -63,6 +63,14 @@ target_include_directories(sound_player SYSTEM PUBLIC
   "utils/export"
 )
 
+add_subdirectory("char_viewer")
+target_compile_options(char_viewer PRIVATE ${COMPILE_OPTIONS})
+target_include_directories(char_viewer SYSTEM PUBLIC
+  "occ/occ/src"
+  "sdl_wrapper/export"
+  "utils/export"
+)
+
 add_subdirectory("sprite_viewer")
 target_compile_options(sprite_viewer PRIVATE ${COMPILE_OPTIONS})
 target_include_directories(sprite_viewer SYSTEM PUBLIC
