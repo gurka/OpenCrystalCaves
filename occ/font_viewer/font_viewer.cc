@@ -1,7 +1,5 @@
 /*
-https://moddingwiki.shikadi.net/wiki/ProGraphx_Toolbox_tileset_format
-
-Show the character/SPL spritesheets all in one
+Show example text using the Crystal Caves font(s)
 */
 #include <filesystem>
 #include <fstream>
@@ -43,8 +41,15 @@ int main(int argc, char* argv[])
     LOG_CRITICAL("Could not load tilesets");
     return 1;
   }
-  const auto surface = sprite_manager.get_char_surface();
-  window->set_size(surface->size());
+  const auto text = L"This is the Crystal Caves font!\n"
+  "\n"
+  "The quick brown fox jumped over the lazy dog\n"
+  "Quick zephyrs blow, vexing daft Jim.\n\n"
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZ\n"
+  "abcdefghijklmnopqrstuvwxyz\n"
+  "0123456789";
+	const auto size = geometry::Size(400, 100);
+  window->set_size(size);
   auto event = Event::create();
   if (!event)
   {
@@ -56,8 +61,8 @@ int main(int argc, char* argv[])
   while (!input.quit)
   {
     event->poll_event(&input);
-    window->fill_rect(geometry::Rectangle(0, 0, surface->size()), {33u, 33u, 33u});
-    surface->blit_surface();
+    window->fill_rect(geometry::Rectangle(0, 0, size), {33u, 33u, 33u});
+	  sprite_manager.render_text(text, Vector<int>(5, 5));
     window->refresh();
   }
 

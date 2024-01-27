@@ -21,7 +21,8 @@ class SpriteManager
   const Surface* get_surface() const;
   geometry::Rectangle get_rect_for_tile(const int sprite) const;
 	const Surface* get_char_surface() const;
- geometry::Rectangle get_rect_for_char(const int ch) const;
+  geometry::Rectangle get_rect_for_char(const wchar_t ch) const;
+	Vector<int> render_text(const std::wstring& text, const Vector<int>& pos) const;
 
  private:
   std::unique_ptr<Surface> sprite_surface_;

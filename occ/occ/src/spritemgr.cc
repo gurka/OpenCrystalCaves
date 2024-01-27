@@ -5,6 +5,7 @@ https://moddingwiki.shikadi.net/wiki/ProGraphx_Toolbox_tileset_format
 
 #include <filesystem>
 #include <fstream>
+#include <map>
 
 #include "logger.h"
 #include "misc.h"
@@ -46,6 +47,89 @@ const uint32_t colors[] = {
   0xFFFF55FF, // "🟪",
   0xFFFFFFAA, // "🟨",
   0xFFFFFFFF, // "⬜",
+};
+
+const std::map<wchar_t, int> char_map{
+	{' ', 10},
+	{'!', 11},
+	{'"', 12},
+	{'#', 13},
+	{'$', 14},
+	{'%', 15},
+	{'&', 16},
+	{'\'', 17},
+	{'(', 18},
+	{')', 19},
+	{'*', 20},
+	{'+', 21},
+	{',', 22},
+	{'-', 23},
+	{'.', 24},
+	{L'£', 25},
+	{'0', 26},
+	{'1', 27},
+	{'2', 28},
+	{'3', 29},
+	{'4', 30},
+	{'5', 31},
+	{'6', 32},
+	{'7', 33},
+	{'8', 34},
+	{'9', 35},
+	{':', 36},
+	{'?', 41},
+	{'A', 43},
+	{'B', 44},
+	{'C', 45},
+	{'D', 46},
+	{'E', 47},
+	{'F', 48},
+	{'G', 49},
+	{'H', 84},
+	{'I', 85},
+	{'J', 86},
+	{'K', 87},
+	{'L', 88},
+	{'M', 89},
+	{'N', 90},
+	{'O', 91},
+	{'P', 92},
+	{'Q', 93},
+	{'R', 94},
+	{'S', 95},
+	{'T', 96},
+	{'U', 97},
+	{'V', 98},
+	{'W', 99},
+	{'X', 100},
+	{'Y', 101},
+	{'Z', 102},
+	{'a', 103},
+	{'b', 104},
+	{'c', 105},
+	{'d', 106},
+	{'e', 107},
+	{'f', 108},
+	{'g', 109},
+	{'h', 110},
+	{'i', 111},
+	{'j', 112},
+	{'k', 113},
+	{'l', 114},
+	{'m', 115},
+	{'n', 116},
+	{'o', 117},
+	{'p', 118},
+	{'q', 119},
+	{'r', 120},
+	{'s', 121},
+	{'t', 122},
+	{'u', 123},
+	{'v', 124},
+	{'w', 125},
+	{'x', 126},
+	{'y', 127},
+	{'z', 128},
 };
 
 int read_sprite_count(std::ifstream& input, const int filler)
@@ -255,13 +339,46 @@ const Surface* SpriteManager::get_char_surface() const
    return char_surface_.get();
  }
 
- geometry::Rectangle SpriteManager::get_rect_for_char(const int ch) const
+ geometry::Rectangle SpriteManager::get_rect_for_char(const wchar_t ch) const
  {
+	 int idx = char_map.find(L' ')->second;
+	 if (auto search = char_map.find(ch); search != char_map.end())
+	 {
+		 idx = search->second;
+	 }
    return
    {
-	 (ch % (char_surface_->width() / CHAR_W)) * CHAR_W,
-	 (ch / (char_surface_->width() / CHAR_H)) * CHAR_H,
+	 (idx % (char_surface_->width() / CHAR_W)) * CHAR_W,
+	 (idx / (char_surface_->width() / CHAR_H)) * CHAR_H,
 	   CHAR_W,
 	   CHAR_H
    };
  }
+
+Vector<int> SpriteManager::render_text(const std::wstring& text, const Vector<int>& pos) const
+{
+	int x = pos.x();
+	int y = pos.y();
+	for (const auto& ch : text)
+	{
+		if (ch == L'\n')
+		{
+			x = pos.x();
+			y += CHAR_H;
+		}
+		else
+		{
+			const auto src_rect = get_rect_for_char(ch);
+			const geometry::Rectangle dest_rect
+			{
+			  x,
+			  y,
+			  CHAR_W,
+			  CHAR_H
+			};
+			get_char_surface()->blit_surface(src_rect, dest_rect);
+			x += CHAR_W;
+		}
+	}
+	return Vector<int>(x, y);
+}

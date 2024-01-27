@@ -1,7 +1,7 @@
-#ifndef MISC_H_
-#define MISC_H_
+#pragma once
 
 #include <array>
+#include <memory>
 #include <random>
 #include <type_traits>
 #include <utility>
@@ -37,5 +37,3 @@ std::string string_format( const std::string& format, Args ... args )
 }
 
 }
-
-#endif  // MISC_H_

@@ -71,6 +71,14 @@ target_include_directories(char_viewer SYSTEM PUBLIC
   "utils/export"
 )
 
+add_subdirectory("font_viewer")
+target_compile_options(font_viewer PRIVATE ${COMPILE_OPTIONS})
+target_include_directories(font_viewer SYSTEM PUBLIC
+  "occ/occ/src"
+  "sdl_wrapper/export"
+  "utils/export"
+)
+
 add_subdirectory("sprite_viewer")
 target_compile_options(sprite_viewer PRIVATE ${COMPILE_OPTIONS})
 target_include_directories(sprite_viewer SYSTEM PUBLIC
