@@ -59,6 +59,7 @@ int main(int argc, char* argv[])
     window->fill_rect(geometry::Rectangle(0, 0, surface->size()), {33u, 33u, 33u});
     surface->blit_surface();
     window->refresh();
+	  sdl->delay(10);
   }
 
   return 0;

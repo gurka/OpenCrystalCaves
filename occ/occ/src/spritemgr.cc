@@ -1,4 +1,4 @@
-﻿/*
+/*
 https://moddingwiki.shikadi.net/wiki/ProGraphx_Toolbox_tileset_format
 */
 #include "spritemgr.h"
@@ -19,8 +19,6 @@ https://moddingwiki.shikadi.net/wiki/ProGraphx_Toolbox_tileset_format
 #define SPRITE_W 16
 #define SPRITE_H 16
 #define SPRITE_STRIDE 52
-#define CHAR_W 8
-#define CHAR_H 8
 #define CHAR_STRIDE 50
 
 struct Header
@@ -290,7 +288,7 @@ geometry::Rectangle SpriteManager::get_rect_for_char(const wchar_t ch) const
   {
     idx = search->second;
   }
-  return {(idx % (char_surface_->width() / CHAR_W)) * CHAR_W, (idx / (char_surface_->width() / CHAR_H)) * CHAR_H, CHAR_W, CHAR_H};
+	return get_rect_for_icon(idx);
 }
 
 Vector<int> SpriteManager::render_text(const std::wstring& text, const Vector<int>& pos) const
@@ -313,4 +311,37 @@ Vector<int> SpriteManager::render_text(const std::wstring& text, const Vector<in
     }
   }
   return Vector<int>(x, y);
+}
+
+geometry::Rectangle SpriteManager::get_rect_for_number(const char ch) const
+{
+	return get_rect_for_icon(ch - '0' + static_cast<int>(Icon::ICON_0));
+}
+
+Vector<int> SpriteManager::render_number(const int num, const Vector<int>& pos) const
+{
+	const auto text = std::to_string(num);
+	// Numbers are right-aligned
+	int x = pos.x() - CHAR_W;
+	// Iterate in reverse due to right align
+	for (auto it = text.crbegin() ; it != text.crend(); ++it)
+	{
+		const auto src_rect = get_rect_for_number(*it);
+		const geometry::Rectangle dest_rect{x, pos.y(), CHAR_W, CHAR_H};
+		get_char_surface()->blit_surface(src_rect, dest_rect);
+		x -= CHAR_W;
+	}
+	return Vector<int>(x, pos.y());
+}
+
+geometry::Rectangle SpriteManager::get_rect_for_icon(const int idx) const
+{
+	return {(idx % (char_surface_->width() / CHAR_W)) * CHAR_W, (idx / (char_surface_->width() / CHAR_H)) * CHAR_H, CHAR_W, CHAR_H};
+}
+
+void SpriteManager::render_icon(const Icon icon, const Vector<int>& pos) const
+{
+	const auto src_rect = get_rect_for_icon(static_cast<int>(icon));
+	const geometry::Rectangle dest_rect{pos.x(), pos.y(), CHAR_W, CHAR_H};
+	get_char_surface()->blit_surface(src_rect, dest_rect);
 }

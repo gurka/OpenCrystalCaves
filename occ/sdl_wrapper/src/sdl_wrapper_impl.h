@@ -8,6 +8,7 @@ class SDLWrapperImpl : public SDLWrapper
  public:
   bool init() override;
   unsigned get_tick() override;
+	void delay(const int ms) override;
 };
 
 #endif  // SDL_WRAPPER_IMPL_H_

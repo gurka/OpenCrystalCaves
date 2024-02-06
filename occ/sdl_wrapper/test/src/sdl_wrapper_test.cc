@@ -42,3 +42,12 @@ TEST_F(SDLWrapperTest, get_tick)
   EXPECT_EQ(tick, wrapper->get_tick());
 }
 
+TEST_F(SDLWrapperTest, delay)
+{
+  auto wrapper = SDLWrapper::create();
+  ASSERT_TRUE(wrapper.get() != nullptr);
+
+  const int ms = 10;
+  EXPECT_CALL(SDLStub::get(), SDL_Delay(ms));
+  wrapper->delay(ms);
+}

@@ -12,6 +12,7 @@ class SDLWrapper
 
   virtual bool init() = 0;
   virtual unsigned get_tick() = 0;
+	virtual void delay(const int ms) = 0;
 };
 
 #endif  // SDL_WRAPPER_H_

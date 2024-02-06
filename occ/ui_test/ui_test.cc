@@ -1,5 +1,5 @@
 /*
-Show example text using the Crystal Caves font(s)
+Show UI elements using the Crystal Caves font(s)
 */
 #include <filesystem>
 #include <fstream>
@@ -56,13 +56,31 @@ int main(int argc, char* argv[])
     LOG_CRITICAL("Could not create event handler");
     return 1;
   }
+	
+	const int score = 7000;
+	const int ammo = 10;
+	const int hearts = 3;
 
   Input input;
   while (!input.quit)
   {
     event->poll_event(&input);
     window->fill_rect(geometry::Rectangle(0, 0, size), {33u, 33u, 33u});
-    sprite_manager.render_text(text, Vector<int>(5, 5));
+	// $
+	sprite_manager.render_text(L"$", Vector<int>(0, 0));
+	// score
+	sprite_manager.render_number(score, Vector<int>(8 * CHAR_W, 0));
+	// Gun
+	  sprite_manager.render_icon(Icon::ICON_GUN, Vector<int>(11 * CHAR_W, 0));
+	// ammo
+	  sprite_manager.render_number(ammo, Vector<int>(15 * CHAR_W, 0));
+	// Hearts
+	  for (int i = 0; i < hearts; i++)
+	  {
+		  sprite_manager.render_icon(Icon::ICON_HEART, Vector<int>((i + 19) * CHAR_W, 0));
+	  }
+	  // Key
+	  sprite_manager.render_icon(Icon::ICON_KEY, Vector<int>(23 * CHAR_W, 0));
     window->refresh();
 	  sdl->delay(10);
   }
