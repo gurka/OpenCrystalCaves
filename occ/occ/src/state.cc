@@ -138,6 +138,7 @@ GameState::GameState(Game& game, SpriteManager& sprite_manager, Surface& game_su
   : State(FADE_TICKS, FADE_TICKS, window),
     game_(game),
     game_surface_(game_surface),
+	sprite_manager_(sprite_manager),
     game_renderer_(&game, &sprite_manager, &game_surface, window)
 {
 }
@@ -167,18 +168,6 @@ void GameState::update(const Input& input)
   game_renderer_.update(game_tick_);
 }
 
-void render_statusbar(Window& window, unsigned score, unsigned num_ammo, unsigned num_lives)
-{
-  constexpr auto statusbar_height = WINDOW_SIZE.y() / 12 / 2;
-  constexpr auto statusbar_rect = geometry::Rectangle(0, WINDOW_SIZE.y() - statusbar_height, WINDOW_SIZE.x(), statusbar_height);
-
-  char statusbar_text[64];
-  snprintf(statusbar_text, 64, "Score: %8u Ammo: %2u Life: %u", score, num_ammo, num_lives);
-
-  window.fill_rect(statusbar_rect, {0u, 0u, 0u});
-  window.render_text(statusbar_rect.position + geometry::Position(32, 0), statusbar_text, 24, {255u, 255u, 255u});
-}
-
 void GameState::draw(Window& window) const
 {
   // Clear window surface
@@ -190,9 +179,6 @@ void GameState::draw(Window& window) const
   // Render game surface to window surface, centered and scaled
   game_surface_.blit_surface(geometry::Rectangle(0, 0, CAMERA_SIZE),
                              geometry::Rectangle((WINDOW_SIZE - CAMERA_SIZE_SCALED) / 2, CAMERA_SIZE_SCALED));
-
-  // Render statusbar
-  render_statusbar(window, game_.get_score(), game_.get_num_ammo(), game_.get_num_lives());
 
   // Debug information
   if (debug_info_)

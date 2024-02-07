@@ -26,6 +26,7 @@ class GameImpl : public Game
       score_(0u),
       num_ammo_(0u),
       num_lives_(0u),
+	has_key_(false),
       missile_(),
       explosion_()
   {
@@ -52,6 +53,7 @@ class GameImpl : public Game
   unsigned get_score() const override { return score_; }
   unsigned get_num_ammo() const override { return num_ammo_; }
   unsigned get_num_lives() const override { return num_lives_; }
+	bool has_key() const override { return has_key_; }
 
   std::string get_debug_info() const override;
 
@@ -76,6 +78,7 @@ class GameImpl : public Game
   unsigned score_;
   unsigned num_ammo_;
   unsigned num_lives_;
+	bool has_key_;
 
   Missile missile_;
   Explosion explosion_;

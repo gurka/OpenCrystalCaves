@@ -45,6 +45,7 @@ bool GameImpl::init()
   score_ = 0u;
   num_ammo_ = 5u;
   num_lives_ = 3u;
+	has_key_ = false;
 
   missile_.alive = false;
 

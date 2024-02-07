@@ -166,8 +166,8 @@ int main()
 		state->draw(*window);
 		
 		// Render FPS
-		auto fps_str = "fps: " + std::to_string(fps);
-		window->render_text(geometry::Position(5, 5), fps_str, 12, { 255u, 255u, 255u });
+		auto fps_str = L"fps: " + std::to_wstring(fps);
+		sprite_manager.render_text(fps_str, geometry::Position(5, 5));
 		
       // Update screen
       window->refresh();

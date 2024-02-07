@@ -41,6 +41,7 @@ class Game
   virtual unsigned get_score() const = 0;
   virtual unsigned get_num_ammo() const = 0;
   virtual unsigned get_num_lives() const = 0;
+	virtual bool has_key() const = 0;
 
   virtual std::string get_debug_info() const = 0;
 };

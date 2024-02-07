@@ -10,6 +10,7 @@ class SDLStub
   MOCK_METHOD1(SDL_Init, int(Uint32));
   MOCK_METHOD0(SDL_GetError, const char*());
   MOCK_METHOD0(SDL_GetTicks, Uint32());
+	MOCK_METHOD1(SDL_Delay, void(Uint32));
   MOCK_METHOD6(SDL_CreateWindow, SDL_Window*(const char*, int, int, int, int, Uint32));
   MOCK_METHOD3(SDL_CreateRenderer, SDL_Renderer*(SDL_Window*, int, Uint32));
   MOCK_METHOD1(SDL_DestroyWindow, void(SDL_Window*));

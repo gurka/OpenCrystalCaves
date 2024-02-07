@@ -99,6 +99,7 @@ class GameState : public State
  private:
   Game& game_;
   Surface& game_surface_;
+	SpriteManager& sprite_manager_;
   GameRenderer game_renderer_;
   bool debug_info_ = false;
   bool paused_ = false;

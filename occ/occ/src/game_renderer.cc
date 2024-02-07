@@ -78,6 +78,7 @@ void GameRenderer::render_game() const
   render_enemies();
   render_tiles(true);
   render_items();
+	render_statusbar();
   window_.set_render_target(nullptr);
 }
 
@@ -583,4 +584,32 @@ void GameRenderer::render_items() const
 	  sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
     }
   }
+}
+
+void GameRenderer::render_statusbar() const
+{
+	constexpr auto statusbar_height = CHAR_H;
+	const auto statusbar_rect = geometry::Rectangle(0, game_camera_.size.y() - CHAR_H, game_camera_.size.x(), statusbar_height);
+
+	window_.fill_rect(statusbar_rect, {0u, 0u, 0u});
+
+	constexpr int dy = 1;
+	  // $
+	  sprite_manager_->render_text(L"$", statusbar_rect.position + geometry::Position(0, dy));
+	  // score
+	  sprite_manager_->render_number(game_->get_score(), statusbar_rect.position + geometry::Position(8 * CHAR_W, dy));
+	  // Gun
+		sprite_manager_->render_icon(Icon::ICON_GUN, statusbar_rect.position + geometry::Position(11 * CHAR_W, dy));
+	  // ammo
+		sprite_manager_->render_number(game_->get_num_ammo(), statusbar_rect.position + geometry::Position(15 * CHAR_W, dy));
+	  // Hearts
+		for (unsigned i = 0; i < game_->get_num_lives(); i++)
+		{
+			sprite_manager_->render_icon(Icon::ICON_HEART, statusbar_rect.position + geometry::Position((i + 19) * CHAR_W, dy));
+		}
+		// Key
+	  if (game_->has_key())
+	  {
+		  sprite_manager_->render_icon(Icon::ICON_KEY, statusbar_rect.position + geometry::Position(23 * CHAR_W, dy));
+	  }
 }
