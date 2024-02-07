@@ -126,22 +126,19 @@ const Item& GameImpl::get_item(int tile_x, int tile_y) const
   }
 }
 
-std::string GameImpl::get_debug_info() const
+std::wstring GameImpl::get_debug_info() const
 {
-  std::ostringstream oss;
+  std::wostringstream oss;
 
-  oss << "player position: (" << player_.position.x() << ", " << player_.position.y() << ")"
-      << "\n";
-  oss << "player velocity: (" << player_.velocity.x() << ", " << player_.velocity.y() << ")"
-      << "\n";
-  oss << "player collide: " << (player_.collide_x ? "x " : "_ ") << (player_.collide_y ? "y" : "_") << "\n";
-  oss << "player walking: " << (player_.walking ? "true" : "false") << "\n";
-  oss << "player jumping: " << (player_.jumping ? "true" : "false") << "\n";
-  oss << "player falling: " << (player_.falling ? "true" : "false") << "\n";
-  oss << "player shooting: " << (player_.shooting ? "true" : "false") << "\n";
-  oss << "missile alive: " << (missile_.alive ? "true" : "false") << "\n";
-  oss << "missile position: (" << missile_.position.x() << ", " << missile_.position.y() << ")"
-      << "\n";
+  oss << L"player position: (" << player_.position.x() << L", " << player_.position.y() << L")\n";
+  oss << L"player velocity: (" << player_.velocity.x() << L", " << player_.velocity.y() << L")\n";
+  oss << L"player collide: " << (player_.collide_x ? L"x " : L"_ ") << (player_.collide_y ? L"y" : L"_") << L"\n";
+  oss << L"player walking: " << (player_.walking ? L"true" : L"false") << L"\n";
+  oss << L"player jumping: " << (player_.jumping ? L"true" : L"false") << L"\n";
+  oss << L"player falling: " << (player_.falling ? L"true" : L"false") << L"\n";
+  oss << L"player shooting: " << (player_.shooting ? L"true" : L"false") << "\n";
+  oss << L"missile alive: " << (missile_.alive ? L"true" : L"false") << L"\n";
+  oss << L"missile position: (" << missile_.position.x() << L", " << missile_.position.y() << L")\n";
 
   return oss.str();
 }

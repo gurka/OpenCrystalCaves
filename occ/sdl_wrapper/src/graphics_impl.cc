@@ -13,7 +13,7 @@ SDL_Rect to_sdl_rect(const geometry::Rectangle& rect)
   return {rect.position.x(), rect.position.y(), rect.size.x(), rect.size.y()};
 }
 
-std::unique_ptr<Window> Window::create(const std::string& title, geometry::Size size, const std::string& text_sprite_filename)
+std::unique_ptr<Window> Window::create(const std::string& title, geometry::Size size)
 {
   auto sdl_window = std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)>(
     SDL_CreateWindow(title.c_str(), 0, 0, size.x(), size.y(), SDL_WINDOW_SHOWN), SDL_DestroyWindow);
@@ -28,18 +28,7 @@ std::unique_ptr<Window> Window::create(const std::string& title, geometry::Size 
     return nullptr;
   }
   auto window = std::make_unique<WindowImpl>(std::move(sdl_window), std::move(sdl_renderer));
-  if (!text_sprite_filename.empty())
-  {
-    window->set_text_sprite_filename(text_sprite_filename);
-  }
   return window;
-}
-
-void WindowImpl::set_text_sprite_filename(const std::string& text_sprite_filename)
-{
-  text_surface_ = std::unique_ptr<Surface>(Surface::from_bmp(text_sprite_filename, *this));
-  SDL_Color char_rgb = {0xFF, 0xFF, 0xFF, 0xFF};
-  font_.BuildFromFile(sdl_renderer_.get(), text_sprite_filename.c_str(), char_rgb);
 }
 
 void WindowImpl::set_size(geometry::Size size)
@@ -107,11 +96,6 @@ void WindowImpl::render_rectangle(const geometry::Rectangle& rect, const Color& 
 SDL_Color to_sdl_color(const Color& color)
 {
   return {color.red, color.green, color.blue, 0xFF};
-}
-
-void WindowImpl::render_text(const geometry::Position& pos, const std::string& text, unsigned font_size, const Color& color)
-{
-  font_.RenderText(sdl_renderer_.get(), pos.x(), pos.y(), text.c_str(), font_size / 16.0f, to_sdl_color(color));
 }
 
 void WindowImpl::render_line(const geometry::Position& from, const geometry::Position& to, const Color& color)

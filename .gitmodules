@@ -4,9 +4,6 @@
 [submodule "occ/external/googletest"]
 	path = occ/external/googletest
 	url = https://github.com/google/googletest.git
-[submodule "occ/external/SDLBitmapFont"]
-	path = occ/external/SDLBitmapFont
-	url = https://github.com/cxong/SDLBitmapFont.git
 [submodule "occ/external/find_steam_game"]
 	path = occ/external/find_steam_game
 	url = https://github.com/cxong/find_steam_game.git

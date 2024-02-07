@@ -35,7 +35,7 @@ int main()
   LOG_INFO("SDLWrapper initialized");
 
   // Create Window
-  auto window = Window::create("OpenCrystalCaves", WINDOW_SIZE, "media/VP16Font.bmp");
+  auto window = Window::create("OpenCrystalCaves", WINDOW_SIZE);
   if (!window)
   {
     LOG_CRITICAL("Could not create Window");

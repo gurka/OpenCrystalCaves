@@ -52,11 +52,11 @@ class SpriteManager
   geometry::Rectangle get_rect_for_tile(const int sprite) const;
 	const Surface* get_char_surface() const;
   geometry::Rectangle get_rect_for_char(const wchar_t ch) const;
-	Vector<int> render_text(const std::wstring& text, const Vector<int>& pos) const;
+	geometry::Position render_text(const std::wstring& text, const geometry::Position& pos) const;
 	geometry::Rectangle get_rect_for_number(const char ch) const;
-	Vector<int> render_number(const int num, const Vector<int>& pos) const;
+	geometry::Position render_number(const int num, const geometry::Position& pos) const;
 	geometry::Rectangle get_rect_for_icon(const int idx) const;
-	void render_icon(const Icon icon, const Vector<int>& pos) const;
+	void render_icon(const Icon icon, const geometry::Position& pos) const;
 
  private:
   std::unique_ptr<Surface> sprite_surface_;

@@ -19,7 +19,7 @@ struct Color
 class Window
 {
  public:
-  static std::unique_ptr<Window> create(const std::string& title, geometry::Size size, const std::string& text_sprite_filename);
+  static std::unique_ptr<Window> create(const std::string& title, geometry::Size size);
 
   virtual ~Window() = default;
 
@@ -28,7 +28,6 @@ class Window
   virtual std::unique_ptr<Surface> create_target_surface(geometry::Size size) = 0;
   virtual void refresh() = 0;
   virtual void fill_rect(const geometry::Rectangle& rect, const Color& color) = 0;
-  virtual void render_text(const geometry::Position& pos, const std::string& text, unsigned font_size, const Color& color) = 0;
   virtual void render_line(const geometry::Position& from, const geometry::Position& to, const Color& color) = 0;
   virtual void render_rectangle(const geometry::Rectangle& rect, const Color& color) = 0;
 };

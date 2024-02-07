@@ -184,9 +184,9 @@ void GameState::draw(Window& window) const
   if (debug_info_)
   {
     // Get debug information from Game and split on newline
-    auto game_debug_info_iss = std::istringstream(game_.get_debug_info());
-    std::string temp;
-    std::vector<std::string> game_debug_infos;
+    auto game_debug_info_iss = std::wistringstream(game_.get_debug_info());
+    std::wstring temp;
+    std::vector<std::wstring> game_debug_infos;
     while (std::getline(game_debug_info_iss, temp))
     {
       game_debug_infos.push_back(std::move(temp));
@@ -200,13 +200,13 @@ void GameState::draw(Window& window) const
     auto pos_y = 25;
     const auto& game_camera = game_renderer_.get_game_camera();
     const auto camera_position_str =
-      "camera position: (" + std::to_string(game_camera.position.x()) + ", " + std::to_string(game_camera.position.y()) + ")";
-    window.render_text(geometry::Position(5, pos_y), camera_position_str, 12, {255u, 0u, 0u});
+      L"camera position: (" + std::to_wstring(game_camera.position.x()) + L", " + std::to_wstring(game_camera.position.y()) + L")";
+    sprite_manager_.render_text(camera_position_str, geometry::Position(5, pos_y));
     pos_y += 20;
 
     for (const auto& game_debug_info : game_debug_infos)
     {
-      window.render_text(geometry::Position(5, pos_y), game_debug_info, 12, {255u, 0u, 0u});
+      sprite_manager_.render_text(game_debug_info, geometry::Position(5, pos_y));
       pos_y += 20;
     }
   }

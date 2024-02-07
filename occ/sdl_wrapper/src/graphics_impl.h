@@ -8,7 +8,6 @@
 
 #include <SDL.h>
 #include <SDL_image.h>
-#include <SDLBitmapFont.h>
 
 #include "geometry.h"
 
@@ -19,14 +18,12 @@ class WindowImpl : public Window
     : sdl_window_(std::move(sdl_window)), sdl_renderer_(std::move(sdl_renderer))
   {
   }
-  void set_text_sprite_filename(const std::string& text_sprite_filename);
 
 	void set_size(geometry::Size size) override;
   void set_render_target(Surface* surface) override;
   std::unique_ptr<Surface> create_target_surface(geometry::Size size) override;
   void refresh() override;
   void fill_rect(const geometry::Rectangle& rect, const Color& color) override;
-  void render_text(const geometry::Position& pos, const std::string& text, unsigned font_size, const Color& color) override;
   void render_line(const geometry::Position& from, const geometry::Position& to, const Color& color) override;
   void render_rectangle(const geometry::Rectangle& rect, const Color& color) override;
 
@@ -35,7 +32,6 @@ class WindowImpl : public Window
  private:
   std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> sdl_window_;
   std::unique_ptr<SDL_Renderer, decltype(&SDL_DestroyRenderer)> sdl_renderer_;
-  SDLBitmapFont font_;
   std::unique_ptr<Surface> text_surface_;
 };
 

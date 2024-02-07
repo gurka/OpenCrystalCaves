@@ -291,7 +291,7 @@ geometry::Rectangle SpriteManager::get_rect_for_char(const wchar_t ch) const
 	return get_rect_for_icon(idx);
 }
 
-Vector<int> SpriteManager::render_text(const std::wstring& text, const Vector<int>& pos) const
+geometry::Position SpriteManager::render_text(const std::wstring& text, const geometry::Position& pos) const
 {
   int x = pos.x();
   int y = pos.y();
@@ -318,7 +318,7 @@ geometry::Rectangle SpriteManager::get_rect_for_number(const char ch) const
 	return get_rect_for_icon(ch - '0' + static_cast<int>(Icon::ICON_0));
 }
 
-Vector<int> SpriteManager::render_number(const int num, const Vector<int>& pos) const
+geometry::Position SpriteManager::render_number(const int num, const geometry::Position& pos) const
 {
 	const auto text = std::to_string(num);
 	// Numbers are right-aligned
@@ -339,7 +339,7 @@ geometry::Rectangle SpriteManager::get_rect_for_icon(const int idx) const
 	return {(idx % (char_surface_->width() / CHAR_W)) * CHAR_W, (idx / (char_surface_->width() / CHAR_H)) * CHAR_H, CHAR_W, CHAR_H};
 }
 
-void SpriteManager::render_icon(const Icon icon, const Vector<int>& pos) const
+void SpriteManager::render_icon(const Icon icon, const geometry::Position& pos) const
 {
 	const auto src_rect = get_rect_for_icon(static_cast<int>(icon));
 	const geometry::Rectangle dest_rect{pos.x(), pos.y(), CHAR_W, CHAR_H};

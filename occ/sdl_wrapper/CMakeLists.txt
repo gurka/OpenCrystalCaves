@@ -4,8 +4,6 @@ project(sdl_wrapper)
 
 include_directories(${SDL2_INCLUDE_DIRS})
 
-file(GLOB SDLBITMAPFONT_HDRS "../external/SDLBitmapFont/*.h")
-file(GLOB SDLBITMAPFONT_SRCS "../external/SDLBitmapFont/*.cpp")
 add_library(sdl_wrapper
   "export/event.h"
   "export/graphics.h"
@@ -16,12 +14,10 @@ add_library(sdl_wrapper
   "src/graphics_impl.h"
   "src/sdl_wrapper_impl.cc"
   "src/sdl_wrapper_impl.h"
-  ${SDLBITMAPFONT_HDRS} ${SDLBITMAPFONT_SRCS}
 )
 target_include_directories(sdl_wrapper PUBLIC
   "export"
   ${SDL2_INCLUDE_DIRS}
-  "../external/SDLBitmapFont"
 )
 target_link_libraries(sdl_wrapper SDL2::SDL2 SDL2_image::SDL2_image)
 target_compile_features(sdl_wrapper PRIVATE cxx_std_17)

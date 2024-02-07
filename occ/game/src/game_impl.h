@@ -55,7 +55,7 @@ class GameImpl : public Game
   unsigned get_num_lives() const override { return num_lives_; }
 	bool has_key() const override { return has_key_; }
 
-  std::string get_debug_info() const override;
+  std::wstring get_debug_info() const override;
 
  private:
   void update_level();

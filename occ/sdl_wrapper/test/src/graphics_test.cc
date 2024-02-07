@@ -24,12 +24,11 @@ TEST_F(GraphicsTest, window_create)
   const auto* window_name = "test";
   const auto window_width = 100;
   const auto window_height = 100;
-  const auto text_sprite_filename = "foobar.bmp";
 
   EXPECT_CALL(SDLStub::get(), SDL_CreateWindow(StrEq(window_name), _, _, window_width, window_height, _)).WillOnce(Return(&sdl_window));
   SDL_Renderer sdl_renderer;
   EXPECT_CALL(SDLStub::get(), SDL_CreateRenderer(_, _, _)).WillOnce(Return(&sdl_renderer));
-  auto window = Window::create(window_name, geometry::Size(window_width, window_height), text_sprite_filename);
+  auto window = Window::create(window_name, geometry::Size(window_width, window_height));
 
   EXPECT_CALL(SDLStub::get(), SDL_DestroyWindow(&sdl_window));
   window.reset();
@@ -41,7 +40,7 @@ TEST_F(GraphicsTest, window_refresh)
   EXPECT_CALL(SDLStub::get(), SDL_CreateWindow(_, _, _, _, _, _)).WillOnce(Return(&sdl_window));
   SDL_Renderer sdl_renderer;
   EXPECT_CALL(SDLStub::get(), SDL_CreateRenderer(_, _, _)).WillOnce(Return(&sdl_renderer));
-  auto window = Window::create("test", geometry::Size(100, 100), "foobar.bmp");
+  auto window = Window::create("test", geometry::Size(100, 100));
 
   EXPECT_CALL(SDLStub::get(), SDL_RenderPresent(&sdl_renderer));
   window->refresh();
@@ -59,7 +58,7 @@ TEST_F(GraphicsTest, surface_from_bmp)
   EXPECT_CALL(SDLStub::get(), SDL_CreateWindow(_, _, _, _, _, _)).WillOnce(Return(&sdl_window));
   SDL_Renderer sdl_renderer;
   EXPECT_CALL(SDLStub::get(), SDL_CreateRenderer(_, _, _)).WillOnce(Return(&sdl_renderer));
-  auto window = Window::create("test", geometry::Size(100, 100), "foobar.bmp");
+  auto window = Window::create("test", geometry::Size(100, 100));
   EXPECT_CALL(SDLStub::get(), SDL_RWFromFile(StrEq(filename), _)).WillOnce(Return(&sdl_rw_ops));
   EXPECT_CALL(SDLStub::get(), SDL_LoadBMP_RW(&sdl_rw_ops, _)).WillOnce(Return(&sdl_surface));
   auto surface = Surface::from_bmp(filename, *window);
@@ -73,7 +72,7 @@ TEST_F(GraphicsTest, surface_fill_rect)
   EXPECT_CALL(SDLStub::get(), SDL_CreateWindow(_, _, _, _, _, _)).WillOnce(Return(&sdl_window));
   SDL_Renderer sdl_renderer;
   EXPECT_CALL(SDLStub::get(), SDL_CreateRenderer(_, _, _)).WillOnce(Return(&sdl_renderer));
-  auto window = Window::create("test", geometry::Size(100, 100), "foobar.bmp");
+  auto window = Window::create("test", geometry::Size(100, 100));
 
   EXPECT_CALL(SDLStub::get(), SDL_SetRenderDrawColor(&sdl_renderer, _, _, _, _));
   EXPECT_CALL(SDLStub::get(), SDL_RenderFillRect(&sdl_renderer, _));

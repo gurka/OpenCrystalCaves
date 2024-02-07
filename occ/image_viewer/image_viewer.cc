@@ -24,7 +24,7 @@ int main()
     LOG_CRITICAL("Could not initialize SDLWrapper");
     return 1;
   }
-  auto window = Window::create("Crystal Caves Image Viewer", geometry::Size(10, 10), "");
+  auto window = Window::create("Crystal Caves Image Viewer", geometry::Size(10, 10));
   if (!window)
   {
     LOG_CRITICAL("Could not create Window");
