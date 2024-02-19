@@ -6,6 +6,7 @@
 #include <utility>
 
 #include "logger.h"
+#include "misc.h"
 #include "occ_math.h"
 
 SDL_Rect to_sdl_rect(const geometry::Rectangle& rect)
@@ -13,13 +14,24 @@ SDL_Rect to_sdl_rect(const geometry::Rectangle& rect)
   return {rect.position.x(), rect.position.y(), rect.size.x(), rect.size.y()};
 }
 
-std::unique_ptr<Window> Window::create(const std::string& title, geometry::Size size)
+std::unique_ptr<Window> Window::create(const std::string& title, geometry::Size size, const std::filesystem::path& icon_path)
 {
   auto sdl_window = std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)>(
     SDL_CreateWindow(title.c_str(), 0, 0, size.x(), size.y(), SDL_WINDOW_SHOWN), SDL_DestroyWindow);
   if (!sdl_window)
   {
     return nullptr;
+  }
+  auto icon = IMG_Load(icon_path.string().c_str());
+  if (!icon)
+  {
+    LOG_ERROR("could not load icon file %s", icon_path.string().c_str());
+  }
+  else
+  {
+    LOG_DEBUG("setting window icon file %s", icon_path.string().c_str());
+    SDL_SetWindowIcon(sdl_window.get(), icon);
+    SDL_FreeSurface(icon);
   }
   auto sdl_renderer =
     std::unique_ptr<SDL_Renderer, decltype(&SDL_DestroyRenderer)>(SDL_CreateRenderer(sdl_window.get(), -1, 0), SDL_DestroyRenderer);

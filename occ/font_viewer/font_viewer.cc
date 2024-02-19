@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
     LOG_CRITICAL("Could not initialize SDLWrapper");
     return 1;
   }
-  auto window = Window::create("OpenCrystalCaves", geometry::Size(10, 10));
+  auto window = Window::create("OpenCrystalCaves", geometry::Size(10, 10), "");
   if (!window)
   {
     LOG_CRITICAL("Could not create Window");
@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
     window->fill_rect(geometry::Rectangle(0, 0, size), {33u, 33u, 33u});
     sprite_manager.render_text(text, geometry::Position(5, 5));
     window->refresh();
-	  sdl->delay(10);
+    sdl->delay(10);
   }
 
   return 0;

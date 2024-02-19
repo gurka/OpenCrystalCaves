@@ -14,6 +14,9 @@
 // From utils
 #include "geometry.h"
 #include "logger.h"
+#include "path.h"
+
+#define ICON_FILENAME_FMT "caves%d.ico"
 
 
 int main()
@@ -34,8 +37,17 @@ int main()
   }
   LOG_INFO("SDLWrapper initialized");
 
+  // TODO: select episode
+  const int episode = 1;
+
   // Create Window
-  auto window = Window::create("OpenCrystalCaves", WINDOW_SIZE);
+  const auto icon_file = misc::string_format(ICON_FILENAME_FMT, episode);
+  const auto icon_path = get_data_path(icon_file);
+  if (icon_path.empty())
+  {
+    LOG_ERROR("could not find icon file %s", icon_file.c_str());
+  }
+  auto window = Window::create("OpenCrystalCaves", WINDOW_SIZE, icon_path);
   if (!window)
   {
     LOG_CRITICAL("Could not create Window");
@@ -47,8 +59,8 @@ int main()
   auto game_surface = window->create_target_surface(CAMERA_SIZE);
   if (!game_surface)
   {
-	LOG_CRITICAL("Could not create game surface");
-	return 1;
+    LOG_CRITICAL("Could not create game surface");
+    return 1;
   }
   LOG_INFO("Game surface created");
 
@@ -59,9 +71,6 @@ int main()
     LOG_CRITICAL("Could not create event handler");
     return 1;
   }
-	
-	// TODO: select episode
-	const int episode = 1;
 
   // Load tileset
   SpriteManager sprite_manager;
@@ -71,15 +80,15 @@ int main()
     return 1;
   }
   LOG_INFO("Tileset loaded");
-	
-	// Load image manager
-	ImageManager image_manager;
-	if (!image_manager.load_images(*window))
-	{
-	  LOG_CRITICAL("Could not load images");
-	  return 1;
-	}
-	LOG_INFO("Images loaded");
+
+  // Load image manager
+  ImageManager image_manager;
+  if (!image_manager.load_images(*window))
+  {
+    LOG_CRITICAL("Could not load images");
+    return 1;
+  }
+  LOG_INFO("Images loaded");
 
   // Create Game
   std::unique_ptr<Game> game = Game::create();
@@ -95,18 +104,18 @@ int main()
   }
   LOG_INFO("Game initialized");
 
-	// Create game states
-	// TODO: more episodes
-	auto splash_images = image_manager.get_images(1, CCImage::IMAGE_APOGEE);
-	SplashState splash{splash_images, *window};
-	auto title_images = image_manager.get_images(1, CCImage::IMAGE_TITLE);
-	auto credits_images = image_manager.get_images(1, CCImage::IMAGE_CREDITS);
-	title_images.insert( title_images.end(), credits_images.begin(), credits_images.end() );
-	TitleState title{title_images, *window};
-	splash.set_next(title);
-	GameState game_state(*game, sprite_manager, *game_surface, *window);
-	title.set_next(game_state);
-	State* state = &splash;
+  // Create game states
+  // TODO: more episodes
+  auto splash_images = image_manager.get_images(1, CCImage::IMAGE_APOGEE);
+  SplashState splash{splash_images, *window};
+  auto title_images = image_manager.get_images(1, CCImage::IMAGE_TITLE);
+  auto credits_images = image_manager.get_images(1, CCImage::IMAGE_CREDITS);
+  title_images.insert(title_images.end(), credits_images.begin(), credits_images.end());
+  TitleState title{title_images, *window};
+  splash.set_next(title);
+  GameState game_state(*game, sprite_manager, *game_surface, *window);
+  title.set_next(game_state);
+  State* state = &splash;
 
   // Game loop
   {
@@ -146,13 +155,13 @@ int main()
         {
           return 0;  // Quit ASAP
         }
-		  state->update(input);
-		  auto new_state = state->next_state();
-		  if (new_state != state)
-		  {
-			  new_state->reset();
-			  state = new_state;
-		  }
+        state->update(input);
+        auto new_state = state->next_state();
+        if (new_state != state)
+        {
+          new_state->reset();
+          state = new_state;
+        }
 
         lag -= ms_per_update;
       }
@@ -163,12 +172,12 @@ int main()
       ///
       /////////////////////////////////////////////////////////////////////////
 
-		state->draw(*window);
-		
-		// Render FPS
-		auto fps_str = L"fps: " + std::to_wstring(fps);
-		sprite_manager.render_text(fps_str, geometry::Position(5, 5));
-		
+      state->draw(*window);
+
+      // Render FPS
+      auto fps_str = L"fps: " + std::to_wstring(fps);
+      sprite_manager.render_text(fps_str, geometry::Position(5, 5));
+
       // Update screen
       window->refresh();
 
