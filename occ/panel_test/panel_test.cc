@@ -53,7 +53,7 @@ class Panel
       const auto question = s.find_first_of("^");
       if (question != std::string::npos)
       {
-        question_pos_ = geometry::Position((question + 2) * CHAR_W, (strings_.size() + 2) * CHAR_H);
+        question_pos_ = geometry::Position((question + 2) * CHAR_W, (static_cast<int>(strings_.size()) + 2) * CHAR_H);
       }
       strings_.push_back(converter.from_bytes(s));
       p_ucsd += len;
@@ -150,10 +150,17 @@ class Panel
     // Spinning question mark
     if (question_pos_ != geometry::Position(0, 0))
     {
-      constexpr Icon q_icons[]{
-        Icon::ICON_QUESTION_1, Icon::ICON_QUESTION_2, Icon::ICON_QUESTION_3, Icon::ICON_QUESTION_4, Icon::ICON_QUESTION_5};
+      constexpr Icon q_icons[]{Icon::ICON_QUESTION_1,
+                               Icon::ICON_QUESTION_2,
+                               Icon::ICON_QUESTION_4,
+                               Icon::ICON_QUESTION_3,
+                               Icon::ICON_QUESTION_1,
+                               Icon::ICON_QUESTION_3,
+                               Icon::ICON_QUESTION_4,
+                               Icon::ICON_QUESTION_2};
+      constexpr bool flip[]{false, false, false, false, true, false, false, false};
       const auto icon_frame = (ticks_ / 2) % std::size(q_icons);
-      sprite_manager.render_icon(q_icons[icon_frame], frame_pos + question_pos_);
+      sprite_manager.render_icon(q_icons[icon_frame], frame_pos + question_pos_, flip);
     }
 
     // Sparkle

@@ -47,7 +47,7 @@ class SurfaceImpl : public Surface
   int height() const override { return h_; }
 
   void blit_surface(const geometry::Rectangle& source,
-                    const geometry::Rectangle& dest) const override;
+                    const geometry::Rectangle& dest, const bool flip = false) const override;
 	void blit_surface() const override;
   void set_render_target();
 	void set_alpha(const uint8_t alpha) override;

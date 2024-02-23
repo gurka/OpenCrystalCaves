@@ -52,7 +52,7 @@ class Surface
   geometry::Size size() const { return geometry::Size(width(), height()); }
   virtual void set_alpha(const uint8_t alpha) = 0;
 
-  virtual void blit_surface(const geometry::Rectangle& source, const geometry::Rectangle& dest) const = 0;
+  virtual void blit_surface(const geometry::Rectangle& source, const geometry::Rectangle& dest, const bool flip = false) const = 0;
   virtual void blit_surface() const = 0;
 };
 

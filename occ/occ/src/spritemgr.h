@@ -56,7 +56,7 @@ class SpriteManager
 	geometry::Rectangle get_rect_for_number(const char ch) const;
 	geometry::Position render_number(const int num, const geometry::Position& pos) const;
 	geometry::Rectangle get_rect_for_icon(const int idx) const;
-	void render_icon(const Icon icon, const geometry::Position& pos) const;
+	void render_icon(const Icon icon, const geometry::Position& pos, const bool flip = false) const;
 
  private:
   std::unique_ptr<Surface> sprite_surface_;

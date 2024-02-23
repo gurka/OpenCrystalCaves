@@ -160,12 +160,13 @@ std::unique_ptr<Surface> Surface::from_pixels(const int w, const int h, const ui
   return create_surface(sdl_surface, window);
 }
 
-void SurfaceImpl::blit_surface(const geometry::Rectangle& source, const geometry::Rectangle& dest) const
+void SurfaceImpl::blit_surface(const geometry::Rectangle& source, const geometry::Rectangle& dest, const bool flip) const
 {
   const auto src_rect = to_sdl_rect(source);
   auto dest_rect = to_sdl_rect(dest);
   // TODO: check error
-  SDL_RenderCopy(sdl_renderer_, sdl_texture_.get(), &src_rect, &dest_rect);
+  const SDL_RendererFlip sdl_flip = flip ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
+  SDL_RenderCopyEx(sdl_renderer_, sdl_texture_.get(), &src_rect, &dest_rect, 0.0, nullptr, sdl_flip);
 }
 
 void SurfaceImpl::blit_surface() const

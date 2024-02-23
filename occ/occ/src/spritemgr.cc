@@ -1,4 +1,4 @@
-﻿/*
+/*
 https://moddingwiki.shikadi.net/wiki/ProGraphx_Toolbox_tileset_format
 */
 #include "spritemgr.h"
@@ -339,9 +339,9 @@ geometry::Rectangle SpriteManager::get_rect_for_icon(const int idx) const
 	return {(idx % (char_surface_->width() / CHAR_W)) * CHAR_W, (idx / (char_surface_->width() / CHAR_H)) * CHAR_H, CHAR_W, CHAR_H};
 }
 
-void SpriteManager::render_icon(const Icon icon, const geometry::Position& pos) const
+void SpriteManager::render_icon(const Icon icon, const geometry::Position& pos, const bool flip) const
 {
 	const auto src_rect = get_rect_for_icon(static_cast<int>(icon));
 	const geometry::Rectangle dest_rect{pos.x(), pos.y(), CHAR_W, CHAR_H};
-	get_char_surface()->blit_surface(src_rect, dest_rect);
+	get_char_surface()->blit_surface(src_rect, dest_rect, flip);
 }
