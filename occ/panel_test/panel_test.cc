@@ -11,7 +11,10 @@ Display Crystal Caves window panels
 #include "event.h"
 #include "graphics.h"
 #include "logger.h"
+#include "misc.h"
 #include "sdl_wrapper.h"
+
+constexpr Icon S_ICONS[]{Icon::ICON_SPARKLE_1, Icon::ICON_SPARKLE_2, Icon::ICON_SPARKLE_3, Icon::ICON_SPARKLE_4};
 
 class Panel
 {
@@ -22,7 +25,7 @@ class Panel
     // END OF WINDOW text
     // Also find the max string size to determine window size
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    constexpr size_t len_limit = 31;
+    constexpr size_t len_limit = 32;
     size_t max_len = 0;
     const char* p_ucsd = ucsd.c_str();
     while (true)
@@ -46,11 +49,38 @@ class Panel
         strings_.push_back(converter.from_bytes(s.substr(0, len_limit)));
         s = s.substr(len_limit);
       }
+      // Find the spinning question mark
+      const auto question = s.find_first_of("^");
+      if (question != std::string::npos)
+      {
+        question_pos_ = geometry::Position((question + 2) * CHAR_W, (strings_.size() + 2) * CHAR_H);
+      }
       strings_.push_back(converter.from_bytes(s));
       p_ucsd += len;
     }
     max_len = std::min(max_len, len_limit);
     size_ = geometry::Position(static_cast<int>(max_len) + 1, static_cast<int>(strings_.size()) + 1);
+  }
+
+  void update()
+  {
+    ticks_ += 1;
+
+    // Randomly switch the sparkle position around
+    const auto sparkle_frame = (ticks_ / 3) % (std::size(S_ICONS) + 1);
+    if (sparkle_frame == 0)
+    {
+      if (misc::random<int>(0, 1) == 0)
+      {
+        // Put the sparkle on the top edge
+        sparkle_pos_ = geometry::Position(misc::random<int>(1, size_.x()) * CHAR_W, 0);
+      }
+      else
+      {
+        // Put the sparkle on the left edge
+        sparkle_pos_ = geometry::Position(0, misc::random<int>(1, size_.y()) * CHAR_H);
+      }
+    }
   }
 
   void draw(const SpriteManager& sprite_manager) const
@@ -117,13 +147,29 @@ class Panel
       y += CHAR_H;
     }
 
-    // TODO: spinning question mark
-    // TODO: sparkles
+    // Spinning question mark
+    if (question_pos_ != geometry::Position(0, 0))
+    {
+      constexpr Icon q_icons[]{
+        Icon::ICON_QUESTION_1, Icon::ICON_QUESTION_2, Icon::ICON_QUESTION_3, Icon::ICON_QUESTION_4, Icon::ICON_QUESTION_5};
+      const auto icon_frame = (ticks_ / 2) % std::size(q_icons);
+      sprite_manager.render_icon(q_icons[icon_frame], frame_pos + question_pos_);
+    }
+
+    // Sparkle
+    const auto sparkle_frame = (ticks_ / 3) % (std::size(S_ICONS) + 1);
+    if (sparkle_frame > 0)
+    {
+      sprite_manager.render_icon(S_ICONS[sparkle_frame - 1], frame_pos + sparkle_pos_);
+    }
   }
 
  private:
   std::vector<std::wstring> strings_;
   geometry::Size size_;
+  geometry::Position question_pos_ = {0, 0};
+  geometry::Position sparkle_pos_ = {0, 0};
+  unsigned ticks_ = 0;
 };
 
 int main(int argc, char* argv[])
@@ -198,26 +244,41 @@ int main(int argc, char* argv[])
     return 1;
   }
 
+  auto sdl_tick = sdl->get_tick();
+  const auto ms_per_update = 57;  // 17.5~ ticks per second
+  auto tick_last_update = sdl_tick;
+  auto lag = 0u;
   Input input;
   while (!input.quit)
   {
-    event->poll_event(&input);
-    if (input.left.pressed() || input.up.pressed())
+    sdl_tick = sdl->get_tick();
+    auto elapsed_ticks = sdl_tick - tick_last_update;
+    tick_last_update = sdl_tick;
+    lag += elapsed_ticks;
+    while (lag >= ms_per_update)
     {
-      index--;
-      if (index < 0)
+      event->poll_event(&input);
+      if (input.left.pressed() || input.up.pressed())
       {
-        index = (int)panels.size() - 1;
+        index--;
+        if (index < 0)
+        {
+          index = (int)panels.size() - 1;
+        }
       }
-    }
-    else if (input.right.pressed() || input.down.pressed())
-    {
-      index++;
-      if (index == (int)panels.size())
+      else if (input.right.pressed() || input.down.pressed())
       {
-        index = 0;
+        index++;
+        if (index == (int)panels.size())
+        {
+          index = 0;
+        }
       }
+      panels[index].update();
+
+      lag -= ms_per_update;
     }
+
     window->fill_rect(geometry::Rectangle(0, 0, SCREEN_SIZE), {33u, 33u, 33u});
     panels[index].draw(sprite_manager);
     window->refresh();
