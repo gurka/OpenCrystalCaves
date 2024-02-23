@@ -53,7 +53,7 @@ class Panel
       const auto question = s.find_first_of("^");
       if (question != std::string::npos)
       {
-        question_pos_ = geometry::Position((question + 2) * CHAR_W, (static_cast<int>(strings_.size()) + 2) * CHAR_H);
+        question_pos_ = geometry::Position((static_cast<int>(question) + 2) * CHAR_W, (static_cast<int>(strings_.size()) + 2) * CHAR_H);
       }
       strings_.push_back(converter.from_bytes(s));
       p_ucsd += len;

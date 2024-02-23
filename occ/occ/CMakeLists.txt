@@ -15,6 +15,7 @@ add_executable(occ
   "src/spritemgr.h"
   "src/state.cc"
   "src/state.h"
+  "src/wchars.h"
   ${AHEASING_HDRS} ${AHEASING_SRCS}
 )
 target_include_directories(occ PUBLIC
