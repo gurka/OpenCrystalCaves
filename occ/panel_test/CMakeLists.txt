@@ -1,5 +1,7 @@
 add_executable(panel_test
   "panel_test.cc"
+  "../occ/src/panel.cc"
+  "../occ/src/panel.h"
   "../occ/src/spritemgr.cc"
   "../occ/src/spritemgr.h"
 )

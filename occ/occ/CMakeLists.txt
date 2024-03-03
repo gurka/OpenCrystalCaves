@@ -11,6 +11,8 @@ add_executable(occ
   "src/imagemgr.cc"
   "src/imagemgr.h"
   "src/occ.cc"
+  "src/panel.cc"
+  "src/panel.h"
   "src/spritemgr.cc"
   "src/spritemgr.h"
   "src/state.cc"
