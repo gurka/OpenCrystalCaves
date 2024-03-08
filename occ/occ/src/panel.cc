@@ -7,7 +7,7 @@
 
 constexpr Icon S_ICONS[]{Icon::ICON_SPARKLE_1, Icon::ICON_SPARKLE_2, Icon::ICON_SPARKLE_3, Icon::ICON_SPARKLE_4};
 
-Panel::Panel(const std::string& ucsd)
+Panel::Panel(const char* ucsd)
 {
   // Convert input text into a vector of strings, ignoring the
   // END OF WINDOW text
@@ -15,14 +15,14 @@ Panel::Panel(const std::string& ucsd)
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
   constexpr size_t len_limit = 32;
   size_t max_len = 0;
-  const char* p_ucsd = ucsd.c_str();
+  const char* p_ucsd = ucsd;
   while (true)
   {
     const size_t len = *p_ucsd;
     max_len = std::max(len, max_len);
     p_ucsd++;
     std::string s(p_ucsd, len);
-    if (s == "END OF WINDOW")
+    if (len == 85 || s == "END OF WINDOW")
     {
       break;
     }

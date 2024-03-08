@@ -10,3 +10,6 @@
 [submodule "occ/external/AHEasing"]
 	path = occ/external/AHEasing
 	url = https://github.com/warrenm/AHEasing.git
+[submodule "occ/external/unlzexe"]
+	path = occ/external/unlzexe
+	url = https://github.com/cxong/unlzexe.git

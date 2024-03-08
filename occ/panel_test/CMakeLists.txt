@@ -9,5 +9,6 @@ target_compile_features(panel_test PRIVATE cxx_std_17)
 target_link_libraries(panel_test
   "utils"
   "sdl_wrapper"
+  "unlzexe"
   SDL2::SDL2
 )

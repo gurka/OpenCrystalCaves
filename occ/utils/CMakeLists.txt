@@ -3,18 +3,24 @@ cmake_minimum_required(VERSION 3.5)
 project(utils)
 
 add_library(utils
+  "export/exe_data.h"
   "export/geometry.h"
   "export/logger.h"
   "export/occ_math.h"
   "export/misc.h"
   "export/path.h"
   "export/vector.h"
+  "src/exe_data.cc"
   "src/logger.cc"
   "src/path.cc"
 )
 target_include_directories(utils PUBLIC
   "export"
   "../external/find_steam_game"
+  "../external/unlzexe"
+)
+target_link_libraries(utils PUBLIC
+  "unlzexe"
 )
 target_compile_features(utils PRIVATE cxx_std_17)
 

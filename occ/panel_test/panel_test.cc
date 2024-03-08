@@ -43,40 +43,83 @@ int main(int argc, char* argv[])
     LOG_CRITICAL("Could not load tilesets");
     return 1;
   }
-  std::vector<Panel> panels = {{"\x19"
-                                "Welcome to Crystal Caves!"
-                                "\x16"
-                                "   Quit to DOS (Y-N) ^"
-                                "\x0D"
-                                "END OF WINDOW"},
-                               {"\x1A"
-                                "     GALACTIC ENCYCLOPEDIA"
-                                "\x1A"
-                                "     ---------------------"
-                                "\x1B"
-                                "ENTRY # 981,231,783,813,651"
-                                "\x15"
-                                "NAME:  Mylo Steamwitz"
-                                "\x0C"
-                                "RACE:  Human"
-                                "\x12"
-                                "SSN:   496-WZ-3452"
-                                "\x19"
-                                "OCCUPATION:  Space Trader"
-                                "\x1B"
-                                "Mylo scours the universe in"
-                                "\x1E"
-                                "search of anything he can sell"
-                                "\x1D"
-                                "that will make him a buck and"
-                                "\x19"
-                                "keep him from joining his"
-                                "\x1E"
-                                "uncle@s Yorp herding business."
-                                "\x17"
-                                "        Press Any Key ^"
-                                "\x0D"
-                                "END OF WINDOW"}};
+  ExeData exe_data{episode};
+  std::vector<Panel> panels = {
+    {"\x19"
+     "Welcome to Crystal Caves!"
+     "\x1E"
+     "Press left and right to scroll"
+     "\x1D"
+     " through the text panels... ^"
+     "\x0D"
+     "END OF WINDOW"},
+    {PanelText::PANEL_TEXT_SFX_ON, exe_data},
+    {PanelText::PANEL_TEXT_END, exe_data},
+    {PanelText::PANEL_TEXT_END_1, exe_data},
+    {PanelText::PANEL_TEXT_END_2, exe_data},
+    {PanelText::PANEL_TEXT_END_3, exe_data},
+    {PanelText::PANEL_TEXT_START_1, exe_data},
+    {PanelText::PANEL_TEXT_START_2, exe_data},
+    {PanelText::PANEL_TEXT_START_3, exe_data},
+    {PanelText::PANEL_TEXT_STORY_1, exe_data},
+    {PanelText::PANEL_TEXT_STORY_2, exe_data},
+    {PanelText::PANEL_TEXT_PAUSED, exe_data},
+    {PanelText::PANEL_TEXT_ORDER_1, exe_data},
+    {PanelText::PANEL_TEXT_ORDER_2, exe_data},
+    {PanelText::PANEL_TEXT_ORDER_3, exe_data},
+    {PanelText::PANEL_TEXT_HIGH_SCORES, exe_data},
+    {PanelText::PANEL_TEXT_ENTER_SCORE, exe_data},
+    {PanelText::PANEL_TEXT_INSTRUCTIONS_1, exe_data},
+    {PanelText::PANEL_TEXT_INSTRUCTIONS_2, exe_data},
+    {PanelText::PANEL_TEXT_INSTRUCTIONS_3, exe_data},
+    {PanelText::PANEL_TEXT_INSTRUCTIONS_4, exe_data},
+    {PanelText::PANEL_TEXT_INSTRUCTIONS_5, exe_data},
+    {PanelText::PANEL_TEXT_INSTRUCTIONS_6, exe_data},
+    {PanelText::PANEL_TEXT_INSTRUCTIONS_7, exe_data},
+    {PanelText::PANEL_TEXT_LEVEL_DONE, exe_data},
+    {PanelText::PANEL_TEXT_TIME_STOP, exe_data},
+    {PanelText::PANEL_TEXT_MORE_CRYSTALS, exe_data},
+    {PanelText::PANEL_TEXT_FILE_ERROR, exe_data},
+    {PanelText::PANEL_TEXT_PRESS_ANY_KEY, exe_data},
+    {PanelText::PANEL_TEXT_JOYSTICK_ON, exe_data},
+    {PanelText::PANEL_TEXT_QUIT_TO_DOS, exe_data},
+    {PanelText::PANEL_TEXT_QUIT_TO, exe_data},
+    {PanelText::PANEL_TEXT_JOY_ZERO, exe_data},
+    {PanelText::PANEL_TEXT_RED_MUSHROOM, exe_data},
+    {PanelText::PANEL_TEXT_LEVER, exe_data},
+    {PanelText::PANEL_TEXT_SWITCH, exe_data},
+    {PanelText::PANEL_TEXT_P, exe_data},
+    {PanelText::PANEL_TEXT_GREEN_MUSHROOM, exe_data},
+    {PanelText::PANEL_TEXT_CHEAT_MODE, exe_data},
+    {PanelText::PANEL_TEXT_SAVED, exe_data},
+    {PanelText::PANEL_TEXT_SAVE_FROM_MAIN, exe_data},
+    {PanelText::PANEL_TEXT_HIT_AIR, exe_data},
+    {PanelText::PANEL_TEXT_RESTORE_FROM_MAIN, exe_data},
+    {PanelText::PANEL_TEXT_REDEFINE_KEYS, exe_data},
+    {PanelText::PANEL_TEXT_KEY_UNAVAILABLE, exe_data},
+    {PanelText::PANEL_TEXT_KEY_LEFT, exe_data},
+    {PanelText::PANEL_TEXT_KEY_RIGHT, exe_data},
+    {PanelText::PANEL_TEXT_KEY_JUMP, exe_data},
+    {PanelText::PANEL_TEXT_KEY_FIRE, exe_data},
+    {PanelText::PANEL_TEXT_MAIN_MENU, exe_data},
+    {PanelText::PANEL_TEXT_HELP_MENU, exe_data},
+    {PanelText::PANEL_TEXT_HIGH_SCORE_NAMES, exe_data},
+    {PanelText::PANEL_TEXT_FOREIGN_ORDERS_1, exe_data},
+    {PanelText::PANEL_TEXT_FOREIGN_ORDERS_2, exe_data},
+    {PanelText::PANEL_TEXT_FOREIGN_ORDERS_3, exe_data},
+    {PanelText::PANEL_TEXT_FOREIGN_ORDERS_4, exe_data},
+    {PanelText::PANEL_TEXT_BBS, exe_data},
+    {PanelText::PANEL_TEXT_ABOUT, exe_data},
+    {PanelText::PANEL_TEXT_REVERSE_GRAVITY, exe_data},
+    {PanelText::PANEL_TEXT_PERFECT, exe_data},
+    {PanelText::PANEL_TEXT_WARP, exe_data},
+    {PanelText::PANEL_TEXT_RESTORE, exe_data},
+    {PanelText::PANEL_TEXT_SAVE, exe_data},
+    {PanelText::PANEL_TEXT_VIDEO_COMPAT, exe_data},
+    {PanelText::PANEL_TEXT_START_SEQ_1, exe_data},
+    {PanelText::PANEL_TEXT_START_SEQ_2, exe_data},
+    {PanelText::PANEL_TEXT_START_SEQ_3, exe_data},
+  };
   int index = 0;
   auto event = Event::create();
   if (!event)
