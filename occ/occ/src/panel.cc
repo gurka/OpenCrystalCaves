@@ -7,13 +7,29 @@
 
 constexpr Icon S_ICONS[]{Icon::ICON_SPARKLE_1, Icon::ICON_SPARKLE_2, Icon::ICON_SPARKLE_3, Icon::ICON_SPARKLE_4};
 
+// https://stackoverflow.com/a/42844629/2038264
+#if __cplusplus >= 201703L  // C++17 and later
+#include <string_view>
+
+static bool ends_with(std::string_view str, std::string_view suffix)
+{
+  return str.size() >= suffix.size() && str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
+}
+
+static bool starts_with(std::string_view str, std::string_view prefix)
+{
+  return str.size() >= prefix.size() && str.compare(0, prefix.size(), prefix) == 0;
+}
+#endif  // C++17
+
+
 Panel::Panel(const char* ucsd)
 {
   // Convert input text into a vector of strings, ignoring the
   // END OF WINDOW text
   // Also find the max string size to determine window size
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-  constexpr size_t len_limit = 32;
+  constexpr size_t len_limit = 33;
   size_t max_len = 0;
   const char* p_ucsd = ucsd;
   while (true)
@@ -44,6 +60,16 @@ Panel::Panel(const char* ucsd)
       question_pos_ = geometry::Position((static_cast<int>(question) + 2) * CHAR_W, (static_cast<int>(strings_.size()) + 2) * CHAR_H);
     }
     strings_.push_back(converter.from_bytes(s));
+    // Add a paragraph break after some special lines
+    if (ends_with(s, "-") || ends_with(s, ": ") || ends_with(s, "."))
+    {
+      strings_.push_back(L"");
+    }
+    // End immediately on some special lines
+    if (ends_with(s, "^"))
+    {
+      break;
+    }
     p_ucsd += len;
   }
   max_len = std::min(max_len, len_limit);
@@ -73,8 +99,8 @@ void Panel::update()
 
 void Panel::draw(const SpriteManager& sprite_manager) const
 {
-  const geometry::Position frame_pos((SCREEN_SIZE.x() / CHAR_W - size_.x() - 1) / 2 * CHAR_W,
-                                     (SCREEN_SIZE.y() / CHAR_H - size_.y() - 1) / 2 * CHAR_H);
+  const geometry::Position frame_pos(((SCREEN_SIZE.x() / CHAR_W - size_.x() - 1) / 2 - 1) * CHAR_W,
+                                     ((SCREEN_SIZE.y() / CHAR_H - size_.y() - 1) / 2 - 1) * CHAR_H);
   const geometry::Size frame_size = size_ + geometry::Size(2, 2);
   // Draw frame
   // Top-left corner
