@@ -11,7 +11,7 @@ find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 
 if(MSVC)
-  set(COMPILE_OPTIONS -MP -W4 -WX -wd\"4090\" -wd\"4996\" -wd\"4204\" /D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
+  set(COMPILE_OPTIONS -MP -W4 -WX -wd\"4090\" -wd\"4996\" -wd\"4204\" /D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING /Zc:__cplusplus)
 else()
   set(COMPILE_OPTIONS -Wall -Wextra -Wpedantic -Weffc++)
 endif()
