@@ -24,6 +24,25 @@ static bool starts_with(std::string_view str, std::string_view prefix)
 */
 #endif  // C++17
 
+constexpr size_t len_limit = 33;
+
+
+Panel::Panel(const std::vector<std::wstring>& strings) : strings_(strings)
+{
+  size_t max_len = 0;
+  for (const auto& s : strings_)
+  {
+    max_len = std::max(s.length(), max_len);
+    // Find the spinning question mark
+    const auto question = s.find_first_of(L"^");
+    if (question != std::string::npos)
+    {
+      question_pos_ = geometry::Position((static_cast<int>(question) + 2) * CHAR_W, (static_cast<int>(strings_.size()) + 1) * CHAR_H);
+    }
+  }
+  max_len = std::min(max_len, len_limit);
+  size_ = geometry::Position(static_cast<int>(max_len) + 1, static_cast<int>(strings_.size()) + 1);
+}
 
 Panel::Panel(const char* ucsd)
 {
@@ -31,7 +50,6 @@ Panel::Panel(const char* ucsd)
   // END OF WINDOW text
   // Also find the max string size to determine window size
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-  constexpr size_t len_limit = 33;
   size_t max_len = 0;
   const char* p_ucsd = ucsd;
   while (true)

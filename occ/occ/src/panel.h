@@ -79,6 +79,7 @@ enum class PanelText : int
 class Panel
 {
  public:
+  Panel(const std::vector<std::wstring>& strings);
   Panel(const char* ucsd);
   Panel(const PanelText pt, const ExeData& exe_data) : Panel(exe_data.data.c_str() + static_cast<int>(pt)) {}
 

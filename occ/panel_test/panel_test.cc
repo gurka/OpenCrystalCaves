@@ -45,14 +45,11 @@ int main(int argc, char* argv[])
   }
   ExeData exe_data{episode};
   std::vector<Panel> panels = {
-    {"\x19"
-     "Welcome to Crystal Caves!"
-     "\x1E"
-     "Press left and right to scroll"
-     "\x1D"
-     " through the text panels... ^"
-     "\x0D"
-     "END OF WINDOW"},
+    std::vector<std::wstring>({
+      L"Welcome to Crystal Caves!",
+      L"Press left and right to scroll",
+      L" through the text panels... ^",
+    }),
     {PanelText::PANEL_TEXT_SFX_ON, exe_data},
     {PanelText::PANEL_TEXT_END, exe_data},
     {PanelText::PANEL_TEXT_END_1, exe_data},
