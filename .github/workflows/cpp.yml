@@ -15,7 +15,8 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - macos-latest
+          # Temporarily disable macos build - broken due to installing SDL via homebrew (python3.12 issue?)
+          # - macos-latest
           - windows-latest
         build_type:
           - debug
