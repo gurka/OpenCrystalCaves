@@ -70,7 +70,7 @@ std::unique_ptr<Surface> WindowImpl::create_target_surface(geometry::Size size)
     LOG_CRITICAL("Could not get texture: %s", SDL_GetError());
     return std::unique_ptr<Surface>();
   }
-  return std::make_unique<SurfaceImpl>(size.x(), size.y(), std::move(sdl_texture), sdl_renderer_.get());
+  return std::make_unique<SurfaceImpl>(size.x(), size.y(), std::move(sdl_texture), *sdl_renderer_.get());
 }
 
 void WindowImpl::refresh()
@@ -133,7 +133,7 @@ std::unique_ptr<Surface> create_surface(SDL_Surface* surface, Window& window)
     LOG_CRITICAL("Could not get texture: %s", SDL_GetError());
     return std::unique_ptr<Surface>();
   }
-  return std::make_unique<SurfaceImpl>(sdl_surface->w, sdl_surface->h, std::move(sdl_texture), sdl_renderer);
+  return std::make_unique<SurfaceImpl>(sdl_surface->w, sdl_surface->h, std::move(sdl_texture), *sdl_renderer);
 }
 
 std::unique_ptr<Surface> Surface::from_bmp(const std::filesystem::path& filename, Window& window)
@@ -166,18 +166,18 @@ void SurfaceImpl::blit_surface(const geometry::Rectangle& source, const geometry
   auto dest_rect = to_sdl_rect(dest);
   // TODO: check error
   const SDL_RendererFlip sdl_flip = flip ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
-  SDL_RenderCopyEx(sdl_renderer_, sdl_texture_.get(), &src_rect, &dest_rect, 0.0, nullptr, sdl_flip);
+  SDL_RenderCopyEx(&sdl_renderer_, sdl_texture_.get(), &src_rect, &dest_rect, 0.0, nullptr, sdl_flip);
 }
 
 void SurfaceImpl::blit_surface() const
 {
   // TODO: check error
-  SDL_RenderCopy(sdl_renderer_, sdl_texture_.get(), nullptr, nullptr);
+  SDL_RenderCopy(&sdl_renderer_, sdl_texture_.get(), nullptr, nullptr);
 }
 
 void SurfaceImpl::set_render_target()
 {
-  SDL_SetRenderTarget(sdl_renderer_, sdl_texture_.get());
+  SDL_SetRenderTarget(&sdl_renderer_, sdl_texture_.get());
 }
 
 void SurfaceImpl::set_alpha(const uint8_t alpha)

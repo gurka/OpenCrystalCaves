@@ -13,3 +13,9 @@ CTestTestfile.cmake
 *.xcodeproj/
 build/
 generated/
+.idea/
+
+# Linux
+Makefile
+*_test
+*.a

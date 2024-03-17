@@ -81,7 +81,7 @@ int main()
         {
           image = (int)IMAGE_APOGEE;
           episode++;
-          if (episode > image_manager.number_of_episodes())
+          if (episode > (int)image_manager.number_of_episodes())
           {
             episode = 1;
           }
