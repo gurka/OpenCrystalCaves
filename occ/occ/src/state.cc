@@ -89,11 +89,50 @@ void SplashState::draw(Window& window) const
   State::draw(window);
 }
 
-TitleState::TitleState(std::vector<Surface*>& images, Window& window) : State(FADE_TICKS, FADE_TICKS, window), images_(images) {}
+#ifdef _MSVC
+#define OS_NAME "Windows"
+#elif defined(__APPLE__)
+#define OS_NAME "macOS"
+#else
+#define OS_NAME "Linux"
+#endif
+
+TitleState::TitleState(SpriteManager& sprite_manager, Surface& game_surface, std::vector<Surface*>& images, Window& window)
+  : State(FADE_TICKS, FADE_TICKS, window),
+    sprite_manager_(sprite_manager),
+    game_surface_(game_surface),
+    images_(images),
+    panel_({
+      L"Welcome to OpenCrystalCaves!",
+      L"----------------------------",
+      L"     New Game",
+      L"     Restore Game",
+      L"     Ordering Info.",  // TODO: hide if retail version detected
+      L"     Instructions",
+      L"     Story",
+      L"     High Scores",
+      L"     Visit our Website",
+      L"     About Apogee",
+      L"     Quit to " OS_NAME,
+      L"             ^",
+    })
+{
+}
+
+void TitleState::update(const Input& input)
+{
+  State::update(input);
+  panel_.update();
+  // TODO: use menus to skip state
+  auto pinput = input_to_player_input(input);
+  if (pinput.jump_pressed || pinput.shoot_pressed)
+  {
+    finish();
+  }
+}
 
 void TitleState::draw(Window& window) const
 {
-  (void)window;
   const auto period_ticks = first_ticks_ + scroll_ticks_ * 2 + last_ticks_;
   const auto ticks = ticks_ % period_ticks;
   if (ticks < first_ticks_)
@@ -130,7 +169,16 @@ void TitleState::draw(Window& window) const
       y += CAMERA_SIZE_SCALED.y();
     }
   }
-  State::draw(window);
+  // Blit to game surface to set scaling properly
+  window.set_render_target(&game_surface_);
+  // Clear window surface
+  window.fill_rect(geometry::Rectangle(0, 0, WINDOW_SIZE), {33u, 33u, 33u, 0u});
+  // TODO: don't scroll if panel showing
+  panel_.draw(sprite_manager_);
+  window.set_render_target(nullptr);
+  // Render game surface to window surface, centered and scaled
+  game_surface_.blit_surface(geometry::Rectangle(0, 0, CAMERA_SIZE),
+                             geometry::Rectangle((WINDOW_SIZE - CAMERA_SIZE_SCALED) / 2, CAMERA_SIZE_SCALED));
 }
 
 
@@ -138,7 +186,7 @@ GameState::GameState(Game& game, SpriteManager& sprite_manager, Surface& game_su
   : State(FADE_TICKS, FADE_TICKS, window),
     game_(game),
     game_surface_(game_surface),
-	sprite_manager_(sprite_manager),
+    sprite_manager_(sprite_manager),
     game_renderer_(&game, &sprite_manager, &game_surface, window)
 {
 }

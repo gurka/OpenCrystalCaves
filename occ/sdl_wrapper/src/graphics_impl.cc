@@ -82,7 +82,7 @@ void WindowImpl::fill_rect(const geometry::Rectangle& rect, const Color& color)
 {
   const auto sdl_rect = to_sdl_rect(rect);
   // TODO: check error
-  SDL_SetRenderDrawColor(sdl_renderer_.get(), color.red, color.green, color.blue, 0xff);
+  SDL_SetRenderDrawColor(sdl_renderer_.get(), color.red, color.green, color.blue, color.alpha);
   SDL_RenderFillRect(sdl_renderer_.get(), &sdl_rect);
 }
 
@@ -158,6 +158,21 @@ std::unique_ptr<Surface> Surface::from_pixels(const int w, const int h, const ui
     SDL_UnlockSurface(sdl_surface);
   }
   return create_surface(sdl_surface, window);
+}
+
+SurfaceImpl::SurfaceImpl(const int w,
+                         const int h,
+                         std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)> sdl_texture,
+                         SDL_Renderer& sdl_renderer)
+  : w_(w),
+    h_(h),
+    sdl_texture_(std::move(sdl_texture)),
+    sdl_renderer_(sdl_renderer)
+{
+  if (SDL_SetTextureBlendMode(sdl_texture_.get(), SDL_BLENDMODE_BLEND) != 0)
+  {
+    LOG_ERROR("Could not set texture blend mode: %s", SDL_GetError());
+  }
 }
 
 void SurfaceImpl::blit_surface(const geometry::Rectangle& source, const geometry::Rectangle& dest, const bool flip) const

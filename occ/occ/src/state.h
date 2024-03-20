@@ -7,6 +7,7 @@
 #include "spritemgr.h"
 
 #include "game.h"
+#include "panel.h"
 
 /// Represents a game state (e.g. splash, title, game)
 /// Contains base logic for fading in/out
@@ -73,19 +74,22 @@ class SplashState : public SkipState
   std::vector<Surface*>& images_;
 };
 
-class TitleState : public SkipState
+class TitleState : public State
 {
-  // TODO: make this state child of State, load menu on key press
  public:
-  TitleState(std::vector<Surface*>& images, Window& window);
+  TitleState(SpriteManager& sprite_manager, Surface& game_surface, std::vector<Surface*>& images, Window& window);
 
+  virtual void update(const Input& input) override;
   virtual void draw(Window& window) const override;
 
  private:
+  SpriteManager& sprite_manager_;
+  Surface& game_surface_;
   std::vector<Surface*>& images_;
   unsigned first_ticks_ = 50;
   unsigned scroll_ticks_ = 50;
   unsigned last_ticks_ = 50;
+  Panel panel_;
 };
 
 class GameState : public State
@@ -99,7 +103,7 @@ class GameState : public State
  private:
   Game& game_;
   Surface& game_surface_;
-	SpriteManager& sprite_manager_;
+  SpriteManager& sprite_manager_;
   GameRenderer game_renderer_;
   bool debug_info_ = false;
   bool paused_ = false;

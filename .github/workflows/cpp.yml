@@ -15,7 +15,8 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - macos-latest
+          # Temporarily disable due to broken python 3.12 via homebrew
+          #- macos-latest
           - windows-latest
         build_type:
           - debug

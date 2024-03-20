@@ -38,13 +38,10 @@ class WindowImpl : public Window
 class SurfaceImpl : public Surface
 {
  public:
-  SurfaceImpl(const int w, const int h, std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)> sdl_texture, SDL_Renderer& sdl_renderer)
-    : w_(w),
-      h_(h),
-      sdl_texture_(std::move(sdl_texture)),
-      sdl_renderer_(sdl_renderer)
-  {
-  }
+  SurfaceImpl(const int w,
+              const int h,
+              std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)> sdl_texture,
+              SDL_Renderer& sdl_renderer);
 
   int width() const override { return w_; }
   int height() const override { return h_; }

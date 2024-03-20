@@ -111,7 +111,7 @@ int main()
   auto title_images = image_manager.get_images(1, CCImage::IMAGE_TITLE);
   auto credits_images = image_manager.get_images(1, CCImage::IMAGE_CREDITS);
   title_images.insert(title_images.end(), credits_images.begin(), credits_images.end());
-  TitleState title{title_images, *window};
+  TitleState title{sprite_manager, *game_surface, title_images, *window};
   splash.set_next(title);
   GameState game_state(*game, sprite_manager, *game_surface, *window);
   title.set_next(game_state);

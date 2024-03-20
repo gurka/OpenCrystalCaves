@@ -1,5 +1,4 @@
-#ifndef GRAPHICS_H_
-#define GRAPHICS_H_
+#pragma once
 
 #include <filesystem>
 #include <memory>
@@ -14,6 +13,7 @@ struct Color
   std::uint8_t red = 0u;
   std::uint8_t green = 0u;
   std::uint8_t blue = 0u;
+  std::uint8_t alpha = 0xffu;
 };
 
 class Window
@@ -55,5 +55,3 @@ class Surface
   virtual void blit_surface(const geometry::Rectangle& source, const geometry::Rectangle& dest, const bool flip = false) const = 0;
   virtual void blit_surface() const = 0;
 };
-
-#endif  // GRAPHICS_H_
