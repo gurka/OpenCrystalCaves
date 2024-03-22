@@ -175,13 +175,24 @@ SurfaceImpl::SurfaceImpl(const int w,
   }
 }
 
-void SurfaceImpl::blit_surface(const geometry::Rectangle& source, const geometry::Rectangle& dest, const bool flip) const
+void SurfaceImpl::blit_surface(const geometry::Rectangle& source, const geometry::Rectangle& dest, const bool flip, const Color tint) const
 {
+	if (SDL_SetTextureColorMod(sdl_texture_.get(), tint.red, tint.green, tint.blue) != 0)
+	{
+		LOG_ERROR("Could not set texture color mod: %s", SDL_GetError());
+	}
   const auto src_rect = to_sdl_rect(source);
   auto dest_rect = to_sdl_rect(dest);
-  // TODO: check error
   const SDL_RendererFlip sdl_flip = flip ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
-  SDL_RenderCopyEx(&sdl_renderer_, sdl_texture_.get(), &src_rect, &dest_rect, 0.0, nullptr, sdl_flip);
+  if (SDL_RenderCopyEx(&sdl_renderer_, sdl_texture_.get(), &src_rect, &dest_rect, 0.0, nullptr, sdl_flip) != 0)
+  {
+	  LOG_ERROR("Could not render texture: %s", SDL_GetError());
+  }
+	// reset tint
+	if (SDL_SetTextureColorMod(sdl_texture_.get(), 0xff, 0xff, 0xff) != 0)
+	{
+		LOG_ERROR("Could not reset texture color mod: %s", SDL_GetError());
+	}
 }
 
 void SurfaceImpl::blit_surface() const

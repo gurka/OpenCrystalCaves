@@ -49,9 +49,13 @@ int main()
   }
 
   Input input;
-  while (!input.quit)
+  while (true)
   {
     event->poll_event(&input);
+    if (input.escape.pressed())
+    {
+      break;
+    }
     if (input.left.pressed() || input.up.pressed())
     {
       index--;

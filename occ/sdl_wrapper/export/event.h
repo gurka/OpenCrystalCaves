@@ -1,5 +1,4 @@
-#ifndef EVENT_H_
-#define EVENT_H_
+#pragma once
 
 #include <memory>
 
@@ -23,6 +22,15 @@ struct Input
     bool repeated = false;
 
     bool pressed() const { return down && !repeated; }
+	  void tick() {
+		  repeated = down;
+	  }
+	  void set_down(const bool d)
+	  {
+		  down = d;
+		  if (!d)
+			  repeated = false;
+	  }
   };
 
   Button up = Button();
@@ -37,14 +45,11 @@ struct Input
 
   Button enter = Button();
   Button space = Button();
+	Button escape = Button();
 
   // Cheat code buttons
   Button noclip = Button();
   Button ammo = Button();
   Button godmode = Button();
   Button reverse_gravity = Button();
-
-  bool quit = false;
 };
-
-#endif  // EVENT_H_

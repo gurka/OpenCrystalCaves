@@ -1,17 +1,16 @@
-#ifndef GAME_H_
-#define GAME_H_
+#pragma once
 
 #include <memory>
 #include <vector>
 
-#include "player_input.h"
-#include "player.h"
+#include "background.h"
+#include "enemy.h"
+#include "item.h"
 #include "level_id.h"
 #include "object.h"
-#include "background.h"
+#include "player.h"
+#include "player_input.h"
 #include "tile.h"
-#include "item.h"
-#include "enemy.h"
 
 class Game
 {
@@ -41,9 +40,7 @@ class Game
   virtual unsigned get_score() const = 0;
   virtual unsigned get_num_ammo() const = 0;
   virtual unsigned get_num_lives() const = 0;
-	virtual bool has_key() const = 0;
+  virtual bool has_key() const = 0;
 
   virtual std::wstring get_debug_info() const = 0;
 };
-
-#endif  // GAME_H_

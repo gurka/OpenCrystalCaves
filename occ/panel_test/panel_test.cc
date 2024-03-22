@@ -45,11 +45,12 @@ int main(int argc, char* argv[])
   }
   ExeData exe_data{episode};
   std::vector<Panel> panels = {
-    std::vector<std::wstring>({
-      L"Welcome to Crystal Caves!",
-      L"Press left and right to scroll",
-      L" through the text panels... ^",
-    }),
+    {std::vector<std::wstring>({
+       L"Welcome to Crystal Caves!",
+       L"Press left and right to scroll",
+       L" through the text panels... ^",
+     }),
+     {}},
     {PanelText::PANEL_TEXT_SFX_ON, exe_data},
     {PanelText::PANEL_TEXT_END, exe_data},
     {PanelText::PANEL_TEXT_END_1, exe_data},
@@ -130,32 +131,36 @@ int main(int argc, char* argv[])
   auto tick_last_update = sdl_tick;
   auto lag = 0u;
   Input input;
-  while (!input.quit)
+  while (true)
   {
+    event->poll_event(&input);
+    if (input.escape.pressed())
+    {
+      break;
+    }
+    if (input.left.pressed() || input.up.pressed())
+    {
+      index--;
+      if (index < 0)
+      {
+        index = (int)panels.size() - 1;
+      }
+    }
+    else if (input.right.pressed() || input.down.pressed())
+    {
+      index++;
+      if (index == (int)panels.size())
+      {
+        index = 0;
+      }
+    }
     sdl_tick = sdl->get_tick();
     auto elapsed_ticks = sdl_tick - tick_last_update;
     tick_last_update = sdl_tick;
     lag += elapsed_ticks;
     while (lag >= ms_per_update)
     {
-      event->poll_event(&input);
-      if (input.left.pressed() || input.up.pressed())
-      {
-        index--;
-        if (index < 0)
-        {
-          index = (int)panels.size() - 1;
-        }
-      }
-      else if (input.right.pressed() || input.down.pressed())
-      {
-        index++;
-        if (index == (int)panels.size())
-        {
-          index = 0;
-        }
-      }
-      panels[index].update();
+      panels[index].update(input);
 
       lag -= ms_per_update;
     }

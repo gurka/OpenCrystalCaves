@@ -151,14 +151,14 @@ int main()
         event->poll_event(&input);
 
         // Handle input
-        if (input.quit)
-        {
-          return 0;  // Quit ASAP
-        }
         state->update(input);
         auto new_state = state->next_state();
         if (new_state != state)
         {
+          if (new_state == nullptr)
+          {
+            return 0;
+          }
           new_state->reset();
           state = new_state;
         }

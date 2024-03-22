@@ -1,5 +1,7 @@
 #pragma once
 
+#include <event.h>
+
 #include "exe_data.h"
 #include "spritemgr.h"
 
@@ -76,21 +78,38 @@ enum class PanelText : int
   PANEL_TEXT_START_SEQ_3 = 0x1C76A,
 };
 
+enum class PanelType
+{
+  PANEL_TYPE_NONE,
+  PANEL_TYPE_DISABLED,
+  PANEL_TYPE_NEW_GAME,
+  PANEL_TYPE_QUIT_TO_OS,
+};
+
 class Panel
 {
  public:
-  Panel(const std::vector<std::wstring>& strings);
+  Panel(const std::vector<std::wstring> strings, const std::vector<std::pair<int, Panel>> children);
   Panel(const char* ucsd);
   Panel(const PanelText pt, const ExeData& exe_data) : Panel(exe_data.data.c_str() + static_cast<int>(pt)) {}
+  Panel(const PanelType type) : children_({}), type_(type) {}
 
-  void update();
+  Panel* update(const Input& input);
+
+  void set_parent(Panel& parent) { parent_ = &parent; }
 
   void draw(const SpriteManager& sprite_manager) const;
 
+  PanelType get_type() const { return type_; }
+
  private:
   std::vector<std::wstring> strings_;
+  std::vector<std::pair<int, Panel>> children_;
+  int index_ = 0;
   geometry::Size size_;
   geometry::Position question_pos_ = {0, 0};
   geometry::Position sparkle_pos_ = {0, 0};
   unsigned ticks_ = 0;
+  PanelType type_;
+  Panel* parent_ = nullptr;
 };

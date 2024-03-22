@@ -10,6 +10,8 @@ struct PlayerInput
   bool shoot = false;
   bool left_pressed = false;
   bool right_pressed = false;
+  bool up_pressed = false;
+  bool down_pressed = false;
   bool jump_pressed = false;
   bool shoot_pressed = false;
   bool noclip_pressed = false;

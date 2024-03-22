@@ -53,9 +53,13 @@ int main(int argc, char* argv[])
   }
 
   Input input;
-  while (!input.quit)
+  while (true)
   {
     event->poll_event(&input);
+	  if (input.escape.pressed())
+	  {
+		  break;
+	  }
     window->fill_rect(geometry::Rectangle(0, 0, surface->size()), {33u, 33u, 33u});
     surface->blit_surface();
     window->refresh();

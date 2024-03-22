@@ -279,10 +279,10 @@ geometry::Rectangle SpriteManager::get_rect_for_char(const wchar_t ch) const
   {
     idx = search->second;
   }
-	return get_rect_for_icon(idx);
+  return get_rect_for_icon(idx);
 }
 
-geometry::Position SpriteManager::render_text(const std::wstring& text, const geometry::Position& pos) const
+geometry::Position SpriteManager::render_text(const std::wstring& text, const geometry::Position& pos, const Color tint) const
 {
   int x = pos.x();
   int y = pos.y();
@@ -297,7 +297,7 @@ geometry::Position SpriteManager::render_text(const std::wstring& text, const ge
     {
       const auto src_rect = get_rect_for_char(ch);
       const geometry::Rectangle dest_rect{x, y, CHAR_W, CHAR_H};
-      get_char_surface()->blit_surface(src_rect, dest_rect);
+      get_char_surface()->blit_surface(src_rect, dest_rect, false, tint);
       x += CHAR_W;
     }
   }
@@ -306,33 +306,33 @@ geometry::Position SpriteManager::render_text(const std::wstring& text, const ge
 
 geometry::Rectangle SpriteManager::get_rect_for_number(const char ch) const
 {
-	return get_rect_for_icon(ch - '0' + static_cast<int>(Icon::ICON_0));
+  return get_rect_for_icon(ch - '0' + static_cast<int>(Icon::ICON_0));
 }
 
 geometry::Position SpriteManager::render_number(const int num, const geometry::Position& pos) const
 {
-	const auto text = std::to_string(num);
-	// Numbers are right-aligned
-	int x = pos.x() - CHAR_W;
-	// Iterate in reverse due to right align
-	for (auto it = text.crbegin() ; it != text.crend(); ++it)
-	{
-		const auto src_rect = get_rect_for_number(*it);
-		const geometry::Rectangle dest_rect{x, pos.y(), CHAR_W, CHAR_H};
-		get_char_surface()->blit_surface(src_rect, dest_rect);
-		x -= CHAR_W;
-	}
-	return Vector<int>(x, pos.y());
+  const auto text = std::to_string(num);
+  // Numbers are right-aligned
+  int x = pos.x() - CHAR_W;
+  // Iterate in reverse due to right align
+  for (auto it = text.crbegin(); it != text.crend(); ++it)
+  {
+    const auto src_rect = get_rect_for_number(*it);
+    const geometry::Rectangle dest_rect{x, pos.y(), CHAR_W, CHAR_H};
+    get_char_surface()->blit_surface(src_rect, dest_rect);
+    x -= CHAR_W;
+  }
+  return Vector<int>(x, pos.y());
 }
 
 geometry::Rectangle SpriteManager::get_rect_for_icon(const int idx) const
 {
-	return {(idx % (char_surface_->width() / CHAR_W)) * CHAR_W, (idx / (char_surface_->width() / CHAR_H)) * CHAR_H, CHAR_W, CHAR_H};
+  return {(idx % (char_surface_->width() / CHAR_W)) * CHAR_W, (idx / (char_surface_->width() / CHAR_H)) * CHAR_H, CHAR_W, CHAR_H};
 }
 
-void SpriteManager::render_icon(const Icon icon, const geometry::Position& pos, const bool flip) const
+void SpriteManager::render_icon(const Icon icon, const geometry::Position& pos, const bool flip, const Color tint) const
 {
-	const auto src_rect = get_rect_for_icon(static_cast<int>(icon));
-	const geometry::Rectangle dest_rect{pos.x(), pos.y(), CHAR_W, CHAR_H};
-	get_char_surface()->blit_surface(src_rect, dest_rect, flip);
+  const auto src_rect = get_rect_for_icon(static_cast<int>(icon));
+  const geometry::Rectangle dest_rect{pos.x(), pos.y(), CHAR_W, CHAR_H};
+  get_char_surface()->blit_surface(src_rect, dest_rect, flip, tint);
 }

@@ -37,7 +37,7 @@ class State
     }
   }
   bool has_finished() const { return fade_out_start_ticks_ > 0 && fade_out_start_ticks_ + fade_out_ticks_ < ticks_; }
-  State* next_state() { return has_finished() ? next_state_ : this; }
+  virtual State* next_state() { return has_finished() ? next_state_ : this; }
 
   virtual void draw(Window& window) const = 0;
 
@@ -81,15 +81,22 @@ class TitleState : public State
 
   virtual void update(const Input& input) override;
   virtual void draw(Window& window) const override;
+  virtual State* next_state() override
+  {
+    if (panel_current_ && panel_current_->get_type() == PanelType::PANEL_TYPE_QUIT_TO_OS)
+    {
+      return nullptr;
+    }
+    return State::next_state();
+  }
 
  private:
   SpriteManager& sprite_manager_;
   Surface& game_surface_;
   std::vector<Surface*>& images_;
-  unsigned first_ticks_ = 50;
-  unsigned scroll_ticks_ = 50;
-  unsigned last_ticks_ = 50;
+  unsigned scroll_ticks_ = 0;
   Panel panel_;
+  Panel* panel_current_ = nullptr;
 };
 
 class GameState : public State

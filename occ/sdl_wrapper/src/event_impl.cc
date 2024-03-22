@@ -13,20 +13,21 @@ std::unique_ptr<Event> Event::create()
 void EventImpl::poll_event(Input* input)
 {
   // Set any input that is pressed as repeated here
-  input->up.repeated = input->up.down;
-  input->down.repeated = input->down.down;
-  input->left.repeated = input->left.down;
-  input->right.repeated = input->right.down;
-  input->z.repeated = input->z.down;
-  input->x.repeated = input->x.down;
-  input->num_1.repeated = input->num_1.down;
-  input->num_2.repeated = input->num_2.down;
-  input->enter.repeated = input->enter.down;
-  input->space.repeated = input->space.down;
-  input->noclip.repeated = input->noclip.down;
-  input->ammo.repeated = input->ammo.down;
-  input->godmode.repeated = input->godmode.down;
-  input->reverse_gravity.repeated = input->reverse_gravity.down;
+	input->up.tick();
+	input->down.tick();
+	input->left.tick();
+	input->right.tick();
+	input->z.tick();
+	input->x.tick();
+	input->num_1.tick();
+	input->num_2.tick();
+	input->enter.tick();
+	input->space.tick();
+	input->escape.tick();
+	input->noclip.tick();
+	input->ammo.tick();
+	input->godmode.tick();
+	input->reverse_gravity.tick();
 
   // Read 
   const auto keys = SDL_GetKeyboardState(nullptr);
@@ -35,8 +36,7 @@ void EventImpl::poll_event(Input* input)
   {
     if (event.type == SDL_QUIT)
     {
-      input->quit = true;
-      return;  // Quit asap
+		input->escape.set_down(true);
     }
 
     else if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
@@ -44,72 +44,52 @@ void EventImpl::poll_event(Input* input)
       switch (event.key.keysym.sym)
       {
         case SDLK_UP:
-          input->up.down = event.type == SDL_KEYDOWN;
-          if (!input->up.down)
-            input->up.repeated = false;
+			  input->up.set_down(event.type == SDL_KEYDOWN);
           break;
 
         case SDLK_DOWN:
-          input->down.down = event.type == SDL_KEYDOWN;
-          if (!input->down.down)
-            input->down.repeated = false;
+			  input->down.set_down(event.type == SDL_KEYDOWN);
           break;
 
         case SDLK_LEFT:
-          input->left.down = event.type == SDL_KEYDOWN;
-          if (!input->left.down)
-            input->left.repeated = false;
+			  input->left.set_down(event.type == SDL_KEYDOWN);
           break;
 
         case SDLK_RIGHT:
-          input->right.down = event.type == SDL_KEYDOWN;
-          if (!input->right.down)
-            input->right.repeated = false;
+			  input->right.set_down(event.type == SDL_KEYDOWN);
           break;
 
         case SDLK_z:
-          input->z.down = event.type == SDL_KEYDOWN;
-          if (!input->z.down)
-            input->z.repeated = false;
+			  input->z.set_down(event.type == SDL_KEYDOWN);
           break;
 
         case SDLK_x:
-          input->x.down = event.type == SDL_KEYDOWN;
-          if (!input->x.down)
-            input->x.repeated = false;
+			  input->x.set_down(event.type == SDL_KEYDOWN);
           break;
 
         case SDLK_g:
-          input->reverse_gravity.down = event.type == SDL_KEYDOWN;
+			  input->reverse_gravity.set_down(event.type == SDL_KEYDOWN);
 	      break;
 
         case SDLK_1:
-          input->num_1.down = event.type == SDL_KEYDOWN;
-          if (!input->num_1.down)
-            input->num_1.repeated = false;
+			  input->num_1.set_down(event.type == SDL_KEYDOWN);
           break;
 
         case SDLK_2:
-          input->num_2.down = event.type == SDL_KEYDOWN;
-          if (!input->num_2.down)
-            input->num_2.repeated = false;
+			  input->num_2.set_down(event.type == SDL_KEYDOWN);
           break;
 
         case SDLK_RETURN:
-          input->enter.down = event.type == SDL_KEYDOWN;
-          if (!input->enter.down)
-            input->enter.repeated = false;
+			  input->enter.set_down(event.type == SDL_KEYDOWN);
           break;
 
         case SDLK_SPACE:
-          input->space.down = event.type == SDL_KEYDOWN;
-          if (!input->space.down)
-            input->space.repeated = false;
+			  input->space.set_down(event.type == SDL_KEYDOWN);
           break;
 
         case SDLK_ESCAPE:
-          input->quit = true;
-          return;  // Quit asap
+			  input->escape.set_down(event.type == SDL_KEYDOWN);
+			  break;
 
         default:
           break;

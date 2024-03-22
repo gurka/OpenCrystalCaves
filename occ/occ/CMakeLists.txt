@@ -17,6 +17,8 @@ add_executable(occ
   "src/spritemgr.h"
   "src/state.cc"
   "src/state.h"
+  "src/utils.cc"
+  "src/utils.h"
   "src/wchars.h"
   ${AHEASING_HDRS} ${AHEASING_SRCS}
 )

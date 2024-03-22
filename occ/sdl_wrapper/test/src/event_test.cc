@@ -67,8 +67,8 @@ TEST_F(EventTest, poll_event)
   EXPECT_FALSE(input.num_2.repeated);
   EXPECT_FALSE(input.space.down);
   EXPECT_FALSE(input.space.repeated);
-
-  EXPECT_FALSE(input.quit);
+	EXPECT_FALSE(input.escape.down);
+ EXPECT_FALSE(input.escape.repeated);
 }
 
 TEST_F(EventTest, poll_event_repeated)
@@ -136,7 +136,8 @@ TEST_F(EventTest, poll_event_early_quit)
   event->poll_event(&input);
   EXPECT_TRUE(input.up.down);
   EXPECT_FALSE(input.up.repeated);
-  EXPECT_TRUE(input.quit);
+  EXPECT_TRUE(input.escape.down);
+	EXPECT_FALSE(input.escape.repeated);
 
 
   event1.type = SDL_KEYUP;
@@ -151,5 +152,6 @@ TEST_F(EventTest, poll_event_early_quit)
   event->poll_event(&input);
   EXPECT_FALSE(input.up.down);
   EXPECT_FALSE(input.up.repeated);
-  EXPECT_TRUE(input.quit);
+  EXPECT_TRUE(input.escape.down);
+	EXPECT_TRUE(input.escape.repeated);
 }

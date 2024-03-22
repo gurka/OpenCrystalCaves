@@ -5,6 +5,7 @@
 #include <easing.h>
 
 #include "constants.h"
+#include "utils.h"
 
 static constexpr int FADE_TICKS = 15;
 
@@ -47,33 +48,13 @@ void State::draw(Window& window) const
 }
 
 
-PlayerInput input_to_player_input(const Input& input)
-{
-  PlayerInput pi;
-  pi.left = input.left.down;
-  pi.right = input.right.down;
-  pi.up = input.up.down;
-  pi.down = input.down.down;
-  pi.jump = input.z.down;
-  pi.shoot = input.x.down;
-  pi.left_pressed = input.left.pressed();
-  pi.right_pressed = input.right.pressed();
-  pi.jump_pressed = input.z.pressed();
-  pi.shoot_pressed = input.x.pressed();
-  pi.noclip_pressed = input.noclip.pressed();
-  pi.ammo_pressed = input.ammo.pressed();
-  pi.godmode_pressed = input.godmode.pressed();
-  pi.reverse_gravity_pressed = input.reverse_gravity.pressed();
-  return pi;
-}
-
 void SkipState::update(const Input& input)
 {
   State::update(input);
   if (ticks_ > grace_ticks_)
   {
-    auto pinput = input_to_player_input(input);
-    if (pinput.jump_pressed || pinput.shoot_pressed)
+    const auto pinput = input_to_player_input(input);
+    if (pinput.jump_pressed || pinput.shoot_pressed || input.escape.pressed())
     {
       finish();
     }
@@ -102,49 +83,93 @@ TitleState::TitleState(SpriteManager& sprite_manager, Surface& game_surface, std
     sprite_manager_(sprite_manager),
     game_surface_(game_surface),
     images_(images),
-    panel_({
-      L"Welcome to OpenCrystalCaves!",
-      L"----------------------------",
-      L"     New Game",
-      L"     Restore Game",
-      L"     Ordering Info.",  // TODO: hide if retail version detected
-      L"     Instructions",
-      L"     Story",
-      L"     High Scores",
-      L"     Visit our Website",
-      L"     About Apogee",
-      L"     Quit to " OS_NAME,
-      L"             ^",
-    })
+    panel_(
+      {
+        L"Welcome to OpenCrystalCaves!",
+        L"----------------------------",
+        L"     New Game",
+        L"     Restore Game",
+        L"     Ordering Info.",  // TODO: hide if retail version detected
+        L"     Instructions",
+        L"     Story",
+        L"     High Scores",
+        L"     Visit our Website",
+        L"     About Apogee",
+        L"     Quit to " OS_NAME,
+      },
+      {
+        {2, {PanelType::PANEL_TYPE_NEW_GAME}},
+        {3, {PanelType::PANEL_TYPE_DISABLED}},
+        {4, {PanelType::PANEL_TYPE_DISABLED}},
+        {5, {PanelType::PANEL_TYPE_DISABLED}},
+        {6, {PanelType::PANEL_TYPE_DISABLED}},
+        {7, {PanelType::PANEL_TYPE_DISABLED}},
+        {8, {PanelType::PANEL_TYPE_DISABLED}},
+        {9, {PanelType::PANEL_TYPE_DISABLED}},
+        {10, {PanelType::PANEL_TYPE_QUIT_TO_OS}},
+      })
 {
 }
 
 void TitleState::update(const Input& input)
 {
   State::update(input);
-  panel_.update();
-  // TODO: use menus to skip state
-  auto pinput = input_to_player_input(input);
-  if (pinput.jump_pressed || pinput.shoot_pressed)
+  const auto pinput = input_to_player_input(input);
+
+  if (panel_current_ == nullptr)
   {
-    finish();
+    if (pinput.jump_pressed || pinput.shoot_pressed || input.escape.pressed())
+    {
+      panel_current_ = &panel_;
+    }
+  }
+  else if (input.escape.pressed())
+  {
+    panel_current_ = nullptr;
+  }
+  else
+  {
+    panel_current_ = panel_current_->update(input);
+  }
+  if (panel_current_)
+  {
+    switch (panel_current_->get_type())
+    {
+      case PanelType::PANEL_TYPE_NEW_GAME:
+        finish();
+        break;
+      case PanelType::PANEL_TYPE_QUIT_TO_OS:
+        finish();
+        break;
+      default:
+        break;
+        // TODO: handle other types
+    }
+  }
+  else
+  {
+    // Don't scroll background if panel shown
+    scroll_ticks_ += 1;
   }
 }
 
 void TitleState::draw(Window& window) const
 {
-  const auto period_ticks = first_ticks_ + scroll_ticks_ * 2 + last_ticks_;
-  const auto ticks = ticks_ % period_ticks;
-  if (ticks < first_ticks_)
+  constexpr unsigned first_ticks = 50;
+  constexpr unsigned scroll_ticks = 50;
+  constexpr unsigned last_ticks = 50;
+  const auto period_ticks = first_ticks + scroll_ticks * 2 + last_ticks;
+  const auto ticks = scroll_ticks_ % period_ticks;
+  if (ticks < first_ticks)
   {
     // Show first image
     images_[0]->blit_surface(geometry::Rectangle(0, 0, images_[0]->size()),
                              geometry::Rectangle((WINDOW_SIZE - CAMERA_SIZE_SCALED) / 2, CAMERA_SIZE_SCALED));
   }
-  else if (ticks < first_ticks_ + scroll_ticks_)
+  else if (ticks < first_ticks + scroll_ticks)
   {
     // Show scrolling from first image to last
-    const auto scroll = (float)(ticks - first_ticks_) / scroll_ticks_ * CAMERA_SIZE_SCALED.y();
+    const auto scroll = (float)(ticks - first_ticks) / scroll_ticks * CAMERA_SIZE_SCALED.y();
     auto y = -(int)scroll;
     for (auto& image : images_)
     {
@@ -152,7 +177,7 @@ void TitleState::draw(Window& window) const
       y += CAMERA_SIZE_SCALED.y();
     }
   }
-  else if (ticks < first_ticks_ + scroll_ticks_ + last_ticks_)
+  else if (ticks < first_ticks + scroll_ticks + last_ticks)
   {
     // Show last image
     images_.back()->blit_surface(geometry::Rectangle(0, 0, images_.back()->size()),
@@ -161,7 +186,7 @@ void TitleState::draw(Window& window) const
   else
   {
     // Show scrolling from last image to first
-    const auto scroll = (1 - (float)(ticks - first_ticks_ - scroll_ticks_ - last_ticks_) / scroll_ticks_) * CAMERA_SIZE_SCALED.y();
+    const auto scroll = (1 - (float)(ticks - first_ticks - scroll_ticks - last_ticks) / scroll_ticks) * CAMERA_SIZE_SCALED.y();
     auto y = -(int)scroll;
     for (auto& image : images_)
     {
@@ -169,16 +194,19 @@ void TitleState::draw(Window& window) const
       y += CAMERA_SIZE_SCALED.y();
     }
   }
-  // Blit to game surface to set scaling properly
-  window.set_render_target(&game_surface_);
-  // Clear window surface
-  window.fill_rect(geometry::Rectangle(0, 0, WINDOW_SIZE), {33u, 33u, 33u, 0u});
-  // TODO: don't scroll if panel showing
-  panel_.draw(sprite_manager_);
-  window.set_render_target(nullptr);
-  // Render game surface to window surface, centered and scaled
-  game_surface_.blit_surface(geometry::Rectangle(0, 0, CAMERA_SIZE),
-                             geometry::Rectangle((WINDOW_SIZE - CAMERA_SIZE_SCALED) / 2, CAMERA_SIZE_SCALED));
+  if (panel_current_)
+  {
+    // Blit to game surface to set scaling properly
+    window.set_render_target(&game_surface_);
+    // Clear window surface
+    window.fill_rect(geometry::Rectangle(0, 0, WINDOW_SIZE), {33u, 33u, 33u, 0u});
+
+    panel_current_->draw(sprite_manager_);
+    window.set_render_target(nullptr);
+    // Render game surface to window surface, centered and scaled
+    game_surface_.blit_surface(geometry::Rectangle(0, 0, CAMERA_SIZE),
+                               geometry::Rectangle((WINDOW_SIZE - CAMERA_SIZE_SCALED) / 2, CAMERA_SIZE_SCALED));
+  }
 }
 
 
@@ -194,6 +222,10 @@ GameState::GameState(Game& game, SpriteManager& sprite_manager, Surface& game_su
 void GameState::update(const Input& input)
 {
   State::update(input);
+  if (input.escape.pressed())
+  {
+    finish();
+  }
   if (input.num_1.pressed())
   {
     debug_info_ = !debug_info_;
