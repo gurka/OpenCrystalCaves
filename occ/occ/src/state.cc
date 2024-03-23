@@ -78,7 +78,11 @@ void SplashState::draw(Window& window) const
 #define OS_NAME "Linux"
 #endif
 
-TitleState::TitleState(SpriteManager& sprite_manager, Surface& game_surface, std::vector<Surface*>& images, Window& window)
+TitleState::TitleState(SpriteManager& sprite_manager,
+                       Surface& game_surface,
+                       std::vector<Surface*>& images,
+                       Window& window,
+                       ExeData& exe_data)
   : State(FADE_TICKS, FADE_TICKS, window),
     sprite_manager_(sprite_manager),
     game_surface_(game_surface),
@@ -105,7 +109,7 @@ TitleState::TitleState(SpriteManager& sprite_manager, Surface& game_surface, std
         {6, {PanelType::PANEL_TYPE_DISABLED}},
         {7, {PanelType::PANEL_TYPE_DISABLED}},
         {8, {PanelType::PANEL_TYPE_DISABLED}},
-        {9, {PanelType::PANEL_TYPE_DISABLED}},
+        {9, {PanelText::PANEL_TEXT_ABOUT, exe_data}},
         {10, {PanelType::PANEL_TYPE_QUIT_TO_OS}},
       })
 {

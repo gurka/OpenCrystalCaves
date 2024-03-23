@@ -108,10 +108,11 @@ int main()
   // TODO: more episodes
   auto splash_images = image_manager.get_images(1, CCImage::IMAGE_APOGEE);
   SplashState splash{splash_images, *window};
+  ExeData exe_data{episode};
   auto title_images = image_manager.get_images(1, CCImage::IMAGE_TITLE);
   auto credits_images = image_manager.get_images(1, CCImage::IMAGE_CREDITS);
   title_images.insert(title_images.end(), credits_images.begin(), credits_images.end());
-  TitleState title{sprite_manager, *game_surface, title_images, *window};
+  TitleState title{sprite_manager, *game_surface, title_images, *window, exe_data};
   splash.set_next(title);
   GameState game_state(*game, sprite_manager, *game_surface, *window);
   title.set_next(game_state);

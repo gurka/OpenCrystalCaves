@@ -77,7 +77,7 @@ class SplashState : public SkipState
 class TitleState : public State
 {
  public:
-  TitleState(SpriteManager& sprite_manager, Surface& game_surface, std::vector<Surface*>& images, Window& window);
+  TitleState(SpriteManager& sprite_manager, Surface& game_surface, std::vector<Surface*>& images, Window& window, ExeData& exe_data);
 
   virtual void update(const Input& input) override;
   virtual void draw(Window& window) const override;

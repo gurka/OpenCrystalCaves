@@ -52,7 +52,7 @@ Panel::Panel(const std::vector<std::wstring> strings, const std::vector<std::pai
   size_ = geometry::Position(static_cast<int>(max_len) + 1, static_cast<int>(strings_.size()) + 1);
 }
 
-Panel::Panel(const char* ucsd)
+Panel::Panel(const char* ucsd) : type_(PanelType::PANEL_TYPE_NORMAL)
 {
   // Convert input text into a vector of strings, ignoring the
   // END OF WINDOW text
@@ -129,7 +129,7 @@ Panel* Panel::update(const Input& input)
   if (!children_.empty())
   {
     const auto index_start = index_;
-    if (pinput.up_pressed)
+    if (pinput.up_pressed || input.up.pressed())
     {
       do
       {
@@ -142,7 +142,7 @@ Panel* Panel::update(const Input& input)
                (children_[index_].second.get_type() == PanelType::PANEL_TYPE_NONE ||
                 children_[index_].second.get_type() == PanelType::PANEL_TYPE_DISABLED));
     }
-    else if (pinput.down_pressed)
+    else if (pinput.down_pressed || input.down.pressed())
     {
       do
       {
@@ -155,12 +155,23 @@ Panel* Panel::update(const Input& input)
                (children_[index_].second.get_type() == PanelType::PANEL_TYPE_NONE ||
                 children_[index_].second.get_type() == PanelType::PANEL_TYPE_DISABLED));
     }
-    else if (pinput.jump_pressed || pinput.shoot_pressed)
+    else if (pinput.jump_pressed || pinput.shoot_pressed || input.enter.pressed())
     {
       next = &children_[index_].second;
     }
   }
-  // TODO: hide panel using escape
+  else
+  {
+    if (pinput.jump_pressed || pinput.shoot_pressed || input.enter.pressed())
+    {
+      next = parent_;
+    }
+  }
+  if (input.escape.pressed())
+  {
+    // hide panel / go back using escape
+    next = parent_;
+  }
   return next;
 }
 
@@ -245,7 +256,10 @@ void Panel::draw(const SpriteManager& sprite_manager) const
         tint = {0xff, 0xff, 0x00};
         // Show spinning question mark if this is the selected menu item
         const auto first_char_idx = string.find_first_not_of(L" ");
-        sprite_manager.render_icon(q_icons[q_frame], geometry::Position(x + (first_char_idx - 2) * CHAR_W, y), q_flip);
+        if (first_char_idx != std::string::npos)
+        {
+          sprite_manager.render_icon(q_icons[q_frame], geometry::Position(x + (static_cast<int>(first_char_idx) - 2) * CHAR_W, y), q_flip);
+        }
       }
       else
       {
