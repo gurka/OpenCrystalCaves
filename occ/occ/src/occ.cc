@@ -142,10 +142,18 @@ int main()
       ///  Logic
       ///
       /////////////////////////////////////////////////////////////////////////
-      sdl_tick = sdl->get_tick();
-      auto elapsed_ticks = sdl_tick - tick_last_update;
-      tick_last_update = sdl_tick;
-      lag += elapsed_ticks;
+      while (true)
+      {
+        sdl_tick = sdl->get_tick();
+        auto elapsed_ticks = sdl_tick - tick_last_update;
+        tick_last_update = sdl_tick;
+        lag += elapsed_ticks;
+        if (lag >= ms_per_update)
+        {
+          break;
+        }
+        sdl->delay(ms_per_update - lag);
+      }
       while (lag >= ms_per_update)
       {
         // Read input
