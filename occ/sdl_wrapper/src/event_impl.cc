@@ -13,83 +13,84 @@ std::unique_ptr<Event> Event::create()
 void EventImpl::poll_event(Input* input)
 {
   // Set any input that is pressed as repeated here
-	input->up.tick();
-	input->down.tick();
-	input->left.tick();
-	input->right.tick();
-	input->z.tick();
-	input->x.tick();
-	input->num_1.tick();
-	input->num_2.tick();
-	input->enter.tick();
-	input->space.tick();
-	input->escape.tick();
-	input->noclip.tick();
-	input->ammo.tick();
-	input->godmode.tick();
-	input->reverse_gravity.tick();
+  input->up.tick();
+  input->down.tick();
+  input->left.tick();
+  input->right.tick();
+  input->z.tick();
+  input->x.tick();
+  input->num_1.tick();
+  input->num_2.tick();
+  input->enter.tick();
+  input->space.tick();
+  input->escape.tick();
+  input->noclip.tick();
+  input->ammo.tick();
+  input->godmode.tick();
+  input->reverse_gravity.tick();
 
-  // Read 
+  // Read
   const auto keys = SDL_GetKeyboardState(nullptr);
   SDL_Event event;
   while (SDL_PollEvent(&event) != 0)
   {
     if (event.type == SDL_QUIT)
     {
-		input->escape.set_down(true);
+      input->escape.set_down(true);
     }
 
     else if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
     {
+      // TODO: use scancodes
       switch (event.key.keysym.sym)
       {
         case SDLK_UP:
-			  input->up.set_down(event.type == SDL_KEYDOWN);
+          input->up.set_down(event.type == SDL_KEYDOWN);
           break;
 
         case SDLK_DOWN:
-			  input->down.set_down(event.type == SDL_KEYDOWN);
+          input->down.set_down(event.type == SDL_KEYDOWN);
           break;
 
         case SDLK_LEFT:
-			  input->left.set_down(event.type == SDL_KEYDOWN);
+          input->left.set_down(event.type == SDL_KEYDOWN);
           break;
 
         case SDLK_RIGHT:
-			  input->right.set_down(event.type == SDL_KEYDOWN);
+          input->right.set_down(event.type == SDL_KEYDOWN);
           break;
 
         case SDLK_z:
-			  input->z.set_down(event.type == SDL_KEYDOWN);
+          input->z.set_down(event.type == SDL_KEYDOWN);
           break;
 
         case SDLK_x:
-			  input->x.set_down(event.type == SDL_KEYDOWN);
+          input->x.set_down(event.type == SDL_KEYDOWN);
           break;
 
         case SDLK_g:
-			  input->reverse_gravity.set_down(event.type == SDL_KEYDOWN);
-	      break;
+          input->reverse_gravity.set_down(event.type == SDL_KEYDOWN);
+          break;
 
         case SDLK_1:
-			  input->num_1.set_down(event.type == SDL_KEYDOWN);
+          input->num_1.set_down(event.type == SDL_KEYDOWN);
           break;
 
         case SDLK_2:
-			  input->num_2.set_down(event.type == SDL_KEYDOWN);
+          input->num_2.set_down(event.type == SDL_KEYDOWN);
           break;
 
         case SDLK_RETURN:
-			  input->enter.set_down(event.type == SDL_KEYDOWN);
+          input->enter.set_down(event.type == SDL_KEYDOWN);
           break;
 
         case SDLK_SPACE:
-			  input->space.set_down(event.type == SDL_KEYDOWN);
+          input->space.set_down(event.type == SDL_KEYDOWN);
           break;
 
         case SDLK_ESCAPE:
-			  input->escape.set_down(event.type == SDL_KEYDOWN);
-			  break;
+          input->escape.set_down(event.type == SDL_KEYDOWN);
+          break;
 
         default:
           break;

@@ -28,6 +28,20 @@ static bool starts_with(std::string_view str, std::string_view prefix)
 
 constexpr size_t len_limit = 33;
 
+Panel::Panel(const std::vector<Panel> children) : type_(PanelType::PANEL_TYPE_PAGES)
+{
+  int i = 0;
+  for (auto child : children)
+  {
+    if (this->parent_)
+    {
+      child.set_parent(*this->parent_);
+    }
+    children_.push_back({i, std::move(child)});
+    i++;
+  }
+}
+
 
 Panel::Panel(const std::vector<std::wstring> strings, const std::vector<std::pair<int, Panel>> children)
   : strings_(std::move(strings)),
@@ -93,6 +107,39 @@ Panel::Panel(const char* ucsd) : type_(PanelType::PANEL_TYPE_NORMAL)
       strings_.push_back(L" from Steam or GOG.");
       strings_.push_back(L"");
     }
+    else if (ends_with(s, "ll encounter many dangerous"))
+    {
+      strings_.push_back(L"         INSTRUCTIONS");
+      strings_.push_back(L"");
+      strings_.push_back(converter.from_bytes(s));
+    }
+    else if (ends_with(s, "changed by pressing F1 during"))
+    {
+      // TODO: allow remapping controls
+      strings_.push_back(L"customized in a future release.");
+    }
+    else if (ends_with(s, "the game.  The defaults are:"))
+    {
+      // TODO: allow remapping controls
+      strings_.push_back(L"They are:");
+      strings_.push_back(L"");
+    }
+    else if (ends_with(s, "Jump        - Ctrl"))
+    {
+      // TODO: allow remapping controls
+      strings_.push_back(L"Jump        - Z");
+    }
+    else if (ends_with(s, "Fire Pistol - Alt"))
+    {
+      // TODO: allow remapping controls
+      strings_.push_back(L"Fire Pistol - X");
+    }
+    else if (ends_with(s, "Action Key  - Alt"))
+    {
+      // TODO: allow remapping controls
+      strings_.push_back(L"Action Key  - X");
+      strings_.push_back(L"");
+    }
     else
     {
       strings_.push_back(converter.from_bytes(s));
@@ -106,9 +153,22 @@ Panel::Panel(const char* ucsd) : type_(PanelType::PANEL_TYPE_NORMAL)
       ends_with(s, "3) Mylo vs. the Supernova") || ends_with(s, "levels, and all-new challenges.") ||
       // Instructions
       ends_with(s, "cave through the main airlock.") || ends_with(s, "lead to the inner caves.") ||
-      ends_with(s, "in any order you choose."))
+      ends_with(s, "in any order you choose.") || ends_with(s, "ll find.") || ends_with(s, "S HEALTH") ||
+      ends_with(s, "the level from the beginning.") || ends_with(s, "TIMED EVENTS") || ends_with(s, "bottom of the screen.") ||
+      ends_with(s, "PLAYER CONTROLS") || ends_with(s, "HINTS AND SECRETS") || ends_with(s, "platforms to find hidden gems.") ||
+      ends_with(s, "that allows you to defeat them.") || ends_with(s, "have infinite men in this game.") ||
+      ends_with(s, "HINTS AND SECRETS ") || ends_with(s, "sometimes they block your path.") ||
+      ends_with(s, "caves have reversed gravity!") || ends_with(s, "by jumping over creatures."))
     {
       strings_.push_back(L"");
+    }
+    else if (ends_with(s, "with the matching color.") || ends_with(s, "status line.") || ends_with(s, "asterisk characters, i.e. *12*.") ||
+             ends_with(s, "you are in front of them.") || ends_with(s, "what they do.") || ends_with(s, "have different effects on Mylo."))
+    {
+      strings_.push_back(L"");
+      question_pos_ = geometry::Position((22 + 2) * CHAR_W, (static_cast<int>(strings_.size()) + 2) * CHAR_H);
+      strings_.push_back(L"        Press Any Key ^");
+      break;
     }
     // End immediately on some special lines
     if (ends_with(s, "^"))
@@ -123,6 +183,40 @@ Panel::Panel(const char* ucsd) : type_(PanelType::PANEL_TYPE_NORMAL)
 
 Panel* Panel::update(const Input& input)
 {
+  auto next = this;
+  const auto pinput = input_to_player_input(input);
+  if (type_ == PanelType::PANEL_TYPE_PAGES)
+  {
+    // Update child but ignore the input result
+    children_[index_].second.update(input);
+    if (pinput.up_pressed || input.up.pressed() || pinput.left_pressed || input.left.pressed())
+    {
+      index_--;
+      if (index_ < 0)
+      {
+        next = parent_;
+      }
+    }
+    else if (pinput.down_pressed || input.down.pressed() || pinput.right_pressed || input.right.pressed() || pinput.jump_pressed ||
+             pinput.shoot_pressed || input.enter.pressed())
+    {
+      index_++;
+      if (index_ == (int)children_.size())
+      {
+        next = parent_;
+      }
+    }
+    else if (input.escape.pressed())
+    {
+      // hide panel / go back using escape
+      next = parent_;
+    }
+    if (next == parent_)
+    {
+      index_ = 0;
+    }
+    return next;
+  }
   ticks_ += 1;
 
   // Randomly switch the sparkle position around
@@ -141,8 +235,6 @@ Panel* Panel::update(const Input& input)
     }
   }
 
-  Panel* next = this;
-  const auto pinput = input_to_player_input(input);
   if (!children_.empty())
   {
     const auto index_start = index_;
@@ -194,6 +286,12 @@ Panel* Panel::update(const Input& input)
 
 void Panel::draw(const SpriteManager& sprite_manager) const
 {
+  if (type_ == PanelType::PANEL_TYPE_PAGES)
+  {
+    // Draw the current child instead
+    children_[index_].second.draw(sprite_manager);
+    return;
+  }
   const geometry::Position frame_pos(((SCREEN_SIZE.x() / CHAR_W - size_.x() - 1) / 2 - 1) * CHAR_W,
                                      ((SCREEN_SIZE.y() / CHAR_H - size_.y() - 1) / 2 - 2) * CHAR_H);
   const geometry::Size frame_size = size_ + geometry::Size(2, 2);
