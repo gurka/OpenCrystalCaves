@@ -158,7 +158,12 @@ Panel::Panel(const char* ucsd) : type_(PanelType::PANEL_TYPE_NORMAL)
       ends_with(s, "PLAYER CONTROLS") || ends_with(s, "HINTS AND SECRETS") || ends_with(s, "platforms to find hidden gems.") ||
       ends_with(s, "that allows you to defeat them.") || ends_with(s, "have infinite men in this game.") ||
       ends_with(s, "HINTS AND SECRETS ") || ends_with(s, "sometimes they block your path.") ||
-      ends_with(s, "caves have reversed gravity!") || ends_with(s, "by jumping over creatures."))
+      ends_with(s, "caves have reversed gravity!") || ends_with(s, "by jumping over creatures.") ||
+      // Story
+      ends_with(s, "-----") || ends_with(s, "981,231,783,813,651") || ends_with(s, "OCCUPATION:  Space Trader") ||
+      ends_with(s, "Yorp herding business.") ||
+      ends_with(s, "continued...") || ends_with(s, "ahead of his creditors.") || ends_with(s, "of Ghoulbone IV.") ||
+      ends_with(s, "- END OF ENTRY -"))
     {
       strings_.push_back(L"");
     }
