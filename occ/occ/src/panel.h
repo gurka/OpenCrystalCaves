@@ -96,9 +96,12 @@ class Panel
   // Menu-type panel with selectable children
   Panel(const std::vector<std::wstring> strings, const std::vector<std::pair<int, Panel>> children);
   // Panel from decoded text from the EXE
-  Panel(const char* ucsd);
+  Panel(const char* ucsd, const std::vector<std::pair<int, geometry::Position>> sprites = {});
   // Panel from EXE text
-  Panel(const PanelText pt, const ExeData& exe_data) : Panel(exe_data.data.c_str() + static_cast<int>(pt)) {}
+  Panel(const PanelText pt, const ExeData& exe_data, const std::vector<std::pair<int, geometry::Position>> sprites = {})
+    : Panel(exe_data.data.c_str() + static_cast<int>(pt), sprites)
+  {
+  }
   // Basic panel
   Panel(const PanelType type) : children_({}), type_(type) {}
 
@@ -113,6 +116,7 @@ class Panel
  private:
   std::vector<std::wstring> strings_;
   std::vector<std::pair<int, Panel>> children_;
+  std::vector<std::pair<int, geometry::Position>> sprites_;
   int index_ = 0;
   geometry::Size size_;
   geometry::Position question_pos_ = {0, 0};

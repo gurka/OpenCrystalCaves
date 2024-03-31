@@ -17,8 +17,6 @@ https://moddingwiki.shikadi.net/wiki/ProGraphx_Toolbox_tileset_format
 #define FONT_FILENAME_FMT "CC%d-F%d.MNI"
 #define SPL_FILENAME_FMT "CC%d-SPL.MNI"
 #define FILLER 2
-#define SPRITE_W 16
-#define SPRITE_H 16
 #define SPRITE_STRIDE 52
 #define CHAR_STRIDE 50
 
@@ -265,6 +263,13 @@ geometry::Rectangle SpriteManager::get_rect_for_tile(const int sprite) const
           (sprite / (sprite_surface_->width() / SPRITE_H)) * SPRITE_H,
           SPRITE_W,
           SPRITE_H};
+}
+
+void SpriteManager::render_tile(const int sprite, const geometry::Position& pos, const geometry::Position camera_position) const
+{
+  const auto src_rect = get_rect_for_tile(sprite);
+  const geometry::Rectangle dest_rect{pos.x() - camera_position.x(), pos.y() - camera_position.y(), SPRITE_W, SPRITE_H};
+  get_surface()->blit_surface(src_rect, dest_rect);
 }
 
 const Surface* SpriteManager::get_char_surface() const

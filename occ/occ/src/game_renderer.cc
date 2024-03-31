@@ -2,16 +2,16 @@
 
 #include "constants.h"
 #include "game.h"
+#include "graphics.h"
+#include "misc.h"
+#include "occ_math.h"
 #include "player.h"
 #include "spritemgr.h"
-#include "graphics.h"
-#include "occ_math.h"
-#include "misc.h"
 
 GameRenderer::GameRenderer(Game* game, SpriteManager* sprite_manager, Surface* game_surface, Window& window)
   : game_(game),
     sprite_manager_(sprite_manager),
-	game_surface_(game_surface),
+    game_surface_(game_surface),
     window_(window),
     game_camera_(math::clamp(game_->get_player().position.x() + (game_->get_player().size.x() / 2) - (CAMERA_SIZE.x() / 2),
                              0,
@@ -29,48 +29,48 @@ GameRenderer::GameRenderer(Game* game, SpriteManager* sprite_manager, Surface* g
 
 void GameRenderer::update(unsigned game_tick)
 {
-	game_tick_diff_ = game_tick - game_tick_;
-	game_tick_ = game_tick;
-	
-	// Update game camera
-	// Note: this isn't exactly how the Crystal Caves camera work, but it's good enough
-	const geometry::Position player_camera_relative_position {(game_->get_player().position + (game_->get_player().size / 2)) - (game_camera_.position + (game_camera_.size / 2))};
-	if (player_camera_relative_position.x() < -4)
-	{
-		game_camera_.position = geometry::Position(math::clamp(game_camera_.position.x() + player_camera_relative_position.x() + 4,
-															   0,
-															   (game_->get_tile_width() * 16) - CAMERA_SIZE.x()),
-												   game_camera_.position.y());
-	}
-	else if (player_camera_relative_position.x() > 20)
-	{
-		game_camera_.position = geometry::Position(math::clamp(game_camera_.position.x() + player_camera_relative_position.x() - 20,
-															   0,
-															   (game_->get_tile_width() * 16) - CAMERA_SIZE.x()),
-												   game_camera_.position.y());
-	}
-	
-	if (player_camera_relative_position.y() < -10)
-	{
-		game_camera_.position = geometry::Position(game_camera_.position.x(),
-												   math::clamp(game_camera_.position.y() + player_camera_relative_position.y() + 10,
-															   0,
-															   (game_->get_tile_height() * 16) - CAMERA_SIZE.y()));
-	}
-	else if (player_camera_relative_position.y() > 32)
-	{
-		game_camera_.position = geometry::Position(game_camera_.position.x(),
-												   math::clamp(game_camera_.position.y() + player_camera_relative_position.y() - 32,
-															   0,
-															   (game_->get_tile_height() * 16) - CAMERA_SIZE.y()));
-	}
+  game_tick_diff_ = game_tick - game_tick_;
+  game_tick_ = game_tick;
+
+  // Update game camera
+  // Note: this isn't exactly how the Crystal Caves camera work, but it's good enough
+  const geometry::Position player_camera_relative_position{(game_->get_player().position + (game_->get_player().size / 2)) -
+                                                           (game_camera_.position + (game_camera_.size / 2))};
+  if (player_camera_relative_position.x() < -4)
+  {
+    game_camera_.position = geometry::Position(
+      math::clamp(game_camera_.position.x() + player_camera_relative_position.x() + 4, 0, (game_->get_tile_width() * 16) - CAMERA_SIZE.x()),
+      game_camera_.position.y());
+  }
+  else if (player_camera_relative_position.x() > 20)
+  {
+    game_camera_.position = geometry::Position(math::clamp(game_camera_.position.x() + player_camera_relative_position.x() - 20,
+                                                           0,
+                                                           (game_->get_tile_width() * 16) - CAMERA_SIZE.x()),
+                                               game_camera_.position.y());
+  }
+
+  if (player_camera_relative_position.y() < -10)
+  {
+    game_camera_.position = geometry::Position(game_camera_.position.x(),
+                                               math::clamp(game_camera_.position.y() + player_camera_relative_position.y() + 10,
+                                                           0,
+                                                           (game_->get_tile_height() * 16) - CAMERA_SIZE.y()));
+  }
+  else if (player_camera_relative_position.y() > 32)
+  {
+    game_camera_.position = geometry::Position(game_camera_.position.x(),
+                                               math::clamp(game_camera_.position.y() + player_camera_relative_position.y() - 32,
+                                                           0,
+                                                           (game_->get_tile_height() * 16) - CAMERA_SIZE.y()));
+  }
 }
 
 void GameRenderer::render_game() const
 {
   window_.set_render_target(game_surface_);
   // Clear game surface (background now)
-  window_.fill_rect(geometry::Rectangle(0, 0, CAMERA_SIZE), { 33u, 33u, 33u });
+  window_.fill_rect(geometry::Rectangle(0, 0, CAMERA_SIZE), {33u, 33u, 33u});
   render_background();
   render_tiles(false);
   render_objects();
@@ -78,7 +78,7 @@ void GameRenderer::render_game() const
   render_enemies();
   render_tiles(true);
   render_items();
-	render_statusbar();
+  render_statusbar();
   window_.set_render_target(nullptr);
 }
 
@@ -104,18 +104,9 @@ void GameRenderer::render_background() const
   {
     for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
     {
-      const auto sprite_id = background.get_sprite() +
-                             (((tile_y + 1) % background.get_size().y()) * 4) +
-                             (tile_x % background.get_size().x());
-      const auto src_rect = sprite_manager_->get_rect_for_tile(sprite_id);
-      const geometry::Rectangle dest_rect
-      {
-        (tile_x * 16) - game_camera_.position.x(),
-        (tile_y * 16) - game_camera_.position.y(),
-        16,
-        16
-      };
-	  sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
+      const auto sprite_id =
+        background.get_sprite() + (((tile_y + 1) % background.get_size().y()) * 4) + (tile_x % background.get_size().x());
+      sprite_manager_->render_tile(sprite_id, {tile_x * SPRITE_W, tile_y * SPRITE_H}, game_camera_.position);
     }
   }
 
@@ -145,9 +136,8 @@ void GameRenderer::render_background() const
         for (int y = 0; y < 4; y++)
         {
           // The sprite with the bright star (358) seems to be less common...
-          static constexpr auto sprites = misc::make_array(356, 356, 356, 356, 357, 357, 357,
-                                                           357, 358, 359, 359, 359, 359, 360,
-                                                           360, 360, 360, 361, 361, 361, 361);
+          static constexpr auto sprites =
+            misc::make_array(356, 356, 356, 356, 357, 357, 357, 357, 358, 359, 359, 359, 359, 360, 360, 360, 360, 361, 361, 361, 361);
           const auto sprite_index = misc::random<size_t>(0, sprites.size() - 1);
           space_sprites.emplace_back(sprites[sprite_index]);
         }
@@ -224,29 +214,13 @@ void GameRenderer::render_background() const
         {
           // Render space sprite
           const auto sprite_id = space_sprites[(tile_y * game_->get_tile_width()) + tile_x];
-          const auto src_rect = sprite_manager_->get_rect_for_tile(sprite_id);
-          const geometry::Rectangle dest_rect
-          {
-            (tile_x * 16) - game_camera_.position.x(),
-            (tile_y * 16) - game_camera_.position.y(),
-            16,
-            16
-          };
-		  sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
+          sprite_manager_->render_tile(sprite_id, {tile_x * SPRITE_W, tile_y * SPRITE_H}, game_camera_.position);
         }
         else if (tile_y == 4)
         {
           // Render horizon
           const auto sprite_id = horizon_sprites[tile_x];
-          const auto src_rect = sprite_manager_->get_rect_for_tile(sprite_id);
-          const geometry::Rectangle dest_rect
-          {
-            (tile_x * 16) - game_camera_.position.x(),
-            (tile_y * 16) - game_camera_.position.y(),
-            16,
-            16
-          };
-		  sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
+          sprite_manager_->render_tile(sprite_id, {tile_x * SPRITE_W, tile_y * SPRITE_H}, game_camera_.position);
         }
       }
     }
@@ -259,27 +233,11 @@ void GameRenderer::render_background() const
       // Moon is behind earth, render moon first
       if (geometry::isColliding(game_camera_, moon_rect))
       {
-        const auto src_rect = sprite_manager_->get_rect_for_tile(634);
-        const geometry::Rectangle dest_rect
-        {
-          moon_rect.position.x() - game_camera_.position.x(),
-          moon_rect.position.y() - game_camera_.position.y(),
-          16,
-          16
-        };
-		sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
+        sprite_manager_->render_tile(static_cast<int>(Sprite::SPRITE_MOON), moon_rect.position, game_camera_.position);
       }
       if (geometry::isColliding(game_camera_, earth_rect))
       {
-        const auto src_rect = sprite_manager_->get_rect_for_tile(632);
-        const geometry::Rectangle dest_rect
-        {
-          earth_rect.position.x() - game_camera_.position.x(),
-          earth_rect.position.y() - game_camera_.position.y(),
-          16,
-          16
-        };
-	    sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
+        sprite_manager_->render_tile(static_cast<int>(Sprite::SPRITE_EARTH), earth_rect.position, game_camera_.position);
       }
     }
     else
@@ -287,27 +245,11 @@ void GameRenderer::render_background() const
       // Earth is behind moon, render earth first
       if (geometry::isColliding(game_camera_, earth_rect))
       {
-        const auto src_rect = sprite_manager_->get_rect_for_tile(632);
-        const geometry::Rectangle dest_rect
-        {
-          earth_rect.position.x() - game_camera_.position.x(),
-          earth_rect.position.y() - game_camera_.position.y(),
-          16,
-          16
-        };
-		sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
+        sprite_manager_->render_tile(static_cast<int>(Sprite::SPRITE_EARTH), earth_rect.position, game_camera_.position);
       }
       if (geometry::isColliding(game_camera_, moon_rect))
       {
-        const auto src_rect = sprite_manager_->get_rect_for_tile(634);
-        const geometry::Rectangle dest_rect
-        {
-          moon_rect.position.x() - game_camera_.position.x(),
-          moon_rect.position.y() - game_camera_.position.y(),
-          16,
-          16
-        };
-		sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
+        sprite_manager_->render_tile(static_cast<int>(Sprite::SPRITE_MOON), moon_rect.position, game_camera_.position);
       }
     }
 
@@ -317,28 +259,12 @@ void GameRenderer::render_background() const
       if (start_tile_x <= 29 && end_tile_x >= 29)
       {
         const auto sprite_id = 752 + ((game_tick_ - volcano_tick_start) / 3) % 4;
-        const auto src_rect = sprite_manager_->get_rect_for_tile(sprite_id);
-        const geometry::Rectangle dest_rect
-        {
-          (29 * 16) - game_camera_.position.x(),
-          (2 * 16) - game_camera_.position.y(),
-          16,
-          16
-        };
-		sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
+        sprite_manager_->render_tile(sprite_id, {29 * SPRITE_W, 2 * SPRITE_H}, game_camera_.position);
       }
       if (start_tile_x <= 30 && end_tile_x >= 30)
       {
         const auto sprite_id = 748 + ((game_tick_ - volcano_tick_start) / 3) % 4;
-        const auto src_rect = sprite_manager_->get_rect_for_tile(sprite_id);
-        const geometry::Rectangle dest_rect
-        {
-          (30 * 16) - game_camera_.position.x(),
-          (2 * 16) - game_camera_.position.y(),
-          16,
-          16
-        };
-		sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
+        sprite_manager_->render_tile(sprite_id, {30 * SPRITE_W, 2 * SPRITE_H}, game_camera_.position);
       }
     }
   }
@@ -348,25 +274,19 @@ void GameRenderer::render_player() const
 {
   // Player sprite ids
   static constexpr int sprite_standing_right = 260;
-  static constexpr std::array<int, 12> sprite_walking_right =
-  {
-      260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271
-  };
+  static constexpr std::array<int, 12> sprite_walking_right = {260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271};
   static constexpr int sprite_jumping_right = 284;
   static constexpr int sprite_shooting_right = 286;
 
   static constexpr int sprite_standing_left = 272;
-  static constexpr std::array<int, 12> sprite_walking_left =
-  {
-      272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283
-  };
+  static constexpr std::array<int, 12> sprite_walking_left = {272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283};
   static constexpr int sprite_jumping_left = 285;
   static constexpr int sprite_shooting_left = 287;
 
   const geometry::Rectangle src_rect = [this]()
   {
     const auto& player = game_->get_player();
-	int sprite = 0;
+    int sprite = 0;
 
     // Sprite selection priority: (currently 'shooting' means pressing shoot button without ammo)
     // If walking:
@@ -383,26 +303,26 @@ void GameRenderer::render_player() const
       {
         if (player.jumping || player.falling)
         {
-		  sprite = sprite_jumping_right;
+          sprite = sprite_jumping_right;
         }
         else
         {
-		  sprite = sprite_walking_right[player.walk_tick % sprite_walking_right.size()];
+          sprite = sprite_walking_right[player.walk_tick % sprite_walking_right.size()];
         }
       }
       else
       {
         if (player.shooting)
         {
-			sprite = sprite_shooting_right;
+          sprite = sprite_shooting_right;
         }
         else if (player.jumping || player.falling)
         {
-			sprite = sprite_jumping_right;
+          sprite = sprite_jumping_right;
         }
         else
         {
-			sprite = sprite_standing_right;
+          sprite = sprite_standing_right;
         }
       }
     }
@@ -412,46 +332,46 @@ void GameRenderer::render_player() const
       {
         if (player.jumping || player.falling)
         {
-			sprite = sprite_jumping_left;
+          sprite = sprite_jumping_left;
         }
         else
         {
-			sprite = sprite_walking_left[player.walk_tick % sprite_walking_left.size()];
+          sprite = sprite_walking_left[player.walk_tick % sprite_walking_left.size()];
         }
       }
       else
       {
         if (player.shooting)
         {
-			sprite = sprite_shooting_left;
+          sprite = sprite_shooting_left;
         }
         else if (player.jumping || player.falling)
         {
-			sprite = sprite_jumping_left;
+          sprite = sprite_jumping_left;
         }
         else
         {
-			sprite = sprite_standing_left;
+          sprite = sprite_standing_left;
         }
       }
     }
-	  if (player.reverse_gravity)
-	  {
-		  sprite += 104;
-	  }
-	  return sprite_manager_->get_rect_for_tile(sprite);
+    if (player.reverse_gravity)
+    {
+      sprite += 104;
+    }
+    return sprite_manager_->get_rect_for_tile(sprite);
   }();
   const auto player_render_pos = game_->get_player().position - game_camera_.position;
 
   // Note: player size is 12x16 but the sprite is 16x16 so we need to adjust where
   // the player is rendered
-  const geometry::Rectangle dest_rect { player_render_pos.x() - 2, player_render_pos.y(), 16, 16 };
+  const geometry::Rectangle dest_rect{player_render_pos.x() - 2, player_render_pos.y(), 16, 16};
 
   sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
 
   if (debug_)
   {
-	window_.render_rectangle(dest_rect, { 255, 0, 0 });
+    window_.render_rectangle(dest_rect, {255, 0, 0});
   }
 }
 
@@ -463,19 +383,13 @@ void GameRenderer::render_enemies() const
     if (geometry::isColliding(geometry::Rectangle(enemy.position, object_size), game_camera_))
     {
       const auto sprite_id = enemy.sprites[game_tick_ % enemy.sprites.size()];
-      const auto src_rect = sprite_manager_->get_rect_for_tile(sprite_id);
-      const geometry::Rectangle dest_rect
-      {
-        enemy.position.x() - game_camera_.position.x(),
-        enemy.position.y() - game_camera_.position.y(),
-        object_size.x(),
-        object_size.y()
-      };
-	  sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
+      sprite_manager_->render_tile(sprite_id, enemy.position, game_camera_.position);
 
       if (debug_)
       {
-        window_.render_rectangle(dest_rect, { 255, 0, 0 });
+        const geometry::Rectangle dest_rect{
+          enemy.position.x() - game_camera_.position.x(), enemy.position.y() - game_camera_.position.y(), object_size.x(), object_size.y()};
+        window_.render_rectangle(dest_rect, {255, 0, 0});
       }
     }
   }
@@ -499,8 +413,7 @@ void GameRenderer::render_tiles(bool in_front) const
         continue;
       }
 
-      if ((in_front && !tile.is_render_in_front()) ||
-          (!in_front && tile.is_render_in_front()))
+      if ((in_front && !tile.is_render_in_front()) || (!in_front && tile.is_render_in_front()))
       {
         continue;
       }
@@ -516,15 +429,7 @@ void GameRenderer::render_tiles(bool in_front) const
           return tile.get_sprite();
         }
       }(game_tick_);
-      const auto src_rect = sprite_manager_->get_rect_for_tile(sprite_id);
-      const geometry::Rectangle dest_rect
-      {
-        (tile_x * 16) - game_camera_.position.x(),
-        (tile_y * 16) - game_camera_.position.y(),
-        16,
-        16
-      };
-	  sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
+      sprite_manager_->render_tile(sprite_id, {tile_x * SPRITE_W, tile_y * SPRITE_H}, game_camera_.position);
     }
   }
 }
@@ -537,19 +442,15 @@ void GameRenderer::render_objects() const
     if (geometry::isColliding(geometry::Rectangle(object.position, object_size), game_camera_))
     {
       const auto sprite_id = object.sprite_id + (game_tick_ % object.num_sprites);
-      const auto src_rect = sprite_manager_->get_rect_for_tile(sprite_id);
-      const geometry::Rectangle dest_rect
-      {
-        object.position.x() - game_camera_.position.x(),
-        object.position.y() - game_camera_.position.y(),
-        object_size.x(),
-        object_size.y()
-      };
-	  sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
+      sprite_manager_->render_tile(sprite_id, object.position, game_camera_.position);
 
       if (debug_)
       {
-        window_.render_rectangle(dest_rect, { 255, 0, 0 });
+        const geometry::Rectangle dest_rect{object.position.x() - game_camera_.position.x(),
+                                            object.position.y() - game_camera_.position.y(),
+                                            object_size.x(),
+                                            object_size.y()};
+        window_.render_rectangle(dest_rect, {255, 0, 0});
       }
     }
   }
@@ -573,43 +474,35 @@ void GameRenderer::render_items() const
         continue;
       }
 
-      const auto src_rect = sprite_manager_->get_rect_for_tile(item.get_sprite());
-      const geometry::Rectangle dest_rect
-      {
-        (tile_x * 16) - game_camera_.position.x(),
-        (tile_y * 16) - game_camera_.position.y(),
-        16,
-        16
-      };
-	  sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
+      sprite_manager_->render_tile(item.get_sprite(), {tile_x * SPRITE_W, tile_y * SPRITE_H}, game_camera_.position);
     }
   }
 }
 
 void GameRenderer::render_statusbar() const
 {
-	constexpr auto statusbar_height = CHAR_H;
-	const auto statusbar_rect = geometry::Rectangle(0, game_camera_.size.y() - CHAR_H, game_camera_.size.x(), statusbar_height);
+  constexpr auto statusbar_height = CHAR_H;
+  const auto statusbar_rect = geometry::Rectangle(0, game_camera_.size.y() - CHAR_H, game_camera_.size.x(), statusbar_height);
 
-	window_.fill_rect(statusbar_rect, {0u, 0u, 0u});
+  window_.fill_rect(statusbar_rect, {0u, 0u, 0u});
 
-	constexpr int dy = 1;
-	  // $
-	  sprite_manager_->render_text(L"$", statusbar_rect.position + geometry::Position(0, dy));
-	  // score
-	  sprite_manager_->render_number(game_->get_score(), statusbar_rect.position + geometry::Position(8 * CHAR_W, dy));
-	  // Gun
-		sprite_manager_->render_icon(Icon::ICON_GUN, statusbar_rect.position + geometry::Position(11 * CHAR_W, dy));
-	  // ammo
-		sprite_manager_->render_number(game_->get_num_ammo(), statusbar_rect.position + geometry::Position(15 * CHAR_W, dy));
-	  // Hearts
-		for (unsigned i = 0; i < game_->get_num_lives(); i++)
-		{
-			sprite_manager_->render_icon(Icon::ICON_HEART, statusbar_rect.position + geometry::Position((i + 19) * CHAR_W, dy));
-		}
-		// Key
-	  if (game_->has_key())
-	  {
-		  sprite_manager_->render_icon(Icon::ICON_KEY, statusbar_rect.position + geometry::Position(23 * CHAR_W, dy));
-	  }
+  constexpr int dy = 1;
+  // $
+  sprite_manager_->render_text(L"$", statusbar_rect.position + geometry::Position(0, dy));
+  // score
+  sprite_manager_->render_number(game_->get_score(), statusbar_rect.position + geometry::Position(8 * CHAR_W, dy));
+  // Gun
+  sprite_manager_->render_icon(Icon::ICON_GUN, statusbar_rect.position + geometry::Position(11 * CHAR_W, dy));
+  // ammo
+  sprite_manager_->render_number(game_->get_num_ammo(), statusbar_rect.position + geometry::Position(15 * CHAR_W, dy));
+  // Hearts
+  for (unsigned i = 0; i < game_->get_num_lives(); i++)
+  {
+    sprite_manager_->render_icon(Icon::ICON_HEART, statusbar_rect.position + geometry::Position((i + 19) * CHAR_W, dy));
+  }
+  // Key
+  if (game_->has_key())
+  {
+    sprite_manager_->render_icon(Icon::ICON_KEY, statusbar_rect.position + geometry::Position(23 * CHAR_W, dy));
+  }
 }

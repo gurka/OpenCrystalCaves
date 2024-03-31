@@ -1,6 +1,7 @@
 #include "panel.h"
 
 #include <codecvt>
+#include <string_view>
 
 #include "constants.h"
 #include "event.h"
@@ -10,8 +11,6 @@
 constexpr Icon S_ICONS[]{Icon::ICON_SPARKLE_1, Icon::ICON_SPARKLE_2, Icon::ICON_SPARKLE_3, Icon::ICON_SPARKLE_4};
 
 // https://stackoverflow.com/a/42844629/2038264
-#if __cplusplus >= 201703L  // C++17 and later
-#include <string_view>
 
 static bool ends_with(std::string_view str, std::string_view suffix)
 {
@@ -24,7 +23,13 @@ static bool starts_with(std::string_view str, std::string_view prefix)
   return str.size() >= prefix.size() && str.compare(0, prefix.size(), prefix) == 0;
 }
 */
-#endif  // C++17
+
+// https://stackoverflow.com/a/25829233/2038264
+inline std::string& ltrim(std::string& s, const char* t = " \t\n\r\f\v")
+{
+  s.erase(0, s.find_first_not_of(t));
+  return s;
+}
 
 constexpr size_t len_limit = 33;
 
@@ -66,7 +71,9 @@ Panel::Panel(const std::vector<std::wstring> strings, const std::vector<std::pai
   size_ = geometry::Position(static_cast<int>(max_len) + 1, static_cast<int>(strings_.size()) + 1);
 }
 
-Panel::Panel(const char* ucsd) : type_(PanelType::PANEL_TYPE_NORMAL)
+Panel::Panel(const char* ucsd, const std::vector<std::pair<int, geometry::Position>> sprites)
+  : type_(PanelType::PANEL_TYPE_NORMAL),
+    sprites_(std::move(sprites))
 {
   // Convert input text into a vector of strings, ignoring the
   // END OF WINDOW text
@@ -140,6 +147,23 @@ Panel::Panel(const char* ucsd) : type_(PanelType::PANEL_TYPE_NORMAL)
       strings_.push_back(L"Action Key  - X");
       strings_.push_back(L"");
     }
+    // Trim some space to allow room for sprites
+    else if (ends_with(s, "collect all the crystals in") || ends_with(s, "each cave you encounter. Once"))
+    {
+      // TODO: allow remapping controls
+      strings_.push_back(converter.from_bytes(ltrim(s)));
+    }
+    // Add extra spaces to allow room for sprites
+    else if (ends_with(s, "you may exit the"))
+    {
+      strings_.push_back(L"accomplished, you may exit");
+    }
+    else if (ends_with(s, "cave through the main airlock."))
+    {
+      strings_.push_back(L"the cave through the main");
+      strings_.push_back(L"airlock.");
+      strings_.push_back(L"");
+    }
     else
     {
       strings_.push_back(converter.from_bytes(s));
@@ -152,18 +176,17 @@ Panel::Panel(const char* ucsd) : type_(PanelType::PANEL_TYPE_NORMAL)
       ends_with(s, "HOW TO ORDER CRYSTAL CAVES!") || ends_with(s, "original and incredible episodes:") ||
       ends_with(s, "3) Mylo vs. the Supernova") || ends_with(s, "levels, and all-new challenges.") ||
       // Instructions
-      ends_with(s, "cave through the main airlock.") || ends_with(s, "lead to the inner caves.") ||
-      ends_with(s, "in any order you choose.") || ends_with(s, "ll find.") || ends_with(s, "S HEALTH") ||
-      ends_with(s, "the level from the beginning.") || ends_with(s, "TIMED EVENTS") || ends_with(s, "bottom of the screen.") ||
-      ends_with(s, "PLAYER CONTROLS") || ends_with(s, "HINTS AND SECRETS") || ends_with(s, "platforms to find hidden gems.") ||
-      ends_with(s, "that allows you to defeat them.") || ends_with(s, "have infinite men in this game.") ||
-      ends_with(s, "HINTS AND SECRETS ") || ends_with(s, "sometimes they block your path.") ||
-      ends_with(s, "caves have reversed gravity!") || ends_with(s, "by jumping over creatures.") ||
+      ends_with(s, "lead to the inner caves.") || ends_with(s, "in any order you choose.") || ends_with(s, "ll find.") ||
+      ends_with(s, "S HEALTH") || ends_with(s, "the level from the beginning.") || ends_with(s, "TIMED EVENTS") ||
+      ends_with(s, "bottom of the screen.") || ends_with(s, "PLAYER CONTROLS") || ends_with(s, "HINTS AND SECRETS") ||
+      ends_with(s, "platforms to find hidden gems.") || ends_with(s, "that allows you to defeat them.") ||
+      ends_with(s, "have infinite men in this game.") || ends_with(s, "HINTS AND SECRETS ") ||
+      ends_with(s, "sometimes they block your path.") || ends_with(s, "caves have reversed gravity!") ||
+      ends_with(s, "by jumping over creatures.") ||
       // Story
       ends_with(s, "-----") || ends_with(s, "981,231,783,813,651") || ends_with(s, "OCCUPATION:  Space Trader") ||
-      ends_with(s, "Yorp herding business.") ||
-      ends_with(s, "continued...") || ends_with(s, "ahead of his creditors.") || ends_with(s, "of Ghoulbone IV.") ||
-      ends_with(s, "- END OF ENTRY -"))
+      ends_with(s, "Yorp herding business.") || ends_with(s, "continued...") || ends_with(s, "ahead of his creditors.") ||
+      ends_with(s, "of Ghoulbone IV.") || ends_with(s, "- END OF ENTRY -"))
     {
       strings_.push_back(L"");
     }
@@ -413,5 +436,11 @@ void Panel::draw(const SpriteManager& sprite_manager) const
   if (sparkle_frame > 0)
   {
     sprite_manager.render_icon(S_ICONS[sparkle_frame - 1], frame_pos + sparkle_pos_);
+  }
+
+  // Draw any sprites in addition
+  for (const auto& sprite : sprites_)
+  {
+    sprite_manager.render_tile(sprite.first, sprite.second);
   }
 }

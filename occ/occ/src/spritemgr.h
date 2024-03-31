@@ -7,6 +7,42 @@
 #include "graphics.h"
 
 // TODO: Rename files to sprite_manager.cc/h ?
+#define SPRITE_W 16
+#define SPRITE_H 16
+
+enum class Sprite : int
+{
+  SPRITE_ENTRY_1 = 12,
+  SPRITE_ENTRY_2 = 13,
+  SPRITE_ENTRY_3 = 14,
+  SPRITE_EXIT_TOP_LEFT_1 = 584,
+  SPRITE_EXIT_TOP_LEFT_2 = 585,
+  SPRITE_EXIT_TOP_LEFT_3 = 586,
+  SPRITE_EXIT_TOP_LEFT_4 = 587,
+  SPRITE_EXIT_BOTTOM_LEFT_1 = 588,
+  SPRITE_EXIT_BOTTOM_LEFT_2 = 589,
+  SPRITE_EXIT_BOTTOM_LEFT_3 = 590,
+  SPRITE_EXIT_BOTTOM_LEFT_4 = 591,
+  SPRITE_EXIT_TOP_RIGHT_1 = 592,
+  SPRITE_EXIT_BOTTOM_RIGHT_1 = 596,
+  SPRITE_EXIT_BOTTOM_RIGHT_2 = 597,
+  SPRITE_EXIT_BOTTOM_RIGHT_3 = 598,
+  SPRITE_EXIT_BOTTOM_RIGHT_4 = 599,
+  SPRITE_CRYSTAL_1_R = 624,
+  SPRITE_CRYSTAL_1_Y = 625,
+  SPRITE_CRYSTAL_1_G = 626,
+  SPRITE_CRYSTAL_1_B = 627,
+  SPRITE_EARTH = 632,
+  SPRITE_MOON = 634,
+  SPRITE_CRYSTAL_2_R = 626,
+  SPRITE_CRYSTAL_2_Y = 627,
+  SPRITE_CRYSTAL_2_G = 628,
+  SPRITE_CRYSTAL_2_B = 629,
+  SPRITE_CRYSTAL_3_R = 646,
+  SPRITE_CRYSTAL_3_Y = 647,
+  SPRITE_CRYSTAL_3_G = 648,
+  SPRITE_CRYSTAL_3_B = 649,
+};
 
 #define CHAR_W 8
 #define CHAR_H 8
@@ -46,6 +82,7 @@ class SpriteManager
   bool load_tilesets(Window& window, const int episode);
   const Surface* get_surface() const;
   geometry::Rectangle get_rect_for_tile(const int sprite) const;
+  void render_tile(const int sprite, const geometry::Position& pos, const geometry::Position camera_position = {0, 0}) const;
   const Surface* get_char_surface() const;
   geometry::Rectangle get_rect_for_char(const wchar_t ch) const;
   geometry::Position render_text(const std::wstring& text, const geometry::Position& pos, const Color tint = {0xff, 0xff, 0xff}) const;
