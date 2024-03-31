@@ -98,10 +98,15 @@ Panel::Panel(const char* ucsd) : type_(PanelType::PANEL_TYPE_NORMAL)
       strings_.push_back(converter.from_bytes(s));
     }
     // Add a paragraph break after some special lines - there doesn't seem to be a consistent pattern here
-    if (ends_with(s, "About Apogee Software") || ends_with(s, "think our goal can be achieved.") ||
-        ends_with(s, "Shareware is not free software.") || ends_with(s, "Your honesty pays...") ||
-        ends_with(s, "HOW TO ORDER CRYSTAL CAVES!") || ends_with(s, "original and incredible episodes:") ||
-        ends_with(s, "3) Mylo vs. the Supernova") || ends_with(s, "levels, and all-new challenges."))
+    if (  // About
+      ends_with(s, "About Apogee Software") || ends_with(s, "think our goal can be achieved.") ||
+      ends_with(s, "Shareware is not free software.") || ends_with(s, "Your honesty pays...") ||
+      // Ordering info
+      ends_with(s, "HOW TO ORDER CRYSTAL CAVES!") || ends_with(s, "original and incredible episodes:") ||
+      ends_with(s, "3) Mylo vs. the Supernova") || ends_with(s, "levels, and all-new challenges.") ||
+      // Instructions
+      ends_with(s, "cave through the main airlock.") || ends_with(s, "lead to the inner caves.") ||
+      ends_with(s, "in any order you choose."))
     {
       strings_.push_back(L"");
     }
@@ -190,7 +195,7 @@ Panel* Panel::update(const Input& input)
 void Panel::draw(const SpriteManager& sprite_manager) const
 {
   const geometry::Position frame_pos(((SCREEN_SIZE.x() / CHAR_W - size_.x() - 1) / 2 - 1) * CHAR_W,
-                                     ((SCREEN_SIZE.y() / CHAR_H - size_.y() - 1) / 2 - 1) * CHAR_H);
+                                     ((SCREEN_SIZE.y() / CHAR_H - size_.y() - 1) / 2 - 2) * CHAR_H);
   const geometry::Size frame_size = size_ + geometry::Size(2, 2);
   // Draw frame
   // Top-left corner

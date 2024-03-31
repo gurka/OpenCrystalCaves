@@ -6,6 +6,7 @@
 
 #include "constants.h"
 #include "utils.h"
+#include <path.h>
 
 static constexpr int FADE_TICKS = 15;
 
@@ -104,8 +105,10 @@ TitleState::TitleState(SpriteManager& sprite_manager,
       {
         {2, {PanelType::PANEL_TYPE_NEW_GAME}},
         {3, {PanelType::PANEL_TYPE_DISABLED}},
-        {4, {PanelText::PANEL_TEXT_ORDER_3, exe_data}},
-        {5, {PanelType::PANEL_TYPE_DISABLED}},
+        // Check if we have the registered version (randomly load a episode 2 file)
+        // If so disable the ordering instructions panel
+        {4, get_data_path("CC2.APG").empty() ? Panel(PanelText::PANEL_TEXT_ORDER_3, exe_data) : Panel(PanelType::PANEL_TYPE_DISABLED)},
+        {5, {PanelText::PANEL_TEXT_INSTRUCTIONS_1, exe_data}},
         {6, {PanelType::PANEL_TYPE_DISABLED}},
         {7, {PanelType::PANEL_TYPE_DISABLED}},
         {8, {PanelType::PANEL_TYPE_DISABLED}},
