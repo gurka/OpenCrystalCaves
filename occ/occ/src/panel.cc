@@ -87,9 +87,21 @@ Panel::Panel(const char* ucsd) : type_(PanelType::PANEL_TYPE_NORMAL)
     {
       question_pos_ = geometry::Position((static_cast<int>(question) + 2) * CHAR_W, (static_cast<int>(strings_.size()) + 2) * CHAR_H);
     }
-    strings_.push_back(converter.from_bytes(s));
-    // Add a paragraph break after some special lines
-    if (ends_with(s, "-") || ends_with(s, ": ") || ends_with(s, "."))
+    // Replace some text
+    if (ends_with(s, "for only $30, plus $3 shipping."))
+    {
+      strings_.push_back(L" from Steam or GOG.");
+      strings_.push_back(L"");
+    }
+    else
+    {
+      strings_.push_back(converter.from_bytes(s));
+    }
+    // Add a paragraph break after some special lines - there doesn't seem to be a consistent pattern here
+    if (ends_with(s, "About Apogee Software") || ends_with(s, "think our goal can be achieved.") ||
+        ends_with(s, "Shareware is not free software.") || ends_with(s, "Your honesty pays...") ||
+        ends_with(s, "HOW TO ORDER CRYSTAL CAVES!") || ends_with(s, "original and incredible episodes:") ||
+        ends_with(s, "3) Mylo vs. the Supernova") || ends_with(s, "levels, and all-new challenges."))
     {
       strings_.push_back(L"");
     }

@@ -104,7 +104,7 @@ TitleState::TitleState(SpriteManager& sprite_manager,
       {
         {2, {PanelType::PANEL_TYPE_NEW_GAME}},
         {3, {PanelType::PANEL_TYPE_DISABLED}},
-        {4, {PanelType::PANEL_TYPE_DISABLED}},
+        {4, {PanelText::PANEL_TEXT_ORDER_3, exe_data}},
         {5, {PanelType::PANEL_TYPE_DISABLED}},
         {6, {PanelType::PANEL_TYPE_DISABLED}},
         {7, {PanelType::PANEL_TYPE_DISABLED}},
