@@ -71,9 +71,12 @@ Panel::Panel(const std::vector<std::wstring> strings, const std::vector<std::pai
   size_ = geometry::Position(static_cast<int>(max_len) + 1, static_cast<int>(strings_.size()) + 1);
 }
 
-Panel::Panel(const char* ucsd, const std::vector<std::pair<int, geometry::Position>> sprites)
+Panel::Panel(const char* ucsd,
+             const std::vector<std::pair<int, geometry::Position>> sprites,
+             const std::vector<std::pair<Icon, geometry::Position>> icons)
   : type_(PanelType::PANEL_TYPE_NORMAL),
-    sprites_(std::move(sprites))
+    sprites_(std::move(sprites)),
+    icons_(std::move(icons))
 {
   // Convert input text into a vector of strings, ignoring the
   // END OF WINDOW text
@@ -148,7 +151,8 @@ Panel::Panel(const char* ucsd, const std::vector<std::pair<int, geometry::Positi
       strings_.push_back(L"");
     }
     // Trim some space to allow room for sprites
-    else if (ends_with(s, "collect all the crystals in") || ends_with(s, "each cave you encounter. Once"))
+    else if (ends_with(s, "collect all the crystals in") || ends_with(s, "each cave you encounter. Once") ||
+             ends_with(s, "Clear colored blocks can be") || ends_with(s, "shot away. Look for these, as"))
     {
       // TODO: allow remapping controls
       strings_.push_back(converter.from_bytes(ltrim(s)));
@@ -438,9 +442,13 @@ void Panel::draw(const SpriteManager& sprite_manager) const
     sprite_manager.render_icon(S_ICONS[sparkle_frame - 1], frame_pos + sparkle_pos_);
   }
 
-  // Draw any sprites in addition
+  // Draw any sprites/icons in addition
   for (const auto& sprite : sprites_)
   {
     sprite_manager.render_tile(sprite.first, sprite.second);
+  }
+  for (const auto& icon : icons_)
+  {
+    sprite_manager.render_icon(icon.first, icon.second);
   }
 }
