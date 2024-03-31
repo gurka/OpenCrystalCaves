@@ -43,5 +43,10 @@ std::filesystem::path get_data_path(const std::filesystem::path& filename)
       return std::filesystem::path(gogfilename);
     }
   }
+  // Try media (contains shareware episode)
+  if (std::filesystem::exists("media/CC1" / filename))
+  {
+    return std::filesystem::path("media/CC1" / filename);
+  }
   return std::filesystem::path();
 }

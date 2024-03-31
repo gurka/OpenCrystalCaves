@@ -70,7 +70,7 @@ void SplashState::draw(Window& window) const
   State::draw(window);
 }
 
-#ifdef _MSVC
+#ifdef _MSC_VER
 #define OS_NAME "Windows"
 #elif defined(__APPLE__)
 #define OS_NAME "macOS"
