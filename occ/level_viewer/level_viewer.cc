@@ -77,7 +77,6 @@ int main(int argc, char* argv[])
     return 1;
   }
   ObjectManager object_manager;
-  // TODO: eliminate items.json
   if (!object_manager.load("media/items.json"))
   {
     LOG_CRITICAL("Could not load items");
@@ -122,11 +121,16 @@ int main(int argc, char* argv[])
     }
 
     window->fill_rect(geometry::Rectangle(0, 0, WIN_SIZE), {33u, 33u, 33u});
-    // TODO: draw level
+    const auto& bg = object_manager.get_background(levels[index].background_id);
     for (int y = 0; y < levels[index].height; y++)
     {
       for (int x = 0; x < levels[index].width; x++)
       {
+        if (bg.valid())
+        {
+          const auto sprite_id = bg.get_sprite(x, y);
+          sprite_manager.render_tile(sprite_id, {x * SPRITE_W, y * SPRITE_H});
+        }
         const auto tile_id = levels[index].tile_ids[y * levels[index].width + x];
         if (tile_id != -1)
         {

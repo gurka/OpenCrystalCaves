@@ -104,8 +104,7 @@ void GameRenderer::render_background() const
   {
     for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
     {
-      const auto sprite_id =
-        background.get_sprite() + (((tile_y + 1) % background.get_size().y()) * 4) + (tile_x % background.get_size().x());
+      const auto sprite_id = background.get_sprite(tile_x, tile_y);
       sprite_manager_->render_tile(sprite_id, {tile_x * SPRITE_W, tile_y * SPRITE_H}, game_camera_.position);
     }
   }
