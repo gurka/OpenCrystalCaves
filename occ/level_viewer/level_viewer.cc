@@ -119,25 +119,43 @@ int main(int argc, char* argv[])
         index = 0;
       }
     }
+    const auto& level = levels[index];
 
     window->fill_rect(geometry::Rectangle(0, 0, WIN_SIZE), {33u, 33u, 33u});
-    const auto& bg = object_manager.get_background(levels[index].background_id);
-    for (int y = 0; y < levels[index].height; y++)
+    const auto& bg = object_manager.get_background(level.background_id);
+    for (int y = 0; y < level.height; y++)
     {
-      for (int x = 0; x < levels[index].width; x++)
+      for (int x = 0; x < level.width; x++)
       {
         if (bg.valid())
         {
           const auto sprite_id = bg.get_sprite(x, y);
           sprite_manager.render_tile(sprite_id, {x * SPRITE_W, y * SPRITE_H});
         }
-        const auto tile_id = levels[index].tile_ids[y * levels[index].width + x];
+        const auto tile_id = level.tile_ids[y * level.width + x];
         if (tile_id != -1)
         {
           const auto& tile = object_manager.get_tile(tile_id);
           if (tile.valid())
           {
             const auto sprite_id = tile.get_sprite();
+            sprite_manager.render_tile(sprite_id, {x * SPRITE_W, y * SPRITE_H});
+          }
+        }
+        // TODO: moving_platforms is dynamic, load from level data instead
+        for (const auto& platform : level.moving_platforms)
+        {
+          sprite_manager.render_tile(platform.sprite_id, platform.position);
+        }
+        sprite_manager.render_tile(static_cast<int>(Sprite::SPRITE_STANDING_RIGHT), level.player_spawn);
+        // TODO: load and render enemies
+        const auto item_id = level.item_ids[y * level.width + x];
+        if (item_id != -1)
+        {
+          const auto& item = object_manager.get_item(item_id);
+          if (item.valid())
+          {
+            const auto sprite_id = item.get_sprite();
             sprite_manager.render_tile(sprite_id, {x * SPRITE_W, y * SPRITE_H});
           }
         }

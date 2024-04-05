@@ -272,7 +272,6 @@ void GameRenderer::render_background() const
 void GameRenderer::render_player() const
 {
   // Player sprite ids
-  static constexpr int sprite_standing_right = 260;
   static constexpr std::array<int, 12> sprite_walking_right = {260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271};
   static constexpr int sprite_jumping_right = 284;
   static constexpr int sprite_shooting_right = 286;
@@ -321,7 +320,7 @@ void GameRenderer::render_player() const
         }
         else
         {
-          sprite = sprite_standing_right;
+          sprite = static_cast<int>(Sprite::SPRITE_STANDING_RIGHT);
         }
       }
     }
