@@ -26,14 +26,14 @@ bool GameImpl::init()
   }
 
   // level_ = LevelLoader::load_level(LevelId::MAIN_LEVEL);
-  level_ = LevelLoader::load_level(LevelId::LEVEL_ONE);
+  level_ = LevelLoader::load_level(LevelId::LEVEL_1);
   if (!level_)
   {
     return false;
   }
 
   // TODO: Temporary
-  if (level_->level_id == LevelId::LEVEL_ONE)
+  if (level_->level_id == LevelId::LEVEL_1)
   {
     // Spawn enemies
     enemies_.emplace_back(geometry::Position(14 * 16, 22 * 16), 2);
@@ -80,9 +80,9 @@ void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
 
 const Background& GameImpl::get_background() const
 {
-  if (level_->background_id != -1)
+  if (level_->background != "")
   {
-    return object_manager_.get_background(level_->background_id);
+    return object_manager_.get_background(level_->background);
   }
   else
   {

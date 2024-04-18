@@ -2,21 +2,20 @@
 
 #include <cstdio>
 #include <fstream>
+#include <nlohmann/json.hpp>
 #include <unordered_map>
 #include <utility>
-#include <nlohmann/json.hpp>
 
-#include "logger.h"
-#include "level.h"
 #include "game.h"
+#include "level.h"
+#include "logger.h"
 
 namespace
 {
 
-const std::unordered_map<LevelId, std::string> level_filename =
-{
-  { LevelId::MAIN_LEVEL, "media/mainlevel.json" },
-  { LevelId::LEVEL_ONE,  "media/level1.json" },
+const std::unordered_map<LevelId, std::string> level_filename = {
+  {LevelId::MAIN_LEVEL, "media/mainlevel.json"},
+  {LevelId::LEVEL_1, "media/level1.json"},
 };
 
 }
@@ -57,9 +56,9 @@ std::unique_ptr<Level> load_level(LevelId level_id)
     LOG_CRITICAL("Level is missing \"Height\" attribute or wrong type!");
     return std::unique_ptr<Level>();
   }
-  if (level_json.count("BackgroundId") == 0 || !level_json["BackgroundId"].is_number())
+  if (level_json.count("Background") == 0 || !level_json["Background"].is_string())
   {
-    LOG_CRITICAL("Level is missing \"BackgroundId\" attribute or wrong type!");
+    LOG_CRITICAL("Level is missing \"Background\" attribute or wrong type!");
     return std::unique_ptr<Level>();
   }
   if (level_json.count("TileIds") == 0 || !level_json["TileIds"].is_array())
@@ -76,7 +75,7 @@ std::unique_ptr<Level> load_level(LevelId level_id)
   // Read attributes
   const auto width = level_json["Width"].get<int>();
   const auto height = level_json["Height"].get<int>();
-  const auto background_id = level_json["BackgroundId"].get<int>();
+  const auto background = level_json["Background"].get<std::string>();
   auto tile_ids = level_json["TileIds"].get<std::vector<int>>();  // TODO: Tile::Id ?
   auto item_ids = level_json["ItemIds"].get<std::vector<int>>();  // TODO: Item::Id ?
 
@@ -89,53 +88,144 @@ std::unique_ptr<Level> load_level(LevelId level_id)
                                    width,
                                    height,
                                    geometry::Position(32, 48),  // Player spawn
-                                   background_id,
+                                   background,
                                    std::move(tile_ids),
                                    std::move(item_ids),
-                                   std::vector<MovingPlatform>(
-                                   {
-                                     {
-                                       // Vertical
-                                       geometry::Position(38 * 16,  7 * 16),
-                                       geometry::Position(38 * 16, 22 * 16),
-                                       2,
-                                       616,
-                                       4
-                                     },
-                                     {
-                                       // Horizontal
-                                       geometry::Position(11 * 16,  8 * 16),
-                                       geometry::Position( 7 * 16,  8 * 16),
-                                       2,
-                                       612,
-                                       4
-                                     }
-                                   }));
+                                   std::vector<MovingPlatform>({{// Vertical
+                                                                 geometry::Position(38 * 16, 7 * 16),
+                                                                 geometry::Position(38 * 16, 22 * 16),
+                                                                 2,
+                                                                 616,
+                                                                 4},
+                                                                {// Horizontal
+                                                                 geometry::Position(11 * 16, 8 * 16),
+                                                                 geometry::Position(7 * 16, 8 * 16),
+                                                                 2,
+                                                                 612,
+                                                                 4}}));
   }
-  else if (level_id == LevelId::LEVEL_ONE)
+  else if (level_id == LevelId::LEVEL_1)
   {
     return std::make_unique<Level>(level_id,
                                    width,
                                    height,
                                    geometry::Position(4 * 16, 22 * 16),  // Player spawn
-                                   background_id,
+                                   background,
                                    std::move(tile_ids),
                                    std::move(item_ids),
-                                   std::vector<MovingPlatform>(
-                                   {
-                                     {
-                                       geometry::Position(36 * 16,  7 * 16),
-                                       geometry::Position(36 * 16, 22 * 16),
-                                       2,
-                                       616,
-                                       4
-                                     },
+                                   std::vector<MovingPlatform>({
+                                     {geometry::Position(36 * 16, 7 * 16), geometry::Position(36 * 16, 22 * 16), 2, 616, 4},
                                    }));
   }
   else
   {
     return std::unique_ptr<Level>();
   }
+}
+
+// https://moddingwiki.shikadi.net/wiki/Crystal_Caves_Map_Format
+
+constexpr int levelLoc = 0x8CE0;
+constexpr int levelRows[] = {
+  // intro
+  5,
+  // finale
+  6,
+  // main
+  25,
+  24,
+  24,
+  24,
+  24,
+  24,
+  24,
+  23,
+  23,
+  24,
+  24,
+  24,
+  24,
+  24,
+  23,
+  24,
+  24,
+};
+const char* levelBGs[] = {
+  // intro
+  "stars",
+  // finale
+  "stars",
+  // main
+  "rocks",
+  "",
+  "",
+  "",
+  "red panel",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+};
+
+std::unique_ptr<Level> load(ExeData& exe_data, const LevelId level_id)
+{
+  // Find the location in exe data of the level
+  const char* ptr = exe_data.data.c_str() + levelLoc;
+  int i;
+  for (i = static_cast<int>(LevelId::INTRO); i <= static_cast<int>(LevelId::LEVEL_16); i++)
+  {
+    if (i == static_cast<int>(level_id))
+    {
+      break;
+    }
+    // Skip this level's rows
+    for (int row = 0; row < levelRows[i]; row++)
+    {
+      const size_t len = *ptr;
+      ptr++;
+      ptr += len;
+    }
+  }
+
+  // Read the tile ids of the level
+  std::vector<int> tile_ids;
+  std::vector<int> item_ids;
+  int width = 0;
+  for (int row = 0; row < levelRows[i]; row++)
+  {
+    const int len = *ptr;
+    if (width == 0)
+    {
+      width = len;
+    }
+    ptr++;
+    for (int i = 0; i < len; i++, ptr++)
+    {
+      tile_ids.push_back(static_cast<int>(*ptr));
+      // TODO
+      item_ids.push_back(-1);
+    }
+  }
+  const auto background = levelBGs[static_cast<int>(level_id)];
+  return std::make_unique<Level>(level_id,
+                                 width,
+                                 levelRows[i],
+                                 geometry::Position(4 * 16, 22 * 16),  // Player spawn
+                                 background,
+                                 std::move(tile_ids),
+                                 std::move(item_ids),
+                                 // TODO: moving platforms
+                                 std::vector<MovingPlatform>({
+                                   {geometry::Position(36 * 16, 7 * 16), geometry::Position(36 * 16, 22 * 16), 2, 616, 4},
+                                 }));
 }
 
 }

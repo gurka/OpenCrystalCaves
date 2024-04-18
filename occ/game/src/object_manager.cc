@@ -25,41 +25,42 @@ bool ObjectManager::load(const std::string& filename)
   objects_file.close();
 
   // Parse backgrounds
-  if (objects_json.count("Backgrounds") == 0 || !objects_json["Backgrounds"].is_array())
+  if (objects_json.count("Backgrounds") == 0 || !objects_json["Backgrounds"].is_object())
   {
     LOG_CRITICAL("JSON missing \"Backgrounds\" attribute or wrong type!");
     return false;
   }
 
-  for (const auto& background_json : objects_json["Backgrounds"])
+  for (const auto& background_json : objects_json["Backgrounds"].items())
   {
     // Verify that the required attributes exists
-    if (background_json.count("Sprite") == 0 || !background_json["Sprite"].is_number())
+    if (background_json.value().count("Sprite") == 0 || !background_json.value()["Sprite"].is_number())
     {
       LOG_CRITICAL("Background is missing \"Sprite\" attribute or wrong type!");
       return false;
     }
 
-    if (background_json.count("SpriteWidth") == 0 || !background_json["SpriteWidth"].is_number())
+    if (background_json.value().count("SpriteWidth") == 0 || !background_json.value()["SpriteWidth"].is_number())
     {
       LOG_CRITICAL("Background is missing \"SpriteWidth\" attribute or wrong type!");
       return false;
     }
 
-    if (background_json.count("SpriteHeight") == 0 || !background_json["SpriteHeight"].is_number())
+    if (background_json.value().count("SpriteHeight") == 0 || !background_json.value()["SpriteHeight"].is_number())
     {
       LOG_CRITICAL("Background is missing \"SpriteHeight\" attribute or wrong type!");
       return false;
     }
 
     // Create and add Background
-    backgrounds_.emplace_back(background_json["Sprite"].get<int>(),
-                              geometry::Size(background_json["SpriteWidth"].get<int>(), background_json["SpriteHeight"].get<int>()));
+    backgrounds_[background_json.key()] = {
+      background_json.value()["Sprite"].get<int>(),
+      geometry::Size(background_json.value()["SpriteWidth"].get<int>(), background_json.value()["SpriteHeight"].get<int>())};
 
     LOG_DEBUG("Loaded background: Sprite: %d SpriteWidth: %d SpriteHeight: %d",
-              background_json["Sprite"].get<int>(),
-              background_json["SpriteWidth"].get<int>(),
-              background_json["SpriteHeight"].get<int>());
+              background_json.value()["Sprite"].get<int>(),
+              background_json.value()["SpriteWidth"].get<int>(),
+              background_json.value()["SpriteHeight"].get<int>());
   }
 
   LOG_INFO("Loaded %d backgrounds", static_cast<int>(backgrounds_.size()));

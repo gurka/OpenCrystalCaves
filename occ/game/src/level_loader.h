@@ -1,9 +1,10 @@
-#ifndef LEVEL_LOADER_H_
-#define LEVEL_LOADER_H_
+#pragma once
 
 #include <string>
 #include <memory>
 #include <vector>
+
+#include "exe_data.h"
 
 enum class LevelId;
 struct Level;
@@ -13,7 +14,6 @@ namespace LevelLoader
 {
 
 std::unique_ptr<Level> load_level(LevelId level_id);
+std::unique_ptr<Level> load(ExeData& exe_data, const LevelId level_id);
 
 }
-
-#endif  // LEVEL_LOADER_H_

@@ -1,16 +1,21 @@
 {
-    "Backgrounds": [
-      {
+    "Backgrounds": {
+      "rocks": {
         "Sprite": 20,
         "SpriteWidth": 2,
         "SpriteHeight": 2
       },
-      {
+      "red panel": {
         "Sprite": 970,
         "SpriteWidth": 2,
         "SpriteHeight": 2
+      },
+      "stars": {
+        "Sprite": 355,
+        "SpriteWidth": 3,
+        "SpriteHeight": 2
       }
-    ],
+    },
     "Tiles": [
       {
         "Sprite": 2,

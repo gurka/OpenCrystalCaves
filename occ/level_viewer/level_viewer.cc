@@ -18,34 +18,6 @@ Display Crystal Caves levels
 
 static constexpr geometry::Size WIN_SIZE = geometry::Size(40 * SPRITE_W, 25 * SPRITE_H);
 
-// https://moddingwiki.shikadi.net/wiki/Crystal_Caves_Map_Format
-
-constexpr int levelLoc = 0x8CE0;
-constexpr int levelRows[] = {
-  // intro
-  5,
-  // finale
-  6,
-  // main
-  25,
-  24,
-  24,
-  24,
-  24,
-  24,
-  24,
-  23,
-  23,
-  24,
-  24,
-  24,
-  24,
-  24,
-  23,
-  24,
-  24,
-};
-
 int main(int argc, char* argv[])
 {
   int episode = 1;
@@ -84,8 +56,11 @@ int main(int argc, char* argv[])
   }
   ExeData exe_data{episode};
   std::vector<Level> levels;
-  // TODO: read exe data
-  auto level = LevelLoader::load_level(LevelId::LEVEL_ONE);
+  auto level = LevelLoader::load_level(LevelId::LEVEL_1);
+  levels.push_back(*level);
+  level = LevelLoader::load_level(LevelId::MAIN_LEVEL);
+  levels.push_back(*level);
+  level = LevelLoader::load(exe_data, LevelId::MAIN_LEVEL);
   levels.push_back(*level);
   int index = 0;
   auto event = Event::create();
@@ -122,7 +97,7 @@ int main(int argc, char* argv[])
     const auto& level = levels[index];
 
     window->fill_rect(geometry::Rectangle(0, 0, WIN_SIZE), {33u, 33u, 33u});
-    const auto& bg = object_manager.get_background(level.background_id);
+    const auto& bg = object_manager.get_background(level.background);
     for (int y = 0; y < level.height; y++)
     {
       for (int x = 0; x < level.width; x++)

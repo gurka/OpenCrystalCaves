@@ -3,8 +3,8 @@
 
 #include <vector>
 
-#include "level_id.h"
 #include "geometry.h"
+#include "level_id.h"
 #include "moving_platform.h"
 
 struct Level
@@ -13,7 +13,7 @@ struct Level
         int width,
         int height,
         const geometry::Position& player_spawn,
-        int background_id,
+        const std::string& background,
         std::vector<int>&& tile_ids,
         std::vector<int>&& item_ids,
         std::vector<MovingPlatform>&& moving_platforms)
@@ -21,7 +21,7 @@ struct Level
       width(width),
       height(height),
       player_spawn(player_spawn),
-      background_id(background_id),
+      background(background),
       tile_ids(std::move(tile_ids)),
       item_ids(std::move(item_ids)),
       moving_platforms(std::move(moving_platforms))
@@ -35,7 +35,7 @@ struct Level
 
   geometry::Position player_spawn;
 
-  int background_id;
+  std::string background;
   std::vector<int> tile_ids;
   std::vector<int> item_ids;
 
