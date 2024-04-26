@@ -94,15 +94,11 @@ std::unique_ptr<Level> load_level(LevelId level_id, const ObjectManager& object_
                                    std::vector<MovingPlatform>({{// Vertical
                                                                  geometry::Position(38 * 16, 7 * 16),
                                                                  geometry::Position(38 * 16, 22 * 16),
-                                                                 2,
-                                                                 616,
-                                                                 4},
+                                                                 false},
                                                                 {// Horizontal
                                                                  geometry::Position(11 * 16, 8 * 16),
                                                                  geometry::Position(7 * 16, 8 * 16),
-                                                                 2,
-                                                                 612,
-                                                                 4}}),
+                                                                 true}}),
                                    object_manager,
                                    false);
   }
@@ -116,7 +112,7 @@ std::unique_ptr<Level> load_level(LevelId level_id, const ObjectManager& object_
                                    tile_ids,
                                    std::move(item_ids),
                                    std::vector<MovingPlatform>({
-                                     {geometry::Position(36 * 16, 7 * 16), geometry::Position(36 * 16, 22 * 16), 2, 616, 4},
+                                     {geometry::Position(36 * 16, 7 * 16), geometry::Position(36 * 16, 22 * 16), false},
                                    }),
                                    object_manager,
                                    false);
@@ -229,9 +225,7 @@ std::unique_ptr<Level> load(ExeData& exe_data, const LevelId level_id, const Obj
                                  tile_ids,
                                  std::move(item_ids),
                                  // TODO: moving platforms
-                                 std::vector<MovingPlatform>({
-                                   {geometry::Position(36 * 16, 7 * 16), geometry::Position(36 * 16, 22 * 16), 2, 616, 4},
-                                 }),
+                                 std::vector<MovingPlatform>(),
                                  object_manager,
                                  true);
 }

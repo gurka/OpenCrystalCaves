@@ -104,8 +104,7 @@ int main(int argc, char* argv[])
       {
         if (bg.valid())
         {
-          const auto sprite_id = bg.get_sprite(x, y);
-          sprite_manager.render_tile(sprite_id, {x * SPRITE_W, y * SPRITE_H});
+          sprite_manager.render_tile(bg.get_sprite(x, y), {x * SPRITE_W, y * SPRITE_H});
         }
         const auto tile = level.get_tile(x, y);
         const auto sprite_id = tile.get_sprite();

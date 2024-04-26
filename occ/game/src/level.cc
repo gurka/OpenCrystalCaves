@@ -38,9 +38,25 @@ Level::Level(LevelId level_id,
       int sprite = 0;
       switch (tile_id)
       {
-        case 'z':
-          // TODO: stars
-          sprite = static_cast<int>(Sprite::SPRITE_STARS);
+        case 'H':
+          // TODO: start and end positions
+          this->moving_platforms.push_back({
+            geometry::Position{x * 16, y * 16},
+            geometry::Position{x * 16, y * 16},
+            true,
+          });
+          break;
+        case 'k':
+          sprite = static_cast<int>(Sprite::SPRITE_CONCRETE_V);
+          break;
+        case 'K':
+          sprite = static_cast<int>(Sprite::SPRITE_CONCRETE);
+          break;
+        case 'l':
+          sprite = static_cast<int>(Sprite::SPRITE_CONCRETE_X);
+          break;
+        case 'L':
+          sprite = static_cast<int>(Sprite::SPRITE_CONCRETE_H);
           break;
         case 'm':
           // mN = earth and moon
@@ -52,6 +68,9 @@ Level::Level(LevelId level_id,
             continue;
           }
           break;
+        case 'n':
+          // TODO: volcano spawn point?
+          break;
         case 'N':
           // TODO: earth?
           sprite = static_cast<int>(Sprite::SPRITE_EARTH);
@@ -59,12 +78,20 @@ Level::Level(LevelId level_id,
         case 'u':
           // TODO: volcano spawn point?
           break;
-        case 'n':
-          // TODO: volcano spawn point?
+        case 'x':
+          sprite = static_cast<int>(Sprite::SPRITE_ENTRY_1);
           break;
         case 'Y':
           // Player spawn
           this->player_spawn = geometry::Position(x * 16, y * 16);
+          break;
+        case 'z':
+          // TODO: stars
+          sprite = static_cast<int>(Sprite::SPRITE_STARS);
+          break;
+        case 'Z':
+          // Random horizon tile
+          sprite = static_cast<int>(HORIZON[rand() % HORIZON.size()]);
           break;
         case '[':
           switch (tile_ids[i + 1])
@@ -85,15 +112,38 @@ Level::Level(LevelId level_id,
               break;
           }
           break;
-        case -114:
+        case -6:
+          sprite = static_cast<int>(Sprite::SPRITE_BARREL_CRACKED);
+          break;
+        case -16:
           if (tile_ids[i + 1] == 'n')
           {
-            // \tn = top of volcano
-            tiles.push_back(Tile(static_cast<int>(Sprite::SPRITE_VOLCANO_TOP_1), 1, 0));
+            // Wood struts
+            tiles.push_back(Tile(static_cast<int>(Sprite::SPRITE_WOOD_STRUT_1), 1, 0));
             i++;
-            tiles.push_back(Tile(static_cast<int>(Sprite::SPRITE_VOLCANO_TOP_2), 1, 0));
+            tiles.push_back(Tile(static_cast<int>(Sprite::SPRITE_WOOD_STRUT_2), 1, 0));
             continue;
           }
+          break;
+        case -43:
+          // TODO: animated
+          sprite = static_cast<int>(Sprite::SPRITE_TORCH_1);
+          break;
+        case -77:
+          if (tile_ids[i + 1] == 'n')
+          {
+            // Wood pillar
+            tiles.push_back(Tile(static_cast<int>(Sprite::SPRITE_WOOD_PILLAR_1), 1, 0));
+            i++;
+            tiles.push_back(Tile(static_cast<int>(Sprite::SPRITE_WOOD_PILLAR_2), 1, 0));
+            continue;
+          }
+          break;
+        case -78:
+          sprite = static_cast<int>(Sprite::SPRITE_WOOD_V);
+          break;
+        case -79:
+          sprite = static_cast<int>(Sprite::SPRITE_WOOD_H);
           break;
         case -113:
           if (tile_ids[i + 1] == 'n')
@@ -109,31 +159,15 @@ Level::Level(LevelId level_id,
             continue;
           }
           break;
-        case 'Z':
-          // Random horizon tile
-          sprite = static_cast<int>(HORIZON[rand() % HORIZON.size()]);
-          break;
-        case 'l':
-          sprite = static_cast<int>(Sprite::SPRITE_CONCRETE_X);
-          break;
-        case 'k':
-          sprite = static_cast<int>(Sprite::SPRITE_CONCRETE_V);
-          break;
-        case 'K':
-          sprite = static_cast<int>(Sprite::SPRITE_CONCRETE);
-          break;
-        case 'L':
-          sprite = static_cast<int>(Sprite::SPRITE_CONCRETE_H);
-          break;
-        case -43:
-          // TODO: animated
-          sprite = static_cast<int>(Sprite::SPRITE_TORCH_1);
-          break;
-        case 'x':
-          sprite = static_cast<int>(Sprite::SPRITE_ENTRY_1);
-          break;
-        case -79:
-          sprite = static_cast<int>(Sprite::SPRITE_WOOD_H);
+        case -114:
+          if (tile_ids[i + 1] == 'n')
+          {
+            // \tn = top of volcano
+            tiles.push_back(Tile(static_cast<int>(Sprite::SPRITE_VOLCANO_TOP_1), 1, 0));
+            i++;
+            tiles.push_back(Tile(static_cast<int>(Sprite::SPRITE_VOLCANO_TOP_2), 1, 0));
+            continue;
+          }
           break;
         default:
           sprite = -1;

@@ -26,6 +26,7 @@ add_library(game
   "src/missile.cc"
   "src/missile.h"
   "src/moving_platform.h"
+  "src/moving_platform.cc"
   "src/object_manager.cc"
   "src/object_manager.h"
   "src/player.cc"
