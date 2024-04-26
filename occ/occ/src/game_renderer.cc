@@ -3,6 +3,7 @@
 #include "constants.h"
 #include "game.h"
 #include "graphics.h"
+#include "level.h"
 #include "misc.h"
 #include "occ_math.h"
 #include "player.h"

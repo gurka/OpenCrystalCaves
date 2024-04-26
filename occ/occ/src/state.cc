@@ -5,6 +5,7 @@
 #include <easing.h>
 
 #include "constants.h"
+#include "level.h"
 #include "utils.h"
 #include <path.h>
 

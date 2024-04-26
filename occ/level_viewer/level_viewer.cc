@@ -56,11 +56,11 @@ int main(int argc, char* argv[])
   }
   ExeData exe_data{episode};
   std::vector<Level> levels;
-  auto level = LevelLoader::load_level(LevelId::LEVEL_1);
+  auto level = LevelLoader::load_level(LevelId::LEVEL_1, object_manager);
   levels.push_back(*level);
-  level = LevelLoader::load_level(LevelId::MAIN_LEVEL);
+  level = LevelLoader::load_level(LevelId::MAIN_LEVEL, object_manager);
   levels.push_back(*level);
-  level = LevelLoader::load(exe_data, LevelId::MAIN_LEVEL);
+  level = LevelLoader::load(exe_data, LevelId::MAIN_LEVEL, object_manager);
   levels.push_back(*level);
   int index = 0;
   auto event = Event::create();
@@ -107,16 +107,9 @@ int main(int argc, char* argv[])
           const auto sprite_id = bg.get_sprite(x, y);
           sprite_manager.render_tile(sprite_id, {x * SPRITE_W, y * SPRITE_H});
         }
-        const auto tile_id = level.tile_ids[y * level.width + x];
-        if (tile_id != -1)
-        {
-          const auto& tile = object_manager.get_tile(tile_id);
-          if (tile.valid())
-          {
-            const auto sprite_id = tile.get_sprite();
-            sprite_manager.render_tile(sprite_id, {x * SPRITE_W, y * SPRITE_H});
-          }
-        }
+        const auto tile = level.get_tile(x, y);
+        const auto sprite_id = tile.get_sprite();
+        sprite_manager.render_tile(sprite_id, {x * SPRITE_W, y * SPRITE_H});
         // TODO: moving_platforms is dynamic, load from level data instead
         for (const auto& platform : level.moving_platforms)
         {
@@ -137,7 +130,7 @@ int main(int argc, char* argv[])
       }
     }
     window->refresh();
-    sdl->delay(10);
+    sdl->delay(30);
   }
 
   return 0;

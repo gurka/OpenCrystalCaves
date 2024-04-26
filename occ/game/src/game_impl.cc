@@ -26,7 +26,7 @@ bool GameImpl::init()
   }
 
   // level_ = LevelLoader::load_level(LevelId::MAIN_LEVEL);
-  level_ = LevelLoader::load_level(LevelId::LEVEL_1);
+  level_ = LevelLoader::load_level(LevelId::LEVEL_1, object_manager_);
   if (!level_)
   {
     return false;
@@ -45,7 +45,7 @@ bool GameImpl::init()
   score_ = 0u;
   num_ammo_ = 5u;
   num_lives_ = 3u;
-	has_key_ = false;
+  has_key_ = false;
 
   missile_.alive = false;
 
@@ -92,20 +92,7 @@ const Background& GameImpl::get_background() const
 
 const Tile& GameImpl::get_tile(int tile_x, int tile_y) const
 {
-  if (tile_x < 0 || tile_x >= level_->width || tile_y < 0 || tile_y >= level_->height)
-  {
-    return Tile::INVALID;
-  }
-
-  const auto tile_id = level_->tile_ids[(tile_y * level_->width) + tile_x];
-  if (tile_id != -1)
-  {
-    return object_manager_.get_tile(tile_id);
-  }
-  else
-  {
-    return Tile::INVALID;
-  }
+  return level_->get_tile(tile_x, tile_y);
 }
 
 const Item& GameImpl::get_item(int tile_x, int tile_y) const
@@ -216,7 +203,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
     player_.godmode = !player_.godmode;
     LOG_DEBUG("God mode %s", player_.godmode ? "ON" : "OFF");
     if (!player_.godmode && player_.reverse_gravity)
-	{
+    {
       player_.reverse_gravity = false;
       LOG_DEBUG("Reverse gravity OFF");
     }
@@ -302,7 +289,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
       player_.velocity = Vector<int>(player_.velocity.x(), gravity);
     }
     if (player_.reverse_gravity)
-	{
+    {
       player_.velocity = Vector<int>(player_.velocity.x(), -player_.velocity.y());
     }
   }
@@ -398,7 +385,8 @@ void GameImpl::update_player(const PlayerInput& player_input)
       // Player jump ended
       player_.jumping = false;
     }
-    else if (player_.jump_tick != 0 && collides_solid(player_.position + geometry::Position(0, player_.reverse_gravity ? -1 : 1), player_.size))
+    else if (player_.jump_tick != 0 &&
+             collides_solid(player_.position + geometry::Position(0, player_.reverse_gravity ? -1 : 1), player_.size))
     {
       // Player did not actually collide with the ground, but standing directly above it
       // and this isn't the first tick in the jump, so we can consider the jump to have

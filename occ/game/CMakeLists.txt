@@ -22,6 +22,7 @@ add_library(game
   "src/level_loader.cc"
   "src/level_loader.h"
   "src/level.h"
+  "src/level.cc"
   "src/missile.cc"
   "src/missile.h"
   "src/moving_platform.h"

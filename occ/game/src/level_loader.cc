@@ -23,7 +23,7 @@ const std::unordered_map<LevelId, std::string> level_filename = {
 namespace LevelLoader
 {
 
-std::unique_ptr<Level> load_level(LevelId level_id)
+std::unique_ptr<Level> load_level(LevelId level_id, const ObjectManager& object_manager)
 {
   // Check if level is valid
   if (level_filename.count(level_id) == 0)
@@ -89,7 +89,7 @@ std::unique_ptr<Level> load_level(LevelId level_id)
                                    height,
                                    geometry::Position(32, 48),  // Player spawn
                                    background,
-                                   std::move(tile_ids),
+                                   tile_ids,
                                    std::move(item_ids),
                                    std::vector<MovingPlatform>({{// Vertical
                                                                  geometry::Position(38 * 16, 7 * 16),
@@ -102,7 +102,9 @@ std::unique_ptr<Level> load_level(LevelId level_id)
                                                                  geometry::Position(7 * 16, 8 * 16),
                                                                  2,
                                                                  612,
-                                                                 4}}));
+                                                                 4}}),
+                                   object_manager,
+                                   false);
   }
   else if (level_id == LevelId::LEVEL_1)
   {
@@ -111,11 +113,13 @@ std::unique_ptr<Level> load_level(LevelId level_id)
                                    height,
                                    geometry::Position(4 * 16, 22 * 16),  // Player spawn
                                    background,
-                                   std::move(tile_ids),
+                                   tile_ids,
                                    std::move(item_ids),
                                    std::vector<MovingPlatform>({
                                      {geometry::Position(36 * 16, 7 * 16), geometry::Position(36 * 16, 22 * 16), 2, 616, 4},
-                                   }));
+                                   }),
+                                   object_manager,
+                                   false);
   }
   else
   {
@@ -175,19 +179,19 @@ const char* levelBGs[] = {
   "",
 };
 
-std::unique_ptr<Level> load(ExeData& exe_data, const LevelId level_id)
+std::unique_ptr<Level> load(ExeData& exe_data, const LevelId level_id, const ObjectManager& object_manager)
 {
   // Find the location in exe data of the level
   const char* ptr = exe_data.data.c_str() + levelLoc;
-  int i;
-  for (i = static_cast<int>(LevelId::INTRO); i <= static_cast<int>(LevelId::LEVEL_16); i++)
+  int level;
+  for (level = static_cast<int>(LevelId::INTRO); level <= static_cast<int>(LevelId::LEVEL_16); level++)
   {
-    if (i == static_cast<int>(level_id))
+    if (level == static_cast<int>(level_id))
     {
       break;
     }
     // Skip this level's rows
-    for (int row = 0; row < levelRows[i]; row++)
+    for (int row = 0; row < levelRows[level]; row++)
     {
       const size_t len = *ptr;
       ptr++;
@@ -199,7 +203,7 @@ std::unique_ptr<Level> load(ExeData& exe_data, const LevelId level_id)
   std::vector<int> tile_ids;
   std::vector<int> item_ids;
   int width = 0;
-  for (int row = 0; row < levelRows[i]; row++)
+  for (int row = 0; row < levelRows[level]; row++)
   {
     const int len = *ptr;
     if (width == 0)
@@ -207,6 +211,8 @@ std::unique_ptr<Level> load(ExeData& exe_data, const LevelId level_id)
       width = len;
     }
     ptr++;
+    const auto row_str = std::string(ptr).substr(0, len);
+    LOG_DEBUG("%s", row_str.c_str());
     for (int i = 0; i < len; i++, ptr++)
     {
       tile_ids.push_back(static_cast<int>(*ptr));
@@ -217,15 +223,17 @@ std::unique_ptr<Level> load(ExeData& exe_data, const LevelId level_id)
   const auto background = levelBGs[static_cast<int>(level_id)];
   return std::make_unique<Level>(level_id,
                                  width,
-                                 levelRows[i],
+                                 levelRows[static_cast<int>(level_id)],
                                  geometry::Position(4 * 16, 22 * 16),  // Player spawn
                                  background,
-                                 std::move(tile_ids),
+                                 tile_ids,
                                  std::move(item_ids),
                                  // TODO: moving platforms
                                  std::vector<MovingPlatform>({
                                    {geometry::Position(36 * 16, 7 * 16), geometry::Position(36 * 16, 22 * 16), 2, 616, 4},
-                                 }));
+                                 }),
+                                 object_manager,
+                                 true);
 }
 
 }
