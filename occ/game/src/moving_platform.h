@@ -5,6 +5,7 @@
 
 struct MovingPlatform
 {
+  // TODO: platforms just move left and right to the limits
   MovingPlatform(geometry::Position position_start, geometry::Position position_end, const bool horizontal);
 
   geometry::Position position;

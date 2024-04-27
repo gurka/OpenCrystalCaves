@@ -15,6 +15,6 @@ namespace LevelLoader
 {
 
 std::unique_ptr<Level> load_level(LevelId level_id, const ObjectManager& object_manager);
-std::unique_ptr<Level> load(ExeData& exe_data, const LevelId level_id, const ObjectManager& object_manager);
+std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, const ObjectManager& object_manager);
 
 }

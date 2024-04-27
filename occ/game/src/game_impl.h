@@ -1,5 +1,4 @@
-#ifndef GAME_IMPL_H_
-#define GAME_IMPL_H_
+#pragma once
 
 #include "game.h"
 
@@ -32,7 +31,7 @@ class GameImpl : public Game
   {
   }
 
-  bool init() override;
+  bool init(const ExeData& exe_data) override;
   void update(unsigned game_tick, const PlayerInput& player_input) override;
 
   const Player& get_player() const override { return player_; }
@@ -83,5 +82,3 @@ class GameImpl : public Game
   Missile missile_;
   Explosion explosion_;
 };
-
-#endif  // GAME_IMPL_H_

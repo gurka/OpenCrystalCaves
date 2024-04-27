@@ -97,7 +97,8 @@ int main()
     LOG_CRITICAL("Could not create Game");
     return 1;
   }
-  if (!game->init())
+  ExeData exe_data{episode};
+  if (!game->init(exe_data))
   {
     LOG_CRITICAL("Could not initialize Game");
     return 1;
@@ -108,7 +109,6 @@ int main()
   // TODO: more episodes
   auto splash_images = image_manager.get_images(1, CCImage::IMAGE_APOGEE);
   SplashState splash{splash_images, *window};
-  ExeData exe_data{episode};
   auto title_images = image_manager.get_images(1, CCImage::IMAGE_TITLE);
   auto credits_images = image_manager.get_images(1, CCImage::IMAGE_CREDITS);
   title_images.insert(title_images.end(), credits_images.begin(), credits_images.end());

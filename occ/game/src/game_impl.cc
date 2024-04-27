@@ -18,15 +18,14 @@ std::unique_ptr<Game> Game::create()
   return std::make_unique<GameImpl>();
 }
 
-bool GameImpl::init()
+bool GameImpl::init(const ExeData& exe_data)
 {
   if (!object_manager_.load("media/items.json"))
   {
     return false;
   }
 
-  // level_ = LevelLoader::load_level(LevelId::MAIN_LEVEL);
-  level_ = LevelLoader::load_level(LevelId::LEVEL_1, object_manager_);
+  level_ = LevelLoader::load(exe_data, LevelId::MAIN_LEVEL, object_manager_);
   if (!level_)
   {
     return false;

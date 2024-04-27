@@ -1,5 +1,15 @@
 #pragma once
 
+enum TileFlags
+{
+  TILE_SOLID = 0x01,
+  TILE_SOLID_TOP = 0x02,
+  TILE_DAMAGE = 0x04,
+  TILE_DEATH = 0x08,
+  TILE_ANIMATED = 0x10,
+  TILE_RENDER_IN_FRONT = 0x20,
+};
+
 class Tile
 {
  public:

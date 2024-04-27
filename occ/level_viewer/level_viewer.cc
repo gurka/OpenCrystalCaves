@@ -122,8 +122,7 @@ int main(int argc, char* argv[])
           const auto& item = object_manager.get_item(item_id);
           if (item.valid())
           {
-            const auto sprite_id = item.get_sprite();
-            sprite_manager.render_tile(sprite_id, {x * SPRITE_W, y * SPRITE_H});
+            sprite_manager.render_tile(item.get_sprite(), {x * SPRITE_W, y * SPRITE_H});
           }
         }
       }

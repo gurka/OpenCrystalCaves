@@ -36,8 +36,14 @@ Level::Level(LevelId level_id,
     {
       // Decode tile ids from exe data
       int sprite = 0;
+      int sprite_count = 1;
+      int flags = 0;
       switch (tile_id)
       {
+        case ' ':
+          // Nothing
+          sprite = -1;
+          break;
         case 'H':
           // TODO: start and end positions
           this->moving_platforms.push_back({
@@ -48,15 +54,19 @@ Level::Level(LevelId level_id,
           break;
         case 'k':
           sprite = static_cast<int>(Sprite::SPRITE_CONCRETE_V);
+          flags |= TILE_SOLID;
           break;
         case 'K':
           sprite = static_cast<int>(Sprite::SPRITE_CONCRETE);
+          flags |= TILE_SOLID;
           break;
         case 'l':
           sprite = static_cast<int>(Sprite::SPRITE_CONCRETE_X);
+          flags |= TILE_SOLID;
           break;
         case 'L':
           sprite = static_cast<int>(Sprite::SPRITE_CONCRETE_H);
+          flags |= TILE_SOLID;
           break;
         case 'm':
           // mN = earth and moon
@@ -70,6 +80,9 @@ Level::Level(LevelId level_id,
           break;
         case 'n':
           // TODO: volcano spawn point?
+          sprite = static_cast<int>(Sprite::SPRITE_VOLCANO_EJECTA_L_1);
+          sprite_count = 4;
+          flags |= TILE_ANIMATED;
           break;
         case 'N':
           // TODO: earth?
@@ -77,9 +90,22 @@ Level::Level(LevelId level_id,
           break;
         case 'u':
           // TODO: volcano spawn point?
+          sprite = static_cast<int>(Sprite::SPRITE_VOLCANO_EJECTA_R_1);
+          sprite_count = 4;
+          flags |= TILE_ANIMATED;
+          break;
+        case 'V':
+          // TODO: start and end positions
+          this->moving_platforms.push_back({
+            geometry::Position{x * 16, y * 16},
+            geometry::Position{x * 16, y * 16},
+            false,
+          });
           break;
         case 'x':
+          // TODO: entrance
           sprite = static_cast<int>(Sprite::SPRITE_ENTRY_1);
+          flags |= TILE_SOLID;
           break;
         case 'Y':
           // Player spawn
@@ -96,6 +122,14 @@ Level::Level(LevelId level_id,
         case '[':
           switch (tile_ids[i + 1])
           {
+              // [4n = winners drugs sign
+            case '4':
+              tiles.push_back(Tile(static_cast<int>(Sprite::SPRITE_WINNERS_1), 1, 0));
+              i++;
+              tiles.push_back(Tile(static_cast<int>(Sprite::SPRITE_WINNERS_2), 1, 0));
+              i++;
+              tiles.push_back(Tile(static_cast<int>(Sprite::SPRITE_WINNERS_3), 1, 0));
+              continue;
               // [m = mine sign
             case 'm':
               tiles.push_back(Tile(static_cast<int>(Sprite::SPRITE_MINE_SIGN_1), 1, 0));
@@ -114,6 +148,11 @@ Level::Level(LevelId level_id,
           break;
         case -6:
           sprite = static_cast<int>(Sprite::SPRITE_BARREL_CRACKED);
+          flags |= TILE_SOLID_TOP;
+          break;
+        case -7:
+          sprite = static_cast<int>(Sprite::SPRITE_BARREL);
+          flags |= TILE_SOLID_TOP;
           break;
         case -16:
           if (tile_ids[i + 1] == 'n')
@@ -128,6 +167,11 @@ Level::Level(LevelId level_id,
         case -43:
           // TODO: animated
           sprite = static_cast<int>(Sprite::SPRITE_TORCH_1);
+          sprite_count = 4;
+          flags |= TILE_ANIMATED;
+          break;
+        case -58:
+          sprite = static_cast<int>(Sprite::SPRITE_SIGN_DOWN);
           break;
         case -77:
           if (tile_ids[i + 1] == 'n')
@@ -141,9 +185,11 @@ Level::Level(LevelId level_id,
           break;
         case -78:
           sprite = static_cast<int>(Sprite::SPRITE_WOOD_V);
+          flags |= TILE_SOLID;
           break;
         case -79:
           sprite = static_cast<int>(Sprite::SPRITE_WOOD_H);
+          flags |= TILE_SOLID;
           break;
         case -113:
           if (tile_ids[i + 1] == 'n')
@@ -179,7 +225,7 @@ Level::Level(LevelId level_id,
       }
       else
       {
-        tile = Tile(sprite, 1, 0);
+        tile = Tile(sprite, sprite_count, flags);
       }
     }
     else
