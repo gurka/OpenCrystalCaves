@@ -25,7 +25,7 @@ bool GameImpl::init(const ExeData& exe_data)
     return false;
   }
 
-  level_ = LevelLoader::load(exe_data, LevelId::MAIN_LEVEL, object_manager_);
+  level_ = LevelLoader::load(exe_data, LevelId::MAIN_LEVEL);
   if (!level_)
   {
     return false;
@@ -101,15 +101,8 @@ const Item& GameImpl::get_item(int tile_x, int tile_y) const
     return Item::INVALID;
   }
 
-  const auto item_id = level_->item_ids[(tile_y * level_->width) + tile_x];
-  if (item_id != -1)
-  {
-    return object_manager_.get_item(item_id);
-  }
-  else
-  {
-    return Item::INVALID;
-  }
+  // TODO: implement items
+  return Item::INVALID;
 }
 
 std::wstring GameImpl::get_debug_info() const

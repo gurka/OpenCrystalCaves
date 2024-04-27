@@ -132,10 +132,7 @@ struct Level
         const geometry::Position& player_spawn,
         const std::string& background,
         const std::vector<int>& tile_ids,
-        std::vector<int>&& item_ids,
-        std::vector<MovingPlatform>&& moving_platforms,
-        const ObjectManager& object_manager,
-        const bool decode);
+        std::vector<int>&& item_ids);
 
   LevelId level_id;
 

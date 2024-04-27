@@ -56,12 +56,11 @@ int main(int argc, char* argv[])
   }
   ExeData exe_data{episode};
   std::vector<Level> levels;
-  auto level = LevelLoader::load_level(LevelId::LEVEL_1, object_manager);
-  levels.push_back(*level);
-  level = LevelLoader::load_level(LevelId::MAIN_LEVEL, object_manager);
-  levels.push_back(*level);
-  level = LevelLoader::load(exe_data, LevelId::MAIN_LEVEL, object_manager);
-  levels.push_back(*level);
+  for (int level_id = static_cast<int>(LevelId::INTRO); level_id <= static_cast<int>(LevelId::LEVEL_16); level_id++)
+  {
+    auto l = LevelLoader::load(exe_data, static_cast<LevelId>(level_id));
+    levels.push_back(*l);
+  }
   int index = 0;
   auto event = Event::create();
   if (!event)
@@ -97,7 +96,11 @@ int main(int argc, char* argv[])
     const auto& level = levels[index];
 
     window->fill_rect(geometry::Rectangle(0, 0, WIN_SIZE), {33u, 33u, 33u});
-    const auto& bg = object_manager.get_background(level.background);
+    Background bg;
+    if (level.background != "")
+    {
+      bg = object_manager.get_background(level.background);
+    }
     for (int y = 0; y < level.height; y++)
     {
       for (int x = 0; x < level.width; x++)
@@ -109,22 +112,12 @@ int main(int argc, char* argv[])
         const auto tile = level.get_tile(x, y);
         const auto sprite_id = tile.get_sprite();
         sprite_manager.render_tile(sprite_id, {x * SPRITE_W, y * SPRITE_H});
-        // TODO: moving_platforms is dynamic, load from level data instead
         for (const auto& platform : level.moving_platforms)
         {
           sprite_manager.render_tile(platform.sprite_id, platform.position);
         }
         sprite_manager.render_tile(static_cast<int>(Sprite::SPRITE_STANDING_RIGHT), level.player_spawn);
         // TODO: load and render enemies
-        const auto item_id = level.item_ids[y * level.width + x];
-        if (item_id != -1)
-        {
-          const auto& item = object_manager.get_item(item_id);
-          if (item.valid())
-          {
-            sprite_manager.render_tile(item.get_sprite(), {x * SPRITE_W, y * SPRITE_H});
-          }
-        }
       }
     }
     window->refresh();
