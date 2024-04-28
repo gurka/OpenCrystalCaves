@@ -67,6 +67,7 @@ const char* levelBGs[] = {
 
 std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
 {
+  LOG_INFO("Loading level %d", static_cast<int>(level_id));
   // Find the location in exe data of the level
   const char* ptr = exe_data.data.c_str() + levelLoc;
   int level;

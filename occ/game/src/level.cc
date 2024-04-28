@@ -30,7 +30,7 @@ Level::Level(LevelId level_id,
     const auto tile_id = tile_ids[i];
     Tile tile;
     // Decode tile ids from exe data
-    int sprite = 0;
+    int sprite = -1;
     int sprite_count = 1;
     int flags = 0;
     switch (tile_id)
@@ -38,6 +38,72 @@ Level::Level(LevelId level_id,
       case ' ':
         // Nothing
         sprite = -1;
+        break;
+        // Blocks
+      case 'r':
+        sprite = static_cast<int>(Sprite::SPRITE_BLOCK_BROWN_NW);
+        flags |= TILE_SOLID;
+        break;
+      case 't':
+        sprite = static_cast<int>(Sprite::SPRITE_BLOCK_BROWN_N);
+        flags |= TILE_SOLID;
+        break;
+      case 'y':
+        sprite = static_cast<int>(Sprite::SPRITE_BLOCK_BROWN_NE);
+        flags |= TILE_SOLID;
+        break;
+      case '4':
+        sprite = static_cast<int>(Sprite::SPRITE_BLOCK_BROWN_W);
+        flags |= TILE_SOLID;
+        break;
+      case '5':
+        sprite = static_cast<int>(Sprite::SPRITE_BLOCK_BROWN_MID);
+        flags |= TILE_SOLID;
+        break;
+      case '6':
+        sprite = static_cast<int>(Sprite::SPRITE_BLOCK_BROWN_E);
+        flags |= TILE_SOLID;
+        break;
+      case 'f':
+        sprite = static_cast<int>(Sprite::SPRITE_BLOCK_BROWN_SW);
+        flags |= TILE_SOLID;
+        break;
+      case 'g':
+        sprite = static_cast<int>(Sprite::SPRITE_BLOCK_BROWN_S);
+        flags |= TILE_SOLID;
+        break;
+      case 'h':
+        sprite = static_cast<int>(Sprite::SPRITE_BLOCK_BROWN_SE);
+        flags |= TILE_SOLID;
+        break;
+        // Bumpable platforms
+      case 'D':
+      case -104:
+        // Keep adding bumpable platforms until we get an 'n'
+        tiles.push_back(Tile(static_cast<int>(Sprite::SPRITE_BUMP_PLATFORM_RED_L), 1, TILE_SOLID));
+        i++;
+        if (tile_id == -104)
+        {
+          // TODO: add hidden crystal
+        }
+        for (; i < tile_ids.size() && tile_ids[i] != 'n' && tile_ids[i] != -102; i++)
+        {
+          tiles.push_back(Tile(static_cast<int>(Sprite::SPRITE_BUMP_PLATFORM_RED_MID), 1, TILE_SOLID));
+          if (tile_ids[i] == -103)
+          {
+            // TODO: add hidden crystal
+          }
+        }
+        tiles.push_back(Tile(static_cast<int>(Sprite::SPRITE_BUMP_PLATFORM_RED_R), 1, TILE_SOLID));
+        if (tile_ids[i] == -102)
+        {
+          // TODO: add hidden crystal
+        }
+        continue;
+        break;
+      case 'd':
+        sprite = static_cast<int>(Sprite::SPRITE_BUMP_PLATFORM_RED_MID);
+        flags |= TILE_SOLID;
         break;
       case 'H':
         // TODO: start and end positions
@@ -100,7 +166,6 @@ Level::Level(LevelId level_id,
       case 'x':
         // TODO: entrance
         sprite = static_cast<int>(Sprite::SPRITE_ENTRY_1);
-        flags |= TILE_SOLID;
         break;
       case 'Y':
         // Player spawn
@@ -119,11 +184,11 @@ Level::Level(LevelId level_id,
         {
             // [4n = winners drugs sign
           case '4':
-            tiles.push_back(Tile(static_cast<int>(Sprite::SPRITE_WINNERS_1), 1, 0));
+            tiles.push_back(Tile(static_cast<int>(Sprite::SPRITE_WINNERS_1), 1, TILE_SOLID_TOP));
             i++;
-            tiles.push_back(Tile(static_cast<int>(Sprite::SPRITE_WINNERS_2), 1, 0));
+            tiles.push_back(Tile(static_cast<int>(Sprite::SPRITE_WINNERS_2), 1, TILE_SOLID_TOP));
             i++;
-            tiles.push_back(Tile(static_cast<int>(Sprite::SPRITE_WINNERS_3), 1, 0));
+            tiles.push_back(Tile(static_cast<int>(Sprite::SPRITE_WINNERS_3), 1, TILE_SOLID_TOP));
             continue;
             // [m = mine sign
           case 'm':
@@ -133,9 +198,9 @@ Level::Level(LevelId level_id,
             continue;
             // [d = danger sign
           case 'd':
-            tiles.push_back(Tile(static_cast<int>(Sprite::SPRITE_DANGER_1), 1, 0));
+            tiles.push_back(Tile(static_cast<int>(Sprite::SPRITE_DANGER_1), 1, TILE_SOLID_TOP));
             i++;
-            tiles.push_back(Tile(static_cast<int>(Sprite::SPRITE_DANGER_2), 1, 0));
+            tiles.push_back(Tile(static_cast<int>(Sprite::SPRITE_DANGER_2), 1, TILE_SOLID_TOP));
             continue;
           default:
             break;
