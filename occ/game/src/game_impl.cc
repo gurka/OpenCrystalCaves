@@ -128,30 +128,28 @@ void GameImpl::update_level()
   for (auto& platform : level_->moving_platforms)
   {
     // Update platform
-    const auto platform_velocity = platform.forward ? platform.velocity_forward : -platform.velocity_forward;
     const auto player_on_platform = (player_.position.y() + player_.size.y() == platform.position.y()) &&
       (player_.position.x() < platform.position.x() + 16) && (player_.position.x() + player_.size.x() > platform.position.x());
+
+    // Move platform
+    const auto new_platform_pos = platform.collide_position() + platform.velocity;
+
+    if (collides_solid(new_platform_pos, platform.collide_size))
+    {
+      // Change direction
+      platform.velocity = -platform.velocity;
+    }
+    platform.position += platform.velocity;
 
     // Move player if standing on platform
     if (player_on_platform)
     {
       // Only move player if not colliding with any static objects
-      const auto new_player_pos = player_.position + platform_velocity;
+      const auto new_player_pos = player_.position + platform.velocity;
       if (!collides_solid(new_player_pos, player_.size))
       {
         player_.position = new_player_pos;
       }
-    }
-
-    // Move platform
-    platform.position += platform_velocity;
-
-    // Check if platform reached end / start
-    if ((platform.forward && platform.position == platform.position_end) ||
-        (!platform.forward && platform.position == platform.position_start))
-    {
-      // Change direction
-      platform.forward = !platform.forward;
     }
   }
 

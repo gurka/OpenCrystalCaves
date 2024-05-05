@@ -106,9 +106,7 @@ Level::Level(LevelId level_id,
         flags |= TILE_SOLID;
         break;
       case 'H':
-        // TODO: start and end positions
         this->moving_platforms.push_back({
-          geometry::Position{x * 16, y * 16},
           geometry::Position{x * 16, y * 16},
           true,
         });
@@ -156,9 +154,7 @@ Level::Level(LevelId level_id,
         flags |= TILE_ANIMATED;
         break;
       case 'V':
-        // TODO: start and end positions
         this->moving_platforms.push_back({
-          geometry::Position{x * 16, y * 16},
           geometry::Position{x * 16, y * 16},
           false,
         });
