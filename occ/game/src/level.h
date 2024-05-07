@@ -5,15 +5,19 @@
 #include "geometry.h"
 #include "level_id.h"
 #include "moving_platform.h"
-#include "object_manager.h"
 #include "tile.h"
 
 enum class Sprite : int
 {
+  SPRITE_NONE = -1,
   SPRITE_CLEAR_BLOCK = 6,
   SPRITE_ENTRY_1 = 12,
   SPRITE_ENTRY_2 = 13,
   SPRITE_ENTRY_3 = 14,
+  SPRITE_ROCKS_1 = 20,
+  SPRITE_ROCKS_2 = 21,
+  SPRITE_ROCKS_3 = 24,
+  SPRITE_ROCKS_4 = 25,
   SPRITE_ROCKMAN_L_1 = 104,
   SPRITE_ROCKMAN_L_2 = 105,
   SPRITE_ROCKMAN_L_3 = 106,
@@ -36,7 +40,12 @@ enum class Sprite : int
   SPRITE_STANDING_RIGHT = 260,
   SPRITE_PISTOL = 308,
   SPRITE_POWER = 309,
-  SPRITE_STARS = 350,  // 4x2
+  SPRITE_STARS_1 = 356,
+  SPRITE_STARS_2 = 357,
+  SPRITE_STARS_3 = 358,
+  SPRITE_STARS_4 = 359,
+  SPRITE_STARS_5 = 360,
+  SPRITE_STARS_6 = 361,
   SPRITE_LIGHT_SWITCH_OFF = 429,
   SPRITE_LIGHT_SWITCH_ON = 430,
   SPRITE_LEVER_R_OFF = 432,
@@ -118,6 +127,10 @@ enum class Sprite : int
   SPRITE_WOOD_STRUT_2 = 887,
   SPRITE_WOOD_PILLAR_1 = 890,
   SPRITE_WOOD_PILLAR_2 = 891,
+  SPRITE_RED_PANEL_1 = 970,
+  SPRITE_RED_PANEL_2 = 971,
+  SPRITE_RED_PANEL_3 = 974,
+  SPRITE_RED_PANEL_4 = 975,
   SPRITE_BUMP_PLATFORM_BLUE_L = 991,
   SPRITE_BUMP_PLATFORM_BLUE_MID = 992,
   SPRITE_BUMP_PLATFORM_BLUE_R = 993,
@@ -147,8 +160,8 @@ struct Level
   Level(LevelId level_id,
         int width,
         int height,
-        const geometry::Position& player_spawn,
-        const std::string& background,
+        const Sprite bg_sprite,
+        geometry::Size bg_tile_size,
         const std::vector<int>& tile_ids,
         std::vector<int>&& item_ids);
 
@@ -160,8 +173,9 @@ struct Level
   geometry::Position player_spawn;
 
   const Tile& get_tile(const int x, const int y) const;
+  const int get_bg(const int x, const int y) const;
 
-  std::string background;
+  std::vector<int> bgs;
   std::vector<Tile> tiles;
   std::vector<int> item_ids;
 

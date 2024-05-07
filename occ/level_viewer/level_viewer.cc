@@ -7,7 +7,6 @@ Display Crystal Caves levels
 
 #include "../game/src/level.h"
 #include "../game/src/level_loader.h"
-#include "../game/src/object_manager.h"
 #include "../occ/src/constants.h"
 #include "../occ/src/spritemgr.h"
 #include "../utils/export/exe_data.h"
@@ -46,12 +45,6 @@ int main(int argc, char* argv[])
   if (!sprite_manager.load_tilesets(*window, episode))
   {
     LOG_CRITICAL("Could not load tilesets");
-    return 1;
-  }
-  ObjectManager object_manager;
-  if (!object_manager.load("media/items.json"))
-  {
-    LOG_CRITICAL("Could not load items");
     return 1;
   }
   ExeData exe_data{episode};
@@ -96,19 +89,16 @@ int main(int argc, char* argv[])
     const auto& level = levels[index];
 
     window->fill_rect(geometry::Rectangle(0, 0, WIN_SIZE), {33u, 33u, 33u});
-    Background bg;
-    if (level.background != "")
-    {
-      bg = object_manager.get_background(level.background);
-    }
     for (int y = 0; y < level.height; y++)
     {
       for (int x = 0; x < level.width; x++)
       {
-        if (bg.valid())
-        {
-          sprite_manager.render_tile(bg.get_sprite(x, y), {x * SPRITE_W, y * SPRITE_H});
-        }
+		  const auto bg_id = level.get_bg(x, y);
+			if (bg_id != -1)
+			{
+				sprite_manager.render_tile(bg_id, {x * SPRITE_W, y * SPRITE_H});
+			}
+		  
         const auto tile = level.get_tile(x, y);
         const auto sprite_id = tile.get_sprite();
         sprite_manager.render_tile(sprite_id, {x * SPRITE_W, y * SPRITE_H});

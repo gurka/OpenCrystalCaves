@@ -7,7 +7,6 @@
 #include "level_loader.h"
 #include "logger.h"
 #include "misc.h"
-#include "object_manager.h"
 
 static constexpr auto gravity = 8u;
 static constexpr auto jump_velocity = misc::make_array<int>(0, -8, -8, -8, -4, -4, -2, -2, -2, -2, 2, 2, 2, 2, 4, 4);
@@ -20,11 +19,6 @@ std::unique_ptr<Game> Game::create()
 
 bool GameImpl::init(const ExeData& exe_data)
 {
-  if (!object_manager_.load("media/items.json"))
-  {
-    return false;
-  }
-
   level_ = LevelLoader::load(exe_data, LevelId::MAIN_LEVEL);
   if (!level_)
   {
@@ -77,16 +71,9 @@ void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
   // ...
 }
 
-const Background& GameImpl::get_background() const
+const int GameImpl::get_bg_sprite(const int x, const int y) const
 {
-  if (level_->background != "")
-  {
-    return object_manager_.get_background(level_->background);
-  }
-  else
-  {
-    return Background::INVALID;
-  }
+  return level_->get_bg(x, y);
 }
 
 const Tile& GameImpl::get_tile(int tile_x, int tile_y) const

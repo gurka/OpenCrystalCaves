@@ -2,6 +2,7 @@
 [![#CrystalCaves on Mastodon](https://img.shields.io/badge/-%23CrystalCaves-%23303030?logo=mastodon)](https://mastodon.gamedev.place/tags/CrystalCaves)
 
 # OpenCrystalCaves
+
 OCC is an unofficial open source engine reimplementation of the game trilogy [Crystal Caves](https://en.wikipedia.org/wiki/Crystal_Caves).
 
 **Note that the sprites are not available in this repository. You need a copy of the original Crystal Caves, shareware or retail, to be able to extract the sprites and use this engine, see below. The shareware Crystal Caves can be found online; the full, retail version can be purchased at [Steam](http://store.steampowered.com/app/358260/Crystal_Caves/) or [GoG](https://www.gog.com/game/crystal_caves).**
@@ -31,9 +32,10 @@ Features that are missing:
 
 ## Compiling OCC
 
-OCC is built using C++17 and requires external libraries: [SDL 2.0](https://www.libsdl.org/), [SDL_image](https://www.libsdl.org/projects/old/SDL_image/) and [nlohmann's JSON](https://nlohmann.github.io/json/). SDL2 must be installed and available in `/usr/include/SDL2` and the JSON library is included in this repository as a git submodule. Additionally the build system `cmake` must be installed.
+OCC is built using C++17 and requires external libraries: [SDL 2.0](https://www.libsdl.org/) and [SDL_image](https://www.libsdl.org/projects/old/SDL_image/). SDL2 must be installed and available in `/usr/include/SDL2`. Additionally the build system `cmake` must be installed.
 
 Steps to compile (Linux, macOS):
+
 ```
 git clone --recursive https://github.com/gurka/OpenCrystalCaves.git
 cd OpenCrystalCaves
@@ -46,6 +48,7 @@ make
 The binary will be available at `OpenCrystalCaves/debug/occ/occ`
 
 Or in Windows (with [vcpkg](https://vcpkg.io)):
+
 ```
 # In vcpkg dir
 ./vcpkg install --triplet x64-windows sdl2 --recurse
@@ -56,7 +59,9 @@ mkdir debug
 cd debug
 cmake -B debug -DCMAKE_BUILD_TYPE=debug -DCMAKE_TOOLCHAIN_FILE=C:/path/to/vcpkg/scripts/buildsystems/vcpkg.cmake ../occ -A x64
 ```
+
 The Visual Studio project will be available at `OpenCrystalCaves/debug`
 
 ## Running OCC
+
 OCC requires data files from the original Crystal Caves (any episode). Either install it via Steam or GoG, or copy the game data to the same folder as OCC (such as `CC1.GFX`).

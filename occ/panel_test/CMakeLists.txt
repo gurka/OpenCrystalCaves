@@ -15,3 +15,9 @@ target_link_libraries(panel_test
   "unlzexe"
   SDL2::SDL2
 )
+if(APPLE)
+	set_target_properties(panel_test PROPERTIES
+		MACOSX_RPATH 1
+		BUILD_WITH_INSTALL_RPATH 1
+		INSTALL_RPATH "@loader_path/../Frameworks;/Library/Frameworks")
+endif()

@@ -2,7 +2,6 @@
 
 #include <cstdio>
 #include <fstream>
-#include <nlohmann/json.hpp>
 #include <unordered_map>
 #include <utility>
 
@@ -40,29 +39,29 @@ constexpr int levelRows[] = {
   24,
   24,
 };
-const char* levelBGs[] = {
+const std::pair<Sprite, geometry::Size> levelBGs[] = {
   // intro
-  "stars",
+  {Sprite::SPRITE_STARS_1, {6, 1}},
   // finale
-  "stars",
+  {Sprite::SPRITE_STARS_1, {6, 1}},
   // main
-  "rocks",
-  "",
-  "",
-  "",
-  "red panel",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
+  {Sprite::SPRITE_ROCKS_1, {2, 2}},
+  {Sprite::SPRITE_NONE, {0, 0}},
+  {Sprite::SPRITE_NONE, {0, 0}},
+  {Sprite::SPRITE_NONE, {0, 0}},
+  {Sprite::SPRITE_RED_PANEL_1, {2, 2}},
+  {Sprite::SPRITE_NONE, {0, 0}},
+  {Sprite::SPRITE_NONE, {0, 0}},
+  {Sprite::SPRITE_NONE, {0, 0}},
+  {Sprite::SPRITE_NONE, {0, 0}},
+  {Sprite::SPRITE_NONE, {0, 0}},
+  {Sprite::SPRITE_NONE, {0, 0}},
+  {Sprite::SPRITE_NONE, {0, 0}},
+  {Sprite::SPRITE_NONE, {0, 0}},
+  {Sprite::SPRITE_NONE, {0, 0}},
+  {Sprite::SPRITE_NONE, {0, 0}},
+  {Sprite::SPRITE_NONE, {0, 0}},
+  {Sprite::SPRITE_NONE, {0, 0}},
 };
 
 std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
@@ -108,13 +107,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
     }
   }
   const auto background = levelBGs[static_cast<int>(level_id)];
-  return std::make_unique<Level>(level_id,
-                                 width,
-                                 levelRows[static_cast<int>(level_id)],
-                                 geometry::Position(4 * 16, 22 * 16),  // Player spawn
-                                 background,
-                                 tile_ids,
-                                 std::move(item_ids));
+  return std::make_unique<Level>(level_id, width, levelRows[static_cast<int>(level_id)], background.first, background.second, tile_ids, std::move(item_ids));
 }
 
 }

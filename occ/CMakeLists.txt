@@ -29,9 +29,6 @@ target_compile_options(game PRIVATE ${COMPILE_OPTIONS})
 target_include_directories(game PUBLIC
   "utils/export"
 )
-target_include_directories(game SYSTEM PUBLIC
-  "external/json/include"
-)
 
 # unlzexe
 add_subdirectory(external/unlzexe)

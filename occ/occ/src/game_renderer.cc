@@ -85,13 +85,6 @@ void GameRenderer::render_game() const
 
 void GameRenderer::render_background() const
 {
-  const auto& background = game_->get_background();
-
-  if (!background.valid())
-  {
-    return;
-  }
-
   // TODO: Create a surface of size CAMERA + (background.size() * 16) and render the background
   //       to it _once_, then just keep render that surface (with game_camera offset) until the
   //       level changes.
@@ -105,8 +98,11 @@ void GameRenderer::render_background() const
   {
     for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
     {
-      const auto sprite_id = background.get_sprite(tile_x, tile_y);
-      sprite_manager_->render_tile(sprite_id, {tile_x * SPRITE_W, tile_y * SPRITE_H}, game_camera_.position);
+      const auto sprite_id = game_->get_bg_sprite(tile_x, tile_y);
+      if (sprite_id != -1)
+      {
+        sprite_manager_->render_tile(sprite_id, {tile_x * SPRITE_W, tile_y * SPRITE_H}, game_camera_.position);
+      }
     }
   }
 
@@ -114,10 +110,6 @@ void GameRenderer::render_background() const
   if (game_->get_level_id() == LevelId::MAIN_LEVEL)
   {
     // Might be cleaner to have this in a dedicated struct for MainLevel stuff
-    static bool initialized = false;
-
-    static std::vector<int> space_sprites;
-    static std::vector<int> horizon_sprites;
 
     static bool volcano_active = false;
     static unsigned volcano_tick_start = 0u;
@@ -127,32 +119,6 @@ void GameRenderer::render_background() const
 
     static bool moon_right = false;
     static int moon_pos_x = 160;
-
-    if (!initialized)
-    {
-      // Generate space sprites
-      for (int x = 0; x < game_->get_tile_width(); x++)
-      {
-        for (int y = 0; y < 4; y++)
-        {
-          // The sprite with the bright star (358) seems to be less common...
-          static constexpr auto sprites =
-            misc::make_array(356, 356, 356, 356, 357, 357, 357, 357, 358, 359, 359, 359, 359, 360, 360, 360, 360, 361, 361, 361, 361);
-          const auto sprite_index = misc::random<size_t>(0, sprites.size() - 1);
-          space_sprites.emplace_back(sprites[sprite_index]);
-        }
-      }
-
-      // Generate horizon
-      for (int x = 0; x < game_->get_tile_width(); x++)
-      {
-        static const auto sprites = misc::make_array(240, 247, 248, 249, 250);
-        const auto sprite_index = misc::random<size_t>(0, sprites.size() - 1);
-        horizon_sprites.emplace_back(sprites[sprite_index]);
-      }
-
-      initialized = true;
-    }
 
     // Update earth and moon, but only when game tick has increased since they use absolute movement
     if (game_tick_diff_ != 0)
@@ -202,27 +168,6 @@ void GameRenderer::render_background() const
     {
       volcano_active = true;
       volcano_tick_start = game_tick_;
-    }
-
-    // Render space and horizon
-    // FIXME: refactor this
-    for (int tile_y = start_tile_y; tile_y <= end_tile_y; tile_y++)
-    {
-      for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
-      {
-        if (tile_y >= 0 && tile_y < 4)
-        {
-          // Render space sprite
-          const auto sprite_id = space_sprites[(tile_y * game_->get_tile_width()) + tile_x];
-          sprite_manager_->render_tile(sprite_id, {tile_x * SPRITE_W, tile_y * SPRITE_H}, game_camera_.position);
-        }
-        else if (tile_y == 4)
-        {
-          // Render horizon
-          const auto sprite_id = horizon_sprites[tile_x];
-          sprite_manager_->render_tile(sprite_id, {tile_x * SPRITE_W, tile_y * SPRITE_H}, game_camera_.position);
-        }
-      }
     }
 
     // Render earth and moon if visible

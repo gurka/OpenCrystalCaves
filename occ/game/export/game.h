@@ -3,7 +3,6 @@
 #include <memory>
 #include <vector>
 
-#include "background.h"
 #include "enemy.h"
 #include "exe_data.h"
 #include "item.h"
@@ -30,7 +29,7 @@ class Game
   virtual int get_tile_width() const = 0;
   virtual int get_tile_height() const = 0;
 
-  virtual const Background& get_background() const = 0;
+  virtual const int get_bg_sprite(const int x, const int y) const = 0;
   virtual const Tile& get_tile(int tile_x, int tile_y) const = 0;
   virtual const Item& get_item(int tile_x, int tile_y) const = 0;
 

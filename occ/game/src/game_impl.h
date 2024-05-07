@@ -9,7 +9,6 @@
 #include "explosion.h"
 #include "level.h"
 #include "missile.h"
-#include "object_manager.h"
 #include "player.h"
 #include "player_input.h"
 
@@ -18,7 +17,6 @@ class GameImpl : public Game
  public:
   GameImpl()
     : player_(),
-      object_manager_(),
       level_(),
       enemies_(),
       objects_(),
@@ -41,7 +39,7 @@ class GameImpl : public Game
   int get_tile_width() const override { return level_->width; }
   int get_tile_height() const override { return level_->height; }
 
-  const Background& get_background() const override;
+  const int get_bg_sprite(const int x, const int y) const override;
   const Tile& get_tile(int tile_x, int tile_y) const override;
   const Item& get_item(int tile_x, int tile_y) const override;
 
@@ -69,7 +67,6 @@ class GameImpl : public Game
   void remove_item(int tile_x, int tile_y);
 
   Player player_;
-  ObjectManager object_manager_;
   std::unique_ptr<Level> level_;
   std::vector<Enemy> enemies_;
   std::vector<Object> objects_;

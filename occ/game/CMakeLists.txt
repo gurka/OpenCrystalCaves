@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.5)
 project(game)
 
 add_library(game
-  "export/background.h"
   "export/enemy.h"
   "export/game.h"
   "export/item.h"
@@ -12,7 +11,6 @@ add_library(game
   "export/player_input.h"
   "export/player.h"
   "export/tile.h"
-  "src/background.cc"
   "src/enemy.cc"
   "src/explosion.cc"
   "src/explosion.h"
@@ -27,8 +25,6 @@ add_library(game
   "src/missile.h"
   "src/moving_platform.h"
   "src/moving_platform.cc"
-  "src/object_manager.cc"
-  "src/object_manager.h"
   "src/player.cc"
   "src/tile.cc"
 )
