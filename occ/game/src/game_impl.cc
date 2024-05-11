@@ -143,7 +143,7 @@ void GameImpl::update_level()
   // Add moving platforms to objects_
   for (auto& platform : level_->moving_platforms)
   {
-    objects_.emplace_back(platform.position, platform.sprite_id, platform.num_sprites);
+    objects_.emplace_back(platform.position, platform.sprite_id, platform.num_sprites, platform.is_reverse());
   }
 }
 
@@ -535,13 +535,13 @@ void GameImpl::update_missile()
   // Add explosion to objects_ if alive
   if (explosion_.alive)
   {
-    objects_.emplace_back(explosion_.position, explosion_.sprites[explosion_.frame], 1);
+    objects_.emplace_back(explosion_.position, explosion_.sprites[explosion_.frame], 1, false);
   }
 
   // Add missile to objects_ if alive
   if (missile_.alive)
   {
-    objects_.emplace_back(missile_.position, (missile_.right ? 296 : 302), 6);
+    objects_.emplace_back(missile_.position, (missile_.right ? 296 : 302), 6, false);
   }
 }
 

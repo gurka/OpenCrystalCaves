@@ -7,6 +7,8 @@ struct MovingPlatform
 {
   MovingPlatform(geometry::Position position, const bool horizontal);
 
+  bool is_reverse() const { return velocity.x() > 0 || velocity.y() > 0; }
+
   geometry::Position position;
   Vector<int> velocity;
   const int sprite_id;

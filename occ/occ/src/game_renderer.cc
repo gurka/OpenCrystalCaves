@@ -385,7 +385,7 @@ void GameRenderer::render_objects() const
     static constexpr geometry::Size object_size = geometry::Size(16, 16);
     if (geometry::isColliding(geometry::Rectangle(object.position, object_size), game_camera_))
     {
-      const auto sprite_id = object.sprite_id + (game_tick_ % object.num_sprites);
+      const auto sprite_id = object.get_sprite(game_tick_);
       sprite_manager_->render_tile(sprite_id, object.position, game_camera_.position);
 
       if (debug_)
