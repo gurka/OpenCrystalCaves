@@ -304,7 +304,10 @@ void GameImpl::update_player(const PlayerInput& player_input)
   {
     const auto new_player_pos = player_.position + geometry::Position(step_x, 0);
 
-    if (!player_.noclip && collides_solid(new_player_pos, player_.size))
+    if (!player_.noclip &&
+        (collides_solid(new_player_pos, player_.size) ||
+         // collide with world edges
+         new_player_pos.x() < 0 || new_player_pos.x() >= level_->width * 16 - player_.size.x()))
     {
       player_.collide_x = true;
       break;

@@ -251,19 +251,22 @@ Panel* Panel::update(const Input& input)
   }
   ticks_ += 1;
 
-  // Randomly switch the sparkle position around
-  const auto sparkle_frame = (ticks_ / 3) % (std::size(S_ICONS) + 1);
-  if (sparkle_frame == 0)
+  if (size_ != geometry::Size())
   {
-    if (misc::random<int>(0, 1) == 0)
+    // Randomly switch the sparkle position around
+    const auto sparkle_frame = (ticks_ / 3) % (std::size(S_ICONS) + 1);
+    if (sparkle_frame == 0)
     {
-      // Put the sparkle on the top edge
-      sparkle_pos_ = geometry::Position(misc::random<int>(1, size_.x()) * CHAR_W, 0);
-    }
-    else
-    {
-      // Put the sparkle on the left edge
-      sparkle_pos_ = geometry::Position(0, misc::random<int>(1, size_.y()) * CHAR_H);
+      if (misc::random<int>(0, 1) == 0)
+      {
+        // Put the sparkle on the top edge
+        sparkle_pos_ = geometry::Position(misc::random<int>(1, size_.x()) * CHAR_W, 0);
+      }
+      else
+      {
+        // Put the sparkle on the left edge
+        sparkle_pos_ = geometry::Position(0, misc::random<int>(1, size_.y()) * CHAR_H);
+      }
     }
   }
 
@@ -322,6 +325,10 @@ void Panel::draw(const SpriteManager& sprite_manager) const
   {
     // Draw the current child instead
     children_[index_].second.draw(sprite_manager);
+    return;
+  }
+  else if (type_ == PanelType::PANEL_TYPE_NEW_GAME)
+  {
     return;
   }
   const geometry::Position frame_pos(((SCREEN_SIZE.x() / CHAR_W - size_.x() - 1) / 2 - 1) * CHAR_W,
