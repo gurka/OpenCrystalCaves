@@ -6,11 +6,12 @@
 #include "enemy.h"
 #include "exe_data.h"
 #include "item.h"
-#include "level_id.h"
 #include "object.h"
 #include "player.h"
 #include "player_input.h"
 #include "tile.h"
+
+struct Level;
 
 class Game
 {
@@ -24,7 +25,7 @@ class Game
 
   virtual const Player& get_player() const = 0;
 
-  virtual LevelId get_level_id() const = 0;
+  virtual const Level& get_level() const = 0;
 
   virtual int get_tile_width() const = 0;
   virtual int get_tile_height() const = 0;

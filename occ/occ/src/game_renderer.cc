@@ -106,79 +106,26 @@ void GameRenderer::render_background() const
     }
   }
 
-  // MAIN_LEVEL has some special things that needs to be rendered
-  if (game_->get_level_id() == LevelId::MAIN_LEVEL)
+  if (game_->get_level().has_earth)
   {
-    // Might be cleaner to have this in a dedicated struct for MainLevel stuff
+    const int earth_orbit_radius = (game_->get_tile_width() - 4) * 16 / 2;
+    const int earth_pos_x =
+      (game_->get_tile_width() - 2) * 16 / 2 + 16 + static_cast<int>(sin(game_tick_ / 500.0 - M_PI_2) * earth_orbit_radius);
+    // Assume there's a moon
+    constexpr int moon_orbit_radius = 2 * 16;
+    constexpr double moon_orbit_period = 30.0;
+    const int moon_pos_x = earth_pos_x + static_cast<int>(sin(game_tick_ / moon_orbit_period) * moon_orbit_radius);
+    const bool moon_right = cos(game_tick_ / moon_orbit_period) > 0;
+    const int moon_sprite = static_cast<int>(moon_right ? Sprite::SPRITE_MOON_SMALL : Sprite::SPRITE_MOON);
 
-    static bool volcano_active = false;
-    static unsigned volcano_tick_start = 0u;
-
-    static bool earth_right = false;
-    static int earth_pos_x = 128;
-
-    static bool moon_right = false;
-    static int moon_pos_x = 160;
-
-    // Update earth and moon, but only when game tick has increased since they use absolute movement
-    if (game_tick_diff_ != 0)
-    {
-      if (earth_right)
-      {
-        earth_pos_x += 1;
-        if ((earth_pos_x / 2) + 16 == game_->get_tile_width() * 16)
-        {
-          earth_right = false;
-        }
-      }
-      else
-      {
-        earth_pos_x -= 1;
-        if (earth_pos_x == 32)
-        {
-          earth_right = true;
-        }
-      }
-
-      if (moon_right)
-      {
-        moon_pos_x += earth_right ? 2 : 1;
-        if (moon_pos_x > earth_pos_x + 72 || (moon_pos_x / 2) + 16 == game_->get_tile_width() * 16)
-        {
-          moon_right = false;
-        }
-      }
-      else
-      {
-        moon_pos_x -= !earth_right ? 2 : 1;
-        if (moon_pos_x < earth_pos_x - 64 || moon_pos_x == 32)
-        {
-          moon_right = true;
-        }
-      }
-    }
-
-    // Update volcano
-    if (volcano_active && game_tick_ - volcano_tick_start >= 81u)
-    {
-      volcano_active = false;
-      volcano_tick_start = game_tick_;
-    }
-    else if (!volcano_active && game_tick_ - volcano_tick_start >= 220u)
-    {
-      volcano_active = true;
-      volcano_tick_start = game_tick_;
-    }
-
-    // Render earth and moon if visible
-    const auto earth_rect = geometry::Rectangle(geometry::Position(earth_pos_x / 2, 0), geometry::Size(16, 16));
-    const auto moon_rect = geometry::Rectangle(geometry::Position(moon_pos_x / 2, 0), geometry::Size(16, 16));
+    const auto earth_rect = geometry::Rectangle(geometry::Position(earth_pos_x, 0), geometry::Size(16, 16));
+    const auto moon_rect = geometry::Rectangle(geometry::Position(moon_pos_x, 0), geometry::Size(16, 16));
     if (moon_right)
     {
       // Moon is behind earth, render moon first
       if (geometry::isColliding(game_camera_, moon_rect))
       {
-        sprite_manager_->render_tile(static_cast<int>(Sprite::SPRITE_MOON), moon_rect.position, game_camera_.position);
+        sprite_manager_->render_tile(moon_sprite, moon_rect.position, game_camera_.position);
       }
       if (geometry::isColliding(game_camera_, earth_rect))
       {
@@ -194,8 +141,29 @@ void GameRenderer::render_background() const
       }
       if (geometry::isColliding(game_camera_, moon_rect))
       {
-        sprite_manager_->render_tile(static_cast<int>(Sprite::SPRITE_MOON), moon_rect.position, game_camera_.position);
+        sprite_manager_->render_tile(moon_sprite, moon_rect.position, game_camera_.position);
       }
+    }
+  }
+
+  // MAIN_LEVEL has some special things that needs to be rendered
+  if (game_->get_level().level_id == LevelId::MAIN_LEVEL)
+  {
+    // Might be cleaner to have this in a dedicated struct for MainLevel stuff
+
+    static bool volcano_active = false;
+    static unsigned volcano_tick_start = 0u;
+
+    // Update volcano
+    if (volcano_active && game_tick_ - volcano_tick_start >= 81u)
+    {
+      volcano_active = false;
+      volcano_tick_start = game_tick_;
+    }
+    else if (!volcano_active && game_tick_ - volcano_tick_start >= 220u)
+    {
+      volcano_active = true;
+      volcano_tick_start = game_tick_;
     }
 
     // Render volcano fire if active and visible

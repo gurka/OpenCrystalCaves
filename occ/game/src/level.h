@@ -93,7 +93,8 @@ enum class Sprite : int
   SPRITE_CRYSTAL_1_G = 626,
   SPRITE_CRYSTAL_1_B = 627,
   SPRITE_EARTH = 632,
-  SPRITE_MOON = 634,
+  SPRITE_MOON = 633,
+  SPRITE_MOON_SMALL = 634,
   SPRITE_CRYSTAL_2_R = 636,
   SPRITE_CRYSTAL_2_Y = 637,
   SPRITE_CRYSTAL_2_G = 638,
@@ -180,4 +181,6 @@ struct Level
   std::vector<int> item_ids;
 
   std::vector<MovingPlatform> moving_platforms;
+  bool has_earth = false;
+  bool has_moon = false;
 };

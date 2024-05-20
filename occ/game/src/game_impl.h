@@ -34,7 +34,7 @@ class GameImpl : public Game
 
   const Player& get_player() const override { return player_; }
 
-  LevelId get_level_id() const override { return level_->level_id; }
+  const Level& get_level() const override { return *level_; }
 
   int get_tile_width() const override { return level_->width; }
   int get_tile_height() const override { return level_->height; }

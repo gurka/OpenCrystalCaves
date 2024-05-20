@@ -245,8 +245,7 @@ Level::Level(LevelId level_id,
           flags |= TILE_SOLID;
           break;
         case 'm':
-          // TODO: earth animation
-          sprite = static_cast<int>(Sprite::SPRITE_EARTH);
+          has_earth = true;
           break;
         case 'n':
           // TODO: volcano spawn point?
@@ -255,10 +254,7 @@ Level::Level(LevelId level_id,
           flags |= TILE_ANIMATED;
           break;
         case 'N':
-          // TODO: moon animation
-          sprite = static_cast<int>(Sprite::SPRITE_MOON);
-          sprite_count = 2;
-          flags |= TILE_ANIMATED;
+          has_moon = true;
           break;
         case 'u':
           // TODO: volcano spawn point?
