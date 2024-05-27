@@ -100,4 +100,8 @@ void EventImpl::poll_event(Input* input)
   input->noclip.down = keys[SDL_SCANCODE_I] && keys[SDL_SCANCODE_L] && keys[SDL_SCANCODE_M];
   input->ammo.down = keys[SDL_SCANCODE_X] && keys[SDL_SCANCODE_T] && keys[SDL_SCANCODE_R] && keys[SDL_SCANCODE_A];
   input->godmode.down = keys[SDL_SCANCODE_Z] && keys[SDL_SCANCODE_E] && keys[SDL_SCANCODE_U] && keys[SDL_SCANCODE_S];
+
+  int x, y;
+  SDL_GetMouseState(&x, &y);
+  input->mouse = geometry::Position(x, y);
 }

@@ -9,6 +9,7 @@
 // TODO: Rename files to sprite_manager.cc/h ?
 #define SPRITE_W 16
 #define SPRITE_H 16
+#define SPRITE_STRIDE 52
 
 #define CHAR_W 8
 #define CHAR_H 8

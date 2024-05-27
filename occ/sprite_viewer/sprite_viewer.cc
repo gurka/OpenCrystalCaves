@@ -54,12 +54,22 @@ int main(int argc, char* argv[])
   while (true)
   {
     event->poll_event(&input);
-	  if (input.escape.pressed())
-	  {
-		  break;
-	  }
+    if (input.escape.pressed())
+    {
+      break;
+    }
     window->fill_rect(geometry::Rectangle(0, 0, surface->size()), {33u, 33u, 33u});
     surface->blit_surface();
+    // Show hovered sprite and draw its index
+    const int x = input.mouse.x() / SPRITE_W;
+    const int y = input.mouse.y() / SPRITE_H;
+    const geometry::Rectangle rect{{x * SPRITE_W, y * SPRITE_H}, {SPRITE_W, SPRITE_H}};
+    window->render_rectangle(rect, {255, 255, 255, 255});
+    const int index = x + y * SPRITE_STRIDE;
+    const auto tooltip = L"x: " + std::to_wstring(x) + L"\ny: " + std::to_wstring(y) + L"\nidx: " + std::to_wstring(index);
+    const int tooltip_x = std::min(rect.position.x() + rect.size.x(), SPRITE_STRIDE * SPRITE_W - 80);
+    const int tooltip_y = std::min(rect.position.y() + rect.size.y(), 22 * SPRITE_H - 16);
+    sprite_manager.render_text(tooltip, geometry::Position{tooltip_x, tooltip_y});
     window->refresh();
     sdl->delay(10);
   }

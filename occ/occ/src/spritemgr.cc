@@ -17,7 +17,6 @@ https://moddingwiki.shikadi.net/wiki/ProGraphx_Toolbox_tileset_format
 #define FONT_FILENAME_FMT "CC%d-F%d.MNI"
 #define SPL_FILENAME_FMT "CC%d-SPL.MNI"
 #define FILLER 2
-#define SPRITE_STRIDE 52
 #define CHAR_STRIDE 50
 
 struct Header
