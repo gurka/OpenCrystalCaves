@@ -65,13 +65,13 @@ void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
   update_missile();
 
   // Update enemies
-  // ...
+  update_enemies();
 
   // Update more?
   // ...
 }
 
-const int GameImpl::get_bg_sprite(const int x, const int y) const
+int GameImpl::get_bg_sprite(const int x, const int y) const
 {
   return level_->get_bg(x, y);
 }
@@ -144,6 +144,12 @@ void GameImpl::update_level()
   for (auto& platform : level_->moving_platforms)
   {
     objects_.emplace_back(platform.position, platform.sprite_id, platform.num_sprites, platform.is_reverse());
+  }
+
+  // Add entrances
+  for (auto& entrance : level_->entrances)
+  {
+    objects_.emplace_back(entrance.position, entrance.get_sprite(), 1, false);
   }
 }
 
@@ -457,38 +463,13 @@ void GameImpl::update_missile()
       }
 
       // Adjust position due to collision size being smaller than sprite size
-      const auto colliding_enemy_index = collides_enemy(missile_.position + geometry::Position(0, 3), missile_.size);
-      if (colliding_enemy_index != -1)
+      auto enemy = collides_enemy(missile_.position + geometry::Position(0, 3), missile_.size);
+      if (enemy)
       {
         missile_.alive = false;
 
-        // Get enemy and decrease health
-        auto& enemy = enemies_[colliding_enemy_index];
-        enemy.health -= 1;
-
-        // TODO: When enemy getting hit and not dying the enemy sprite should turn white for
-        //       some time. All colors except black in the sprite should become white.
-        //       This is applicable for when the player gets hit as well
-        //       Modify the sprite on the fly / some kind of filter, or pre-create white sprites
-        //       for all player and enemy sprite when loading sprites?
-
-        // Check if enemy died
-        if (enemy.health == 0)
-        {
-          // TODO: When an enemy dies there should be another type of explosion
-          //       or bones spawning. The explosion/bones should move during animation
-          //       in the same direction as the missile coming from
-          // Create explosion where enemy is
-          explosion_.alive = true;
-          explosion_.frame = 0;
-          explosion_.position = enemy.position;
-
-          // Give score (?)
-          score_ += 500;
-
-          // Remove enemy
-          enemies_.erase(enemies_.begin() + colliding_enemy_index);
-        }
+        // Decrease enemy health
+        enemy->health -= 1;
 
         break;
       }
@@ -548,6 +529,38 @@ void GameImpl::update_missile()
   }
 }
 
+void GameImpl::update_enemies()
+{
+  for (auto it = enemies_.begin(); it != enemies_.end();)
+  {
+    // TODO: When enemy getting hit and not dying the enemy sprite should turn white for
+    //       some time. All colors except black in the sprite should become white.
+    //       This is applicable for when the player gets hit as well
+    //       Modify the sprite on the fly / some kind of filter, or pre-create white sprites
+    //       for all player and enemy sprite when loading sprites?
+
+    // Check if enemy died
+    if (it->health == 0)
+    {
+      // TODO: When an enemy dies there should be another type of explosion
+      //       or bones spawning. The explosion/bones should move during animation
+      //       in the same direction as the missile coming from
+      // Create explosion where enemy is
+      explosion_.alive = true;
+      explosion_.frame = 0;
+      explosion_.position = it->position;
+
+      // Give score (?)
+      score_ += 500;
+
+      // Remove enemy
+      it = enemies_.erase(it);
+    }
+    else
+      it++;
+  }
+}
+
 bool GameImpl::collides_solid(const geometry::Position& position, const geometry::Size& size)
 {
   // Note: this function only works with size x and y <= 16
@@ -574,17 +587,17 @@ bool GameImpl::collides_solid(const geometry::Position& position, const geometry
  * If is colliding with an enemy the index in enemies_ to that enemy is returned
  * otherwise -1 is returned.
  */
-int GameImpl::collides_enemy(const geometry::Position& position, const geometry::Size& size)
+Enemy* GameImpl::collides_enemy(const geometry::Position& position, const geometry::Size& size)
 {
   const auto rect = geometry::Rectangle(position, size);
   for (auto i = 0u; i < enemies_.size(); i++)
   {
     if (geometry::isColliding(rect, geometry::Rectangle(enemies_[i].position, 16, 16)))
     {
-      return i;
+      return &enemies_[i];
     }
   }
-  return -1;
+  return nullptr;
 }
 
 bool GameImpl::player_on_platform(const geometry::Position& player_position)

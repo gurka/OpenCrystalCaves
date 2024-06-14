@@ -93,18 +93,22 @@ int main(int argc, char* argv[])
     {
       for (int x = 0; x < level.width; x++)
       {
-		  const auto bg_id = level.get_bg(x, y);
-			if (bg_id != -1)
-			{
-				sprite_manager.render_tile(bg_id, {x * SPRITE_W, y * SPRITE_H});
-			}
-		  
+        const auto bg_id = level.get_bg(x, y);
+        if (bg_id != -1)
+        {
+          sprite_manager.render_tile(bg_id, {x * SPRITE_W, y * SPRITE_H});
+        }
+
         const auto tile = level.get_tile(x, y);
         const auto sprite_id = tile.get_sprite();
         sprite_manager.render_tile(sprite_id, {x * SPRITE_W, y * SPRITE_H});
         for (const auto& platform : level.moving_platforms)
         {
           sprite_manager.render_tile(platform.sprite_id, platform.position);
+        }
+        for (const auto& entrance : level.entrances)
+        {
+          sprite_manager.render_tile(entrance.get_sprite(), entrance.position);
         }
         sprite_manager.render_tile(static_cast<int>(Sprite::SPRITE_STANDING_RIGHT), level.player_spawn);
         // TODO: load and render enemies

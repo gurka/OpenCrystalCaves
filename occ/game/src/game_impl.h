@@ -39,7 +39,7 @@ class GameImpl : public Game
   int get_tile_width() const override { return level_->width; }
   int get_tile_height() const override { return level_->height; }
 
-  const int get_bg_sprite(const int x, const int y) const override;
+  int get_bg_sprite(const int x, const int y) const override;
   const Tile& get_tile(int tile_x, int tile_y) const override;
   const Item& get_item(int tile_x, int tile_y) const override;
 
@@ -59,9 +59,10 @@ class GameImpl : public Game
   void update_player(const PlayerInput& player_input);
   void update_items();
   void update_missile();
+  void update_enemies();
 
   bool collides_solid(const geometry::Position& position, const geometry::Size& size);
-  int collides_enemy(const geometry::Position& position, const geometry::Size& size);
+  Enemy* collides_enemy(const geometry::Position& position, const geometry::Size& size);
   bool player_on_platform(const geometry::Position& player_position);
 
   void remove_item(int tile_x, int tile_y);
@@ -70,6 +71,7 @@ class GameImpl : public Game
   std::unique_ptr<Level> level_;
   std::vector<Enemy> enemies_;
   std::vector<Object> objects_;
+  std::vector<Entrance> entrances_;
 
   unsigned score_;
   unsigned num_ammo_;

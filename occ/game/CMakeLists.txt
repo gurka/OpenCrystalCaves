@@ -4,14 +4,17 @@ project(game)
 
 add_library(game
   "export/enemy.h"
+  "export/entrance.h"
   "export/game.h"
   "export/item.h"
   "export/level_id.h"
   "export/object.h"
   "export/player_input.h"
   "export/player.h"
+  "export/sprite.h"
   "export/tile.h"
   "src/enemy.cc"
+  "src/entrance.cc"
   "src/explosion.cc"
   "src/explosion.h"
   "src/game_impl.cc"

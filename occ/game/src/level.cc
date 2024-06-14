@@ -27,7 +27,8 @@ Level::Level(LevelId level_id,
     width(width),
     height(height),
     item_ids(std::move(item_ids)),
-    moving_platforms()
+    moving_platforms(),
+    entrances()
 {
   bool is_stars_row = false;
   bool is_horizon_row = false;
@@ -37,6 +38,7 @@ Level::Level(LevelId level_id,
   bool is_wood_pillar = false;
   bool is_volcano = false;
   int volcano_sprite = -1;
+  int entrance_level = static_cast<int>(LevelId::LEVEL_1);
   for (int i = 0; i < static_cast<int>(tile_ids.size()); i++)
   {
     const int x = i % width;
@@ -55,19 +57,19 @@ Level::Level(LevelId level_id,
     const auto tile_id = tile_ids[i];
     Tile tile;
     int bg = static_cast<int>(bg_sprite);
-	  if (is_stars_row)
-	  {
-		bg = static_cast<int>(STARS[rand() % STARS.size()]);
-	  }
-	  else if (is_horizon_row)
-	  {
-		bg = static_cast<int>(HORIZON[rand() % HORIZON.size()]);
-	  }
-	  else if (bg_sprite != Sprite::SPRITE_NONE)
-	  {
-		// Normal background
-		bg = static_cast<int>(bg_sprite) + (((y + 1) % bg_tile_size.y()) * 4) + (x % bg_tile_size.x());
-	  }
+    if (is_stars_row)
+    {
+      bg = static_cast<int>(STARS[rand() % STARS.size()]);
+    }
+    else if (is_horizon_row)
+    {
+      bg = static_cast<int>(HORIZON[rand() % HORIZON.size()]);
+    }
+    else if (bg_sprite != Sprite::SPRITE_NONE)
+    {
+      // Normal background
+      bg = static_cast<int>(bg_sprite) + (((y + 1) % bg_tile_size.y()) * 4) + (x % bg_tile_size.x());
+    }
     // Decode tile ids from exe data
     int sprite = -1;
     int sprite_count = 1;
@@ -269,8 +271,9 @@ Level::Level(LevelId level_id,
           });
           break;
         case 'x':
-          // TODO: entrance
-          sprite = static_cast<int>(Sprite::SPRITE_ENTRY_1);
+          // TODO: remember completion state
+          this->entrances.push_back({geometry::Position{x * 16, y * 16}, entrance_level, EntranceState::CLOSED});
+          entrance_level++;
           break;
         case 'Y':
           // Player spawn
@@ -298,19 +301,19 @@ Level::Level(LevelId level_id,
               // [4n = winners drugs sign
             case '4':
               sprite = static_cast<int>(Sprite::SPRITE_WINNERS_1);
-				  flags |= TILE_SOLID_TOP;
+              flags |= TILE_SOLID_TOP;
               is_sign = true;
               break;
               // [m = mine sign
             case 'm':
               sprite = static_cast<int>(Sprite::SPRITE_MINE_SIGN_1);
-				  flags |= TILE_RENDER_IN_FRONT;
+              flags |= TILE_RENDER_IN_FRONT;
               is_sign = true;
               break;
               // [d = danger sign
             case 'd':
               sprite = static_cast<int>(Sprite::SPRITE_DANGER_1);
-				  flags |= TILE_SOLID_TOP;
+              flags |= TILE_SOLID_TOP;
               is_sign = true;
               break;
             default:
