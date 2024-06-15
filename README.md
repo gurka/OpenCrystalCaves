@@ -9,9 +9,7 @@ OCC is an unofficial open source engine reimplementation of the game trilogy [Cr
 
 Current state of OCC:
 
-![Screenshot 1](/screenshots/screenshot1.png?raw=true "Screenshot 1")
-
-![Screenshot 2](/screenshots/screenshot2.png?raw=true "Screenshot 2")
+![Animation](/screenshots/animation.png?raw=true "Animation")
 
 ![Screenshot 3](/screenshots/screenshot3.png?raw=true "Screenshot 3")
 
@@ -25,8 +23,8 @@ Currently the engine can:
 Features that are missing:
 
 - Main menu including starting a new game and loading a saved game.
-- Entering levels.
-- Shooting.
+- Exiting levels.
+- Items.
 - Enemies.
 - (and much more).
 
