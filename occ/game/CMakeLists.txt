@@ -11,7 +11,6 @@ add_library(game
   "export/object.h"
   "export/player_input.h"
   "export/player.h"
-  "export/sprite.h"
   "export/tile.h"
   "src/enemy.cc"
   "src/entrance.cc"

@@ -341,13 +341,16 @@ void GameState::update(const Input& input)
 
   if (game_.get_player().entering_level != level_)
   {
-    // Start fading out
-    fade_out_start_ticks_ = ticks_;
-    level_ = game_.get_player().entering_level;
-  }
-  else if (has_finished())
-  {
-    reset();
+    if (fade_out_start_ticks_ == 0)
+    {
+      // Start fading out
+      fade_out_start_ticks_ = ticks_;
+    }
+    else if (has_finished())
+    {
+      level_ = game_.get_player().entering_level;
+      reset();
+    }
   }
 }
 
