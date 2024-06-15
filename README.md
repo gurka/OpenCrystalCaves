@@ -9,7 +9,7 @@ OCC is an unofficial open source engine reimplementation of the game trilogy [Cr
 
 Current state of OCC:
 
-![Animation](/screenshots/animation.png?raw=true "Animation")
+![Animation](/screenshots/animation.gif?raw=true "Animation")
 
 ![Screenshot 3](/screenshots/screenshot3.png?raw=true "Screenshot 3")
 
