@@ -44,7 +44,7 @@ enum class Icon : int
 class SpriteManager
 {
  public:
-  SpriteManager() : sprite_surface_(), char_surface_() {}
+  SpriteManager() : sprite_surface_(), char_surface_(), cones_surface_() {}
 
   bool load_tilesets(Window& window, const int episode);
   const Surface* get_surface() const;
@@ -57,8 +57,10 @@ class SpriteManager
   geometry::Position render_number(const int num, const geometry::Position& pos) const;
   geometry::Rectangle get_rect_for_icon(const int idx) const;
   void render_icon(const Icon icon, const geometry::Position& pos, const bool flip = false, const Color tint = {0xff, 0xff, 0xff}) const;
+  void render_cones(const geometry::Position& pos, const geometry::Position camera_position = {0, 0}) const;
 
  private:
   std::unique_ptr<Surface> sprite_surface_;
   std::unique_ptr<Surface> char_surface_;
+  std::unique_ptr<Surface> cones_surface_;
 };

@@ -6,6 +6,7 @@
 
 #include "constants.h"
 #include "level.h"
+#include "logger.h"
 #include "utils.h"
 #include <path.h>
 
@@ -286,16 +287,28 @@ void TitleState::draw(Window& window) const
     game_surface_.blit_surface(geometry::Rectangle(0, 0, CAMERA_SIZE),
                                geometry::Rectangle((WINDOW_SIZE - CAMERA_SIZE_SCALED) / 2, CAMERA_SIZE_SCALED));
   }
+  State::draw(window);
 }
 
 
-GameState::GameState(Game& game, SpriteManager& sprite_manager, Surface& game_surface, Window& window)
+GameState::GameState(Game& game, SpriteManager& sprite_manager, Surface& game_surface, Window& window, ExeData& exe_data)
   : State(FADE_TICKS, FADE_TICKS, window),
     game_(game),
     game_surface_(game_surface),
     sprite_manager_(sprite_manager),
-    game_renderer_(&game, &sprite_manager, &game_surface, window)
+    game_renderer_(&game, &sprite_manager, &game_surface, window),
+    exe_data_(exe_data)
 {
+}
+
+void GameState::reset()
+{
+  State::reset();
+  if (!game_.init(exe_data_, level_))
+  {
+    LOG_CRITICAL("Could not initialize Game level %d", static_cast<int>(level_));
+    finish();
+  }
 }
 
 void GameState::update(const Input& input)
@@ -325,6 +338,17 @@ void GameState::update(const Input& input)
     game_tick_ += 1;
   }
   game_renderer_.update(game_tick_);
+
+  if (game_.get_player().entering_level != level_)
+  {
+    // Start fading out
+    fade_out_start_ticks_ = ticks_;
+    level_ = game_.get_player().entering_level;
+  }
+  else if (has_finished())
+  {
+    reset();
+  }
 }
 
 void GameState::draw(Window& window) const
@@ -369,4 +393,6 @@ void GameState::draw(Window& window) const
       pos_y += 20;
     }
   }
+
+  State::draw(window);
 }

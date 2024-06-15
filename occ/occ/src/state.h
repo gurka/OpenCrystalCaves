@@ -102,8 +102,9 @@ class TitleState : public State
 class GameState : public State
 {
  public:
-  GameState(Game& game, SpriteManager& sprite_manager, Surface& game_surface, Window& window);
+  GameState(Game& game, SpriteManager& sprite_manager, Surface& game_surface, Window& window, ExeData& exe_data);
 
+  virtual void reset() override;
   virtual void update(const Input& input) override;
   virtual void draw(Window& window) const override;
 
@@ -112,9 +113,11 @@ class GameState : public State
   Surface& game_surface_;
   SpriteManager& sprite_manager_;
   GameRenderer game_renderer_;
+  ExeData& exe_data_;
   bool debug_info_ = false;
   bool paused_ = false;
   unsigned game_tick_ = 0;
+  LevelId level_ = LevelId::MAIN_LEVEL;
 };
 
 // TODO: end state

@@ -17,16 +17,16 @@ std::unique_ptr<Game> Game::create()
   return std::make_unique<GameImpl>();
 }
 
-bool GameImpl::init(const ExeData& exe_data)
+bool GameImpl::init(const ExeData& exe_data, const LevelId level)
 {
-  level_ = LevelLoader::load(exe_data, LevelId::MAIN_LEVEL);
+  level_ = LevelLoader::load(exe_data, level);
   if (!level_)
   {
     return false;
   }
 
   // TODO: Temporary
-  if (level_->level_id == LevelId::LEVEL_1)
+  if (level == LevelId::LEVEL_1)
   {
     // Spawn enemies
     enemies_.emplace_back(geometry::Position(14 * 16, 22 * 16), 2);
@@ -34,6 +34,7 @@ bool GameImpl::init(const ExeData& exe_data)
   }
 
   player_.position = level_->player_spawn;
+  player_.entering_level = level;
 
   score_ = 0u;
   num_ammo_ = 5u;
@@ -149,6 +150,16 @@ void GameImpl::update_level()
   // Add entrances
   for (auto& entrance : level_->entrances)
   {
+    if (entrance.state != EntranceState::COMPLETE)
+    {
+      entrance.state =
+        geometry::isColliding({player_.position, player_.size}, {entrance.position, 16, 16}) ? EntranceState::OPEN : EntranceState::CLOSED;
+      if (entrance.state == EntranceState::OPEN)
+      {
+        player_.entering_level = static_cast<LevelId>(entrance.level);
+      }
+    }
+    entrance.update();
     objects_.emplace_back(entrance.position, entrance.get_sprite(), 1, false);
   }
 }
@@ -163,6 +174,10 @@ void GameImpl::update_player(const PlayerInput& player_input)
    * 4. Update player information based on collision
    */
 
+  if (player_.entering_level != level_->level_id)
+  {
+    return;
+  }
 
   /**
    * 1. Update player information based on input

@@ -1,9 +1,9 @@
-#ifndef PLAYER_H_
-#define PLAYER_H_
+#pragma once
 
 #include <array>
 
 #include "geometry.h"
+#include "level_id.h"
 #include "vector.h"
 
 struct Player
@@ -36,6 +36,5 @@ struct Player
   bool noclip = false;
   bool godmode = false;
   bool reverse_gravity = false;
+  LevelId entering_level = LevelId::INTRO;
 };
-
-#endif  // PLAYER_H_

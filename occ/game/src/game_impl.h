@@ -29,7 +29,7 @@ class GameImpl : public Game
   {
   }
 
-  bool init(const ExeData& exe_data) override;
+  bool init(const ExeData& exe_data, const LevelId level) override;
   void update(unsigned game_tick, const PlayerInput& player_input) override;
 
   const Player& get_player() const override { return player_; }

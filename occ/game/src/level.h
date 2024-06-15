@@ -27,7 +27,7 @@ struct Level
   geometry::Position player_spawn;
 
   const Tile& get_tile(const int x, const int y) const;
-  const int get_bg(const int x, const int y) const;
+  int get_bg(const int x, const int y) const;
 
   std::vector<int> bgs;
   std::vector<Tile> tiles;

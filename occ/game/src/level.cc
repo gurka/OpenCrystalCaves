@@ -272,6 +272,9 @@ Level::Level(LevelId level_id,
           break;
         case 'x':
           // TODO: remember completion state
+          // Everything is under construction...
+          sprite = static_cast<int>(Sprite::SPRITE_CONES);
+          flags |= TILE_RENDER_IN_FRONT;
           this->entrances.push_back({geometry::Position{x * 16, y * 16}, entrance_level, EntranceState::CLOSED});
           entrance_level++;
           break;
@@ -405,7 +408,7 @@ const Tile& Level::get_tile(const int x, const int y) const
   return tiles[(y * width) + x];
 }
 
-const int Level::get_bg(const int x, const int y) const
+int Level::get_bg(const int x, const int y) const
 {
   if (x < 0 || y >= width || y < 0 || y >= height)
   {

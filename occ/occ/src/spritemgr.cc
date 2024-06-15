@@ -11,6 +11,7 @@ https://moddingwiki.shikadi.net/wiki/ProGraphx_Toolbox_tileset_format
 #include "misc.h"
 #include "occ_math.h"
 #include "path.h"
+#include "sprite.h"
 #include "wchars.h"
 
 #define GFX_FILENAME_FMT "CC%d.GFX"
@@ -247,6 +248,15 @@ bool SpriteManager::load_tilesets(Window& window, const int episode)
       return false;
     }
   }
+  if (!cones_surface_)
+  {
+    const auto path = get_data_path("../cones.png");
+    cones_surface_ = Surface::from_image(path, window);
+    if (!cones_surface_)
+    {
+      return false;
+    }
+  }
 
   return true;
 }
@@ -266,6 +276,11 @@ geometry::Rectangle SpriteManager::get_rect_for_tile(const int sprite) const
 
 void SpriteManager::render_tile(const int sprite, const geometry::Position& pos, const geometry::Position camera_position) const
 {
+  if (sprite == static_cast<int>(Sprite::SPRITE_CONES))
+  {
+    render_cones(pos, camera_position);
+    return;
+  }
   const auto src_rect = get_rect_for_tile(sprite);
   const geometry::Rectangle dest_rect{pos.x() - camera_position.x(), pos.y() - camera_position.y(), SPRITE_W, SPRITE_H};
   get_surface()->blit_surface(src_rect, dest_rect);
@@ -306,6 +321,12 @@ geometry::Position SpriteManager::render_text(const std::wstring& text, const ge
     }
   }
   return Vector<int>(x, y);
+}
+
+void SpriteManager::render_cones(const geometry::Position& pos, const geometry::Position camera_position) const
+{
+  const geometry::Rectangle dest_rect{pos.x() - camera_position.x(), pos.y() - camera_position.y(), SPRITE_W, SPRITE_H};
+  cones_surface_->blit_surface({0, 0, SPRITE_W, SPRITE_H}, dest_rect);
 }
 
 geometry::Rectangle SpriteManager::get_rect_for_number(const char ch) const

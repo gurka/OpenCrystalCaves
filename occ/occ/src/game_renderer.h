@@ -13,7 +13,7 @@ class GameRenderer
  public:
   GameRenderer(Game* game, SpriteManager* sprite_manager, Surface* game_surface, Window& window);
 
-	void update(unsigned game_tick);
+  void update(unsigned game_tick);
   void render_game() const;
 
   const geometry::Rectangle& get_game_camera() const { return game_camera_; }
@@ -28,7 +28,7 @@ class GameRenderer
   void render_tiles(bool in_front) const;
   void render_objects() const;
   void render_items() const;
-	void render_statusbar() const;
+  void render_statusbar() const;
 
   Game* game_;
   SpriteManager* sprite_manager_;

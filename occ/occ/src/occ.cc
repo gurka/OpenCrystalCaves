@@ -98,7 +98,7 @@ int main()
     return 1;
   }
   ExeData exe_data{episode};
-  if (!game->init(exe_data))
+  if (!game->init(exe_data, LevelId::INTRO))
   {
     LOG_CRITICAL("Could not initialize Game");
     return 1;
@@ -114,7 +114,7 @@ int main()
   title_images.insert(title_images.end(), credits_images.begin(), credits_images.end());
   TitleState title{sprite_manager, *game_surface, title_images, *window, exe_data};
   splash.set_next(title);
-  GameState game_state(*game, sprite_manager, *game_surface, *window);
+  GameState game_state(*game, sprite_manager, *game_surface, *window, exe_data);
   title.set_next(game_state);
   State* state = &splash;
 
