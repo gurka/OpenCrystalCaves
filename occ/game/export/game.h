@@ -45,4 +45,6 @@ class Game
   virtual bool has_key() const = 0;
 
   virtual std::wstring get_debug_info() const = 0;
+
+  LevelId entering_level = LevelId::INTRO;
 };

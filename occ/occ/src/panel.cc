@@ -48,8 +48,9 @@ Panel::Panel(const std::vector<Panel> children) : type_(PanelType::PANEL_TYPE_PA
 }
 
 
-Panel::Panel(const std::vector<std::wstring> strings, const std::vector<std::pair<int, Panel>> children)
-  : strings_(std::move(strings)),
+Panel::Panel(const std::vector<std::wstring> strings, const std::vector<std::pair<int, Panel>> children, const PanelType type)
+  : type_(type),
+    strings_(std::move(strings)),
     children_(std::move(children))
 {
   for (auto& child : children_)

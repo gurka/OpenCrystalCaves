@@ -12,6 +12,75 @@
 
 static constexpr int FADE_TICKS = 15;
 
+const std::vector<Panel> makeInstructionsPanels(const ExeData& exe_data)
+{
+  return {{
+    {
+      PanelText::PANEL_TEXT_INSTRUCTIONS_1,
+      exe_data,
+      {
+        {static_cast<int>(Sprite::SPRITE_CRYSTAL_1_R), {264, 48}},
+        {static_cast<int>(Sprite::SPRITE_EXIT_TOP_LEFT_1), {248, 64}},
+        {static_cast<int>(Sprite::SPRITE_EXIT_TOP_RIGHT_1), {264, 64}},
+        {static_cast<int>(Sprite::SPRITE_EXIT_BOTTOM_LEFT_1), {248, 80}},
+        {static_cast<int>(Sprite::SPRITE_EXIT_BOTTOM_RIGHT_1), {264, 80}},
+        {static_cast<int>(Sprite::SPRITE_ENTRY_1), {264, 112}},
+      },
+    },
+    {
+      PanelText::PANEL_TEXT_INSTRUCTIONS_2,
+      exe_data,
+      {
+        {static_cast<int>(Sprite::SPRITE_PISTOL), {32, 68}},
+        {static_cast<int>(Sprite::SPRITE_ROCKMAN_WALK_L_1), {264, 88}},
+        {static_cast<int>(Sprite::SPRITE_LEVER_R_OFF), {264, 128}},
+      },
+    },
+    {
+      PanelText::PANEL_TEXT_INSTRUCTIONS_3,
+      exe_data,
+      {},
+      {
+        {Icon::ICON_HEART, {208, 128}},
+        {Icon::ICON_HEART, {216, 128}},
+        {Icon::ICON_HEART, {224, 128}},
+      },
+    },
+    {
+      PanelText::PANEL_TEXT_INSTRUCTIONS_4,
+      exe_data,
+      {
+        {static_cast<int>(Sprite::SPRITE_POWER), {32, 64}},
+      },
+    },
+    {
+      PanelText::PANEL_TEXT_INSTRUCTIONS_5,
+      exe_data,
+      {
+        {static_cast<int>(Sprite::SPRITE_SWITCH_OFF), {264, 128}},
+      },
+    },
+    {
+      PanelText::PANEL_TEXT_INSTRUCTIONS_6,
+      exe_data,
+      {
+        {static_cast<int>(Sprite::SPRITE_CRYSTAL_HIDDEN), {264, 56}},
+        {static_cast<int>(Sprite::SPRITE_LIGHT_SWITCH_OFF), {216, 128}},
+      },
+    },
+    {
+      PanelText::PANEL_TEXT_INSTRUCTIONS_7,
+      exe_data,
+      {
+        {static_cast<int>(Sprite::SPRITE_CLEAR_BLOCK), {264, 40}},
+        {static_cast<int>(Sprite::SPRITE_GRAVITY), {264, 80}},
+        {static_cast<int>(Sprite::SPRITE_MUSHROOM_RED), {32, 144}},
+        {static_cast<int>(Sprite::SPRITE_MUSHROOM_GREEN), {264, 144}},
+      },
+    },
+  }};
+}
+
 State::State(const unsigned fade_in_ticks, const unsigned fade_out_ticks, Window& window)
   : overlay_(std::unique_ptr<Surface>(Surface::from_pixels(SCREEN_SIZE.x(), SCREEN_SIZE.y(), nullptr, window))),
     fade_in_ticks_(fade_in_ticks),
@@ -91,6 +160,7 @@ TitleState::TitleState(SpriteManager& sprite_manager,
     game_surface_(game_surface),
     images_(images),
     panel_(
+      // TODO: add options menu here
       {
         L"Welcome to OpenCrystalCaves!",
         L"----------------------------",
@@ -110,74 +180,7 @@ TitleState::TitleState(SpriteManager& sprite_manager,
         // Check if we have the registered version (randomly load a episode 2 file)
         // If so disable the ordering instructions panel
         {4, get_data_path("CC2.APG").empty() ? Panel(PanelText::PANEL_TEXT_ORDER_3, exe_data) : Panel(PanelType::PANEL_TYPE_DISABLED)},
-        {
-          5,
-          {{
-            {
-              PanelText::PANEL_TEXT_INSTRUCTIONS_1,
-              exe_data,
-              {
-                {static_cast<int>(Sprite::SPRITE_CRYSTAL_1_R), {264, 48}},
-                {static_cast<int>(Sprite::SPRITE_EXIT_TOP_LEFT_1), {248, 64}},
-                {static_cast<int>(Sprite::SPRITE_EXIT_TOP_RIGHT_1), {264, 64}},
-                {static_cast<int>(Sprite::SPRITE_EXIT_BOTTOM_LEFT_1), {248, 80}},
-                {static_cast<int>(Sprite::SPRITE_EXIT_BOTTOM_RIGHT_1), {264, 80}},
-                {static_cast<int>(Sprite::SPRITE_ENTRY_1), {264, 112}},
-              },
-            },
-            {
-              PanelText::PANEL_TEXT_INSTRUCTIONS_2,
-              exe_data,
-              {
-                {static_cast<int>(Sprite::SPRITE_PISTOL), {32, 68}},
-                {static_cast<int>(Sprite::SPRITE_ROCKMAN_WALK_L_1), {264, 88}},
-                {static_cast<int>(Sprite::SPRITE_LEVER_R_OFF), {264, 128}},
-              },
-            },
-            {
-              PanelText::PANEL_TEXT_INSTRUCTIONS_3,
-              exe_data,
-              {},
-              {
-                {Icon::ICON_HEART, {208, 128}},
-                {Icon::ICON_HEART, {216, 128}},
-                {Icon::ICON_HEART, {224, 128}},
-              },
-            },
-            {
-              PanelText::PANEL_TEXT_INSTRUCTIONS_4,
-              exe_data,
-              {
-                {static_cast<int>(Sprite::SPRITE_POWER), {32, 64}},
-              },
-            },
-            {
-              PanelText::PANEL_TEXT_INSTRUCTIONS_5,
-              exe_data,
-              {
-                {static_cast<int>(Sprite::SPRITE_SWITCH_OFF), {264, 128}},
-              },
-            },
-            {
-              PanelText::PANEL_TEXT_INSTRUCTIONS_6,
-              exe_data,
-              {
-                {static_cast<int>(Sprite::SPRITE_CRYSTAL_HIDDEN), {264, 56}},
-                {static_cast<int>(Sprite::SPRITE_LIGHT_SWITCH_OFF), {216, 128}},
-              },
-            },
-            {
-              PanelText::PANEL_TEXT_INSTRUCTIONS_7,
-              exe_data,
-              {
-                {static_cast<int>(Sprite::SPRITE_CLEAR_BLOCK), {264, 40}},
-                {static_cast<int>(Sprite::SPRITE_GRAVITY), {264, 80}},
-                {static_cast<int>(Sprite::SPRITE_MUSHROOM_RED), {32, 144}},
-                {static_cast<int>(Sprite::SPRITE_MUSHROOM_GREEN), {264, 144}},
-              },
-            },
-          }},
-        },
+        {5, makeInstructionsPanels(exe_data)},
         {6,
          {{
            {PanelText::PANEL_TEXT_STORY_1, exe_data},
@@ -297,13 +300,41 @@ GameState::GameState(Game& game, SpriteManager& sprite_manager, Surface& game_su
     game_surface_(game_surface),
     sprite_manager_(sprite_manager),
     game_renderer_(&game, &sprite_manager, &game_surface, window),
-    exe_data_(exe_data)
+    exe_data_(exe_data),
+    panel_(
+      {
+        L"OpenCrystalCaves Game Menu",
+        L"--------------------------",
+        L"     Instructions",
+        L"     Options",
+        L"     Save Game",
+        L"     Quit Game",
+      },
+      {
+        {2, makeInstructionsPanels(exe_data)},
+        {3, {PanelType::PANEL_TYPE_DISABLED}},  // TODO: options
+        {4, {PanelType::PANEL_TYPE_DISABLED}},  // TODO: save game
+        {5,
+         {{
+            L"Quit to:",
+            L"",
+            L" " OS_NAME,
+            L" Title",
+            L" Main Level",  // TODO: disable if main level
+          },
+          {
+            {2, {PanelType::PANEL_TYPE_QUIT_TO_OS}},
+            {3, {PanelType::PANEL_TYPE_QUIT_TO_TITLE}},
+            {4, {PanelType::PANEL_TYPE_QUIT_TO_MAIN_LEVEL}},
+          }}},
+      })
 {
 }
 
 void GameState::reset()
 {
   State::reset();
+	paused_ = false;
   if (!game_.init(exe_data_, level_))
   {
     LOG_CRITICAL("Could not initialize Game level %d", static_cast<int>(level_));
@@ -314,42 +345,85 @@ void GameState::reset()
 void GameState::update(const Input& input)
 {
   State::update(input);
-  if (input.escape.pressed())
-  {
-    finish();
-  }
-  if (input.num_1.pressed())
-  {
-    debug_info_ = !debug_info_;
-  }
-  if (input.num_2.pressed())
-  {
-    game_renderer_.set_debug(!game_renderer_.get_debug());
-  }
-  if (input.enter.pressed())
-  {
-    paused_ = !paused_;
-  }
 
-  if (!paused_ || (paused_ && input.space.pressed()))
+  if (panel_current_ == nullptr)
   {
-    // Call game loop
-    game_.update(game_tick_, input_to_player_input(input));
-    game_tick_ += 1;
-  }
-  game_renderer_.update(game_tick_);
-
-  if (game_.get_player().entering_level != level_)
-  {
-    if (fade_out_start_ticks_ == 0)
+    if (input.escape.pressed())
     {
-      // Start fading out
-      fade_out_start_ticks_ = ticks_;
+      panel_current_ = &panel_;
     }
-    else if (has_finished())
+  }
+  else if (input.escape.pressed())
+  {
+    panel_current_ = nullptr;
+  }
+  else
+  {
+    panel_current_ = panel_current_->update(input);
+  }
+  if (panel_current_)
+  {
+    switch (panel_current_->get_type())
     {
-      level_ = game_.get_player().entering_level;
-      reset();
+      case PanelType::PANEL_TYPE_QUIT_TO_OS:
+			panel_current_ = nullptr;
+			paused_ = true;
+        finish();
+        break;
+		case PanelType::PANEL_TYPE_QUIT_TO_TITLE:
+			panel_current_ = nullptr;
+			paused_ = true;
+	finish();
+	break;
+		case PanelType::PANEL_TYPE_QUIT_TO_MAIN_LEVEL:
+			panel_current_ = nullptr;
+			if (level_ != LevelId::MAIN_LEVEL)
+			{
+				game_.entering_level = LevelId::MAIN_LEVEL;
+				paused_ = true;
+				finish();
+			}
+	break;
+      default:
+        break;
+        // TODO: handle other types
+    }
+  }
+  else
+  {
+    if (input.num_1.pressed())
+    {
+      debug_info_ = !debug_info_;
+    }
+    if (input.num_2.pressed())
+    {
+      game_renderer_.set_debug(!game_renderer_.get_debug());
+    }
+    if (input.enter.pressed())
+    {
+      paused_ = !paused_;
+    }
+
+    if (!paused_ || (paused_ && input.space.pressed()))
+    {
+      // Call game loop
+      game_.update(game_tick_, input_to_player_input(input));
+      game_tick_ += 1;
+    }
+    game_renderer_.update(game_tick_);
+
+    if (game_.entering_level != level_)
+    {
+      if (fade_out_start_ticks_ == 0)
+      {
+        // Start fading out
+        fade_out_start_ticks_ = ticks_;
+      }
+      else if (has_finished())
+      {
+        level_ = game_.entering_level;
+        reset();
+      }
     }
   }
 }
@@ -397,5 +471,36 @@ void GameState::draw(Window& window) const
     }
   }
 
+  if (panel_current_)
+  {
+    // Blit to game surface to set scaling properly
+    window.set_render_target(&game_surface_);
+    // Clear window surface
+    window.fill_rect(geometry::Rectangle(0, 0, WINDOW_SIZE), {33u, 33u, 33u, 0u});
+
+    panel_current_->draw(sprite_manager_);
+    window.set_render_target(nullptr);
+    // Render game surface to window surface, centered and scaled
+    game_surface_.blit_surface(geometry::Rectangle(0, 0, CAMERA_SIZE),
+                               geometry::Rectangle((WINDOW_SIZE - CAMERA_SIZE_SCALED) / 2, CAMERA_SIZE_SCALED));
+  }
+
   State::draw(window);
+}
+
+State* GameState::next_state()
+{
+  if (panel_current_)
+  {
+    switch (panel_current_->get_type())
+    {
+      case PanelType::PANEL_TYPE_QUIT_TO_OS:
+        return nullptr;  // TODO: connect to TitleState
+      case PanelType::PANEL_TYPE_QUIT_TO_TITLE:
+        return nullptr;
+      default:
+        break;
+    }
+  }
+  return State::next_state();
 }

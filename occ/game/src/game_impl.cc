@@ -34,7 +34,7 @@ bool GameImpl::init(const ExeData& exe_data, const LevelId level)
   }
 
   player_.position = level_->player_spawn;
-  player_.entering_level = level;
+  entering_level = level;
 
   score_ = 0u;
   num_ammo_ = 5u;
@@ -156,7 +156,7 @@ void GameImpl::update_level()
         geometry::isColliding({player_.position, player_.size}, {entrance.position, 16, 16}) ? EntranceState::OPEN : EntranceState::CLOSED;
       if (entrance.state == EntranceState::OPEN)
       {
-        player_.entering_level = static_cast<LevelId>(entrance.level);
+        entering_level = static_cast<LevelId>(entrance.level);
       }
     }
     entrance.update();
@@ -174,7 +174,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
    * 4. Update player information based on collision
    */
 
-  if (player_.entering_level != level_->level_id)
+  if (entering_level != level_->level_id)
   {
     return;
   }

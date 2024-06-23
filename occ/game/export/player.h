@@ -36,5 +36,4 @@ struct Player
   bool noclip = false;
   bool godmode = false;
   bool reverse_gravity = false;
-  LevelId entering_level = LevelId::INTRO;
 };

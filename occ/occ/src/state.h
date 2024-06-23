@@ -107,6 +107,7 @@ class GameState : public State
   virtual void reset() override;
   virtual void update(const Input& input) override;
   virtual void draw(Window& window) const override;
+  virtual State* next_state() override;
 
  private:
   Game& game_;
@@ -118,6 +119,8 @@ class GameState : public State
   bool paused_ = false;
   unsigned game_tick_ = 0;
   LevelId level_ = LevelId::MAIN_LEVEL;
+  Panel panel_;
+  Panel* panel_current_ = nullptr;
 };
 
 // TODO: end state

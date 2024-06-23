@@ -86,6 +86,8 @@ enum class PanelType
   PANEL_TYPE_PAGES,
   PANEL_TYPE_NEW_GAME,
   PANEL_TYPE_QUIT_TO_OS,
+  PANEL_TYPE_QUIT_TO_TITLE,
+  PANEL_TYPE_QUIT_TO_MAIN_LEVEL,
 };
 
 class Panel
@@ -94,7 +96,9 @@ class Panel
   // Panel that pages through its children
   Panel(const std::vector<Panel> children);
   // Menu-type panel with selectable children
-  Panel(const std::vector<std::wstring> strings, const std::vector<std::pair<int, Panel>> children);
+  Panel(const std::vector<std::wstring> strings,
+        const std::vector<std::pair<int, Panel>> children,
+        const PanelType type = PanelType::PANEL_TYPE_NORMAL);
   // Panel from decoded text from the EXE
   Panel(const char* ucsd,
         const std::vector<std::pair<int, geometry::Position>> sprites = {},
