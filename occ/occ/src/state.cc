@@ -334,7 +334,9 @@ GameState::GameState(Game& game, SpriteManager& sprite_manager, Surface& game_su
 void GameState::reset()
 {
   State::reset();
-	paused_ = false;
+  paused_ = false;
+  panel_current_ = nullptr;
+  panel_next_ = nullptr;
   if (!game_.init(exe_data_, level_))
   {
     LOG_CRITICAL("Could not initialize Game level %d", static_cast<int>(level_));
@@ -366,24 +368,26 @@ void GameState::update(const Input& input)
     switch (panel_current_->get_type())
     {
       case PanelType::PANEL_TYPE_QUIT_TO_OS:
-			panel_current_ = nullptr;
-			paused_ = true;
+        panel_next_ = panel_current_;
+        panel_current_ = nullptr;
+        paused_ = true;
         finish();
         break;
-		case PanelType::PANEL_TYPE_QUIT_TO_TITLE:
-			panel_current_ = nullptr;
-			paused_ = true;
-	finish();
-	break;
-		case PanelType::PANEL_TYPE_QUIT_TO_MAIN_LEVEL:
-			panel_current_ = nullptr;
-			if (level_ != LevelId::MAIN_LEVEL)
-			{
-				game_.entering_level = LevelId::MAIN_LEVEL;
-				paused_ = true;
-				finish();
-			}
-	break;
+      case PanelType::PANEL_TYPE_QUIT_TO_TITLE:
+        panel_next_ = panel_current_;
+        panel_current_ = nullptr;
+        paused_ = true;
+        finish();
+        break;
+      case PanelType::PANEL_TYPE_QUIT_TO_MAIN_LEVEL:
+        panel_current_ = nullptr;
+        if (level_ != LevelId::MAIN_LEVEL)
+        {
+          game_.entering_level = LevelId::MAIN_LEVEL;
+          paused_ = true;
+          finish();
+        }
+        break;
       default:
         break;
         // TODO: handle other types
@@ -490,14 +494,14 @@ void GameState::draw(Window& window) const
 
 State* GameState::next_state()
 {
-  if (panel_current_)
+  if (panel_next_)
   {
-    switch (panel_current_->get_type())
+    switch (panel_next_->get_type())
     {
       case PanelType::PANEL_TYPE_QUIT_TO_OS:
-        return nullptr;  // TODO: connect to TitleState
-      case PanelType::PANEL_TYPE_QUIT_TO_TITLE:
         return nullptr;
+      case PanelType::PANEL_TYPE_QUIT_TO_TITLE:
+        break;
       default:
         break;
     }

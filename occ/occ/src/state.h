@@ -79,6 +79,11 @@ class TitleState : public State
  public:
   TitleState(SpriteManager& sprite_manager, Surface& game_surface, std::vector<Surface*>& images, Window& window, ExeData& exe_data);
 
+  virtual void reset() override
+  {
+    panel_current_ = nullptr;
+    State::reset();
+  }
   virtual void update(const Input& input) override;
   virtual void draw(Window& window) const override;
   virtual State* next_state() override
@@ -121,6 +126,7 @@ class GameState : public State
   LevelId level_ = LevelId::MAIN_LEVEL;
   Panel panel_;
   Panel* panel_current_ = nullptr;
+  Panel* panel_next_ = nullptr;
 };
 
 // TODO: end state

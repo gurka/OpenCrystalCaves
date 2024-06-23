@@ -116,6 +116,7 @@ int main()
   splash.set_next(title);
   GameState game_state(*game, sprite_manager, *game_surface, *window, exe_data);
   title.set_next(game_state);
+  game_state.set_next(title);
   State* state = &splash;
 
   // Game loop
