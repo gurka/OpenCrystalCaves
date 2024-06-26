@@ -1,9 +1,12 @@
 [![C/C++ CI](https://github.com/gurka/OpenCrystalCaves/actions/workflows/cpp.yml/badge.svg)](https://github.com/gurka/OpenCrystalCaves/actions/workflows/cpp.yml)
 [![#CrystalCaves on Mastodon](https://img.shields.io/badge/-%23CrystalCaves-%23303030?logo=mastodon)](https://mastodon.gamedev.place/tags/CrystalCaves)
+[![Download at itch.io](https://img.shields.io/badge/-Downloads-%23303030?logo=itchdotio)](https://congusbongus.itch.io/opencrystalcaves)
 
 # OpenCrystalCaves
 
 OCC is an unofficial open source engine reimplementation of the game trilogy [Crystal Caves](https://en.wikipedia.org/wiki/Crystal_Caves).
+
+Download binaries and project info at [itch.io](https://congusbongus.itch.io/opencrystalcaves)
 
 **This repository includes the shareware version of Crystal Caves. To play the full, retail version, you can copy over the data files or purchase them at [Steam](http://store.steampowered.com/app/358260/Crystal_Caves/) or [GoG](https://www.gog.com/game/crystal_caves).**
 
