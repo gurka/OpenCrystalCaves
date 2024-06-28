@@ -2,10 +2,26 @@ cmake_minimum_required(VERSION 3.15)
 
 project(occ)
 
-# debug flags (-fuse-old=gold is for Travis)
-if(UNIX AND NOT APPLE)
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fsanitize=leak -fsanitize=undefined -fuse-ld=gold")
+set(VERSION_MAJOR "0")
+set(VERSION_MINOR "1")
+set(VERSION_PATCH "0")
+set(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
+
+# Optionally configure CI files since they are excluded in source archives
+if(EXISTS ${CMAKE_SOURCE_DIR}/.github/workflows/cpp.yml.cmake)
+	configure_file(
+		${CMAKE_SOURCE_DIR}/.github/workflows/cpp.yml.cmake
+		${CMAKE_SOURCE_DIR}/.github/workflows/cpp.yml
+		@ONLY
+	)
 endif()
+
+if(UNIX AND NOT APPLE)
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fsanitize=leak -fsanitize=undefined")
+endif()
+
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_BINARY_DIR}")
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_BINARY_DIR}")
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
@@ -122,3 +138,77 @@ add_test(sdl_wrapper sdl_wrapper/sdl_wrapper_test)
 target_compile_options(sdl_wrapper PRIVATE ${COMPILE_OPTIONS})
 add_test(utils utils/utils_test)
 target_compile_options(utils PRIVATE ${COMPILE_OPTIONS})
+
+# install/package
+
+set(EXE_EXTENSION "")
+if(WIN32)
+	set(EXE_EXTENSION ".exe")
+elseif(APPLE)
+	set(LIB_EXTENSION ".dylib")
+else()
+	set(LIB_EXTENSION ".so")
+endif()
+install(
+  PROGRAMS
+    ${CMAKE_CURRENT_BINARY_DIR}/occ${EXE_EXTENSION}
+    DESTINATION .)
+install(DIRECTORY
+	${CMAKE_SOURCE_DIR}/../media
+	DESTINATION .)
+install(FILES
+	${CMAKE_SOURCE_DIR}/../README.md
+	DESTINATION .)
+if(WIN32)
+	# Copy DLLs
+  # TODO: scripts to download DLLs
+	file(GLOB DLLS "${CMAKE_SOURCE_DIR}/../dll/*.dll")
+	foreach(DLL ${DLLS})
+		install(FILES "${DLL}" DESTINATION ${INSTALL_PREFIX})
+	endforeach()
+endif()
+
+set(CPACK_PACKAGE_NAME "OpenCrystalCaves")
+set(CPACK_PACKAGE_VENDOR "OpenCrystalCaves Team")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "OpenCrystalCaves: Retro Platform Game")
+set(CPACK_PACKAGE_VERSION ${VERSION})
+set(CPACK_PACKAGE_VERSION_MAJOR ${VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${VERSION_PATCH})
+set(CPACK_PACKAGE_EXECUTABLES "occ;OpenCrystalCaves")
+if(WIN32)
+	set(CPACK_GENERATOR ZIP)
+	set(CPACK_PACKAGE_INSTALL_DIRECTORY "OpenCrystalCaves")
+elseif(APPLE)
+	set(CPACK_GENERATOR "DragNDrop")
+	set(CPACK_DMG_FORMAT "UDBZ")
+	set(CPACK_DMG_VOLUME_NAME "OpenCrystalCaves")
+	set(CPACK_SYSTEM_NAME "OSX")
+  # TODO: icon
+
+	# copy SDL frameworks
+	set(APPS occ)
+	set(LIBS SDL2 SDL2_image)
+	foreach(APP ${APPS})
+		foreach(LIB ${LIBS})
+			install(DIRECTORY /Library/Frameworks/${LIB}.framework
+				DESTINATION ${INSTALL_PREFIX}/Frameworks)
+		endforeach()
+	endforeach()
+else()
+	# probably linux
+
+	# Pack only tar.gz since deb and rpm packages may differ in distros
+	set(CPACK_GENERATOR TGZ)
+
+	# debian specific
+	set(CPACK_DEBIAN_PACKAGE_MAINTAINER "OpenCrystalCaves Team")
+	set(CPACK_DEBIAN_PACKAGE_SECTION Games)
+	set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libsdl2-image")
+
+	# fedora/suse specific
+	set(CPACK_RPM_PACKAGE_LICENSE "MIT")
+	set(CPACK_RPM_PACKAGE_REQUIRES "sdl_image >= 2")
+
+endif()
+include(CPack)
