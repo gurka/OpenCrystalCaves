@@ -11,7 +11,6 @@ CMakeFiles/
 CMakeScripts/
 CTestTestfile.cmake
 *.xcodeproj/
-build/
 generated/
 .idea/
 
