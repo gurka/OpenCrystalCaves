@@ -41,12 +41,12 @@ Steps to compile (Linux, macOS):
 git clone --recursive https://github.com/gurka/OpenCrystalCaves.git
 cd OpenCrystalCaves
 mkdir debug
+cmake -Bdebug -DCMAKE_BUILD_TYPE=debug occ
 cd debug
-cmake ../occ -DCMAKE_BUILD_TYPE=debug
 make
 ```
 
-The binary will be available at `OpenCrystalCaves/debug/occ/occ`
+The binary will be available at `OpenCrystalCaves/build/occ`
 
 Or in Windows (with [vcpkg](https://vcpkg.io)):
 
@@ -57,12 +57,11 @@ Or in Windows (with [vcpkg](https://vcpkg.io)):
 git clone --recursive https://github.com/gurka/OpenCrystalCaves.git
 cd OpenCrystalCaves
 mkdir debug
-cd debug
-cmake -B debug -DCMAKE_BUILD_TYPE=debug -DCMAKE_TOOLCHAIN_FILE=C:/path/to/vcpkg/scripts/buildsystems/vcpkg.cmake ../occ -A x64
+cmake -Bdebug -DCMAKE_BUILD_TYPE=debug -DCMAKE_TOOLCHAIN_FILE=C:/path/to/vcpkg/scripts/buildsystems/vcpkg.cmake ../occ -A x64
 ```
 
 The Visual Studio project will be available at `OpenCrystalCaves/debug`
 
 ## Running OCC
 
-OCC requires data files from the original Crystal Caves (any episode). Either install it via Steam or GoG, or copy the game data to the same folder as OCC (such as `CC1.GFX`).
+OCC requires data files from the original Crystal Caves (any episode). Either install it via Steam or GoG, or copy the game data to the `media` folder in the occ package (such as `CC1.GFX`).

@@ -19,3 +19,4 @@ generated/
 Makefile
 *_test
 *.a
+CPack*Config.*

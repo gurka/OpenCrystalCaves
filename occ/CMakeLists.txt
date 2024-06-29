@@ -8,28 +8,30 @@ set(VERSION_PATCH "0")
 set(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 
 # Optionally configure CI files since they are excluded in source archives
-if(EXISTS ${CMAKE_SOURCE_DIR}/.github/workflows/cpp.yml.cmake)
+if(EXISTS ${CMAKE_SOURCE_DIR}/../.github/workflows/cpp.yml.cmake)
 	configure_file(
-		${CMAKE_SOURCE_DIR}/.github/workflows/cpp.yml.cmake
-		${CMAKE_SOURCE_DIR}/.github/workflows/cpp.yml
+		${CMAKE_SOURCE_DIR}/../.github/workflows/cpp.yml.cmake
+		${CMAKE_SOURCE_DIR}/../.github/workflows/cpp.yml
 		@ONLY
 	)
 endif()
 
 if(UNIX AND NOT APPLE)
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fsanitize=leak -fsanitize=undefined")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fsanitize=leak -fsanitize=undefined -fuse-ld=gold")
 endif()
 
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_BINARY_DIR}")
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_BINARY_DIR}")
+# occ is both the binary and the directory, so they can't be in the same folder...
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/../build")
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/../build")
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 
 if(MSVC)
-  set(COMPILE_OPTIONS -MP -W4 -WX -wd\"4090\" -wd\"4996\" -wd\"4204\" /D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING /Zc:__cplusplus)
+  add_compile_options(-MP -W4 -WX -wd\"4090\" -wd\"4996\" -wd\"4204\" /D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING /Zc:__cplusplus)
 else()
-  set(COMPILE_OPTIONS -Wall -Wextra -Wpedantic -Weffc++)
+  add_compile_options(-Wall -Wextra -Wpedantic)
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Weffc++>)
 endif()
 
 # sdl_wrapper
@@ -141,24 +143,21 @@ target_compile_options(utils PRIVATE ${COMPILE_OPTIONS})
 
 # install/package
 
+set(INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/../build)
 set(EXE_EXTENSION "")
 if(WIN32)
 	set(EXE_EXTENSION ".exe")
-elseif(APPLE)
-	set(LIB_EXTENSION ".dylib")
-else()
-	set(LIB_EXTENSION ".so")
 endif()
 install(
   PROGRAMS
-    ${CMAKE_CURRENT_BINARY_DIR}/occ${EXE_EXTENSION}
-    DESTINATION .)
+    ${INSTALL_PREFIX}/occ${EXE_EXTENSION}
+    DESTINATION ${INSTALL_PREFIX})
 install(DIRECTORY
 	${CMAKE_SOURCE_DIR}/../media
-	DESTINATION .)
+	DESTINATION ${INSTALL_PREFIX})
 install(FILES
 	${CMAKE_SOURCE_DIR}/../README.md
-	DESTINATION .)
+	DESTINATION ${INSTALL_PREFIX})
 if(WIN32)
 	# Copy DLLs
   # TODO: scripts to download DLLs
