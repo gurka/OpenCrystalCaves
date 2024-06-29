@@ -19,3 +19,8 @@ Makefile
 *_test
 *.a
 CPack*Config.*
+
+# Windows
+build/*.dll
+build/*.exe
+build/*.pdb

@@ -28,10 +28,9 @@ find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 
 if(MSVC)
-  add_compile_options(-MP -W4 -WX -wd\"4090\" -wd\"4996\" -wd\"4204\" /D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING /Zc:__cplusplus)
+  set(COMPILE_OPTIONS -MP -W4 -WX -wd\"4090\" -wd\"4996\" -wd\"4204\" /D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING /Zc:__cplusplus)
 else()
-  add_compile_options(-Wall -Wextra -Wpedantic)
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Weffc++>)
+  set(COMPILE_OPTIONS -Wall -Wextra -Wpedantic)
 endif()
 
 # sdl_wrapper
