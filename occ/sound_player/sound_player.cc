@@ -10,6 +10,11 @@ https://moddingwiki.shikadi.net/wiki/Crystal_Caves_Sound_format
 #include <find_steam_game.h>
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
+#include <SDL_mixer.h>
+
+#include "graphics.h"
+#include "logger.h"
+#include "sdl_wrapper.h"
 
 #define SND_FILENAME_FMT "CC1-{}.SND"
 #define GOG_ID "1207665273"
@@ -68,94 +73,58 @@ struct SoundData
 {
   SDL_AudioSpec spec;
   std::vector<Sound> sounds;
-  int sound_index = -1;
-  int counter = 0;
-  int freq_counter = 0;
-  int index = -1;
-  int dc = 64;
 
-  // Bytes per sample (single channel)
-  int bps() const { return (spec.format & 0xFF) / 8; }
-
-  const Sound& sound() const { return sounds[sound_index]; }
-
-  int16_t freq() const { return sound().data[index]; }
-
-  int amp() const
+  std::string to_raw(int sound_index) const
   {
-    if (freq() == 0 || (index % sound().vibrate) == 0)
-    {
-      return spec.silence;
-    }
-    return dc;
-  }
+    const int freq_len = 400;
+    // Bytes per sample (single channel)
+    const int bps = (spec.format & 0xFF) / 8;
 
-  void tick()
-  {
-    if (counter == 0)
+    // Find length of sound
+    const auto& sound = sounds[sound_index];
+    size_t len;
+    for (len = 0;; len++)
     {
-      nextfreq();
-    }
-    else
-    {
-      if (freq_counter == 0)
+      const auto freq = sound.data[len];
+      if (len >= 300 || freq == -1)
       {
-        freq_counter = sound().data[index];
-        dc *= -1;
+        break;
       }
-      counter--;
-      freq_counter--;
     }
-  }
-
-  void nextfreq()
-  {
-    if (is_end())
+    std::string s(len * freq_len * spec.channels * bps, '\0');
+    Uint8* ptr = (Uint8*)s.data();
+    Uint8 dc = 64;
+    for (int i = 0; i < len; i++)
     {
-      return;
-    }
-    index++;
-    freq_counter = 0;
-    counter = 256;
-  }
-
-  bool is_end() const { return sound_index == -1 || index >= 300 || counter == -1 || freq() == -1; }
-
-  void play(const int _sound_index)
-  {
-    sound_index = _sound_index;
-    std::cout << "Playing sound " << sound_index << " vibrate=" << std::hex << sound().vibrate << " unknown0=" << sound().unknown0
-              << " unknown1=" << sound().unknown1 << " unknown2=" << sound().unknown2 << std::dec << "\n";
-    index = -1;
-    freq_counter = 0;
-    counter = 256;
-  }
-};
-
-void callback(void* userdata, Uint8* stream, int len)
-{
-  SoundData* sdata = reinterpret_cast<SoundData*>(userdata);
-  int i = 0;
-  do
-  {
-    if (sdata->index == -1)
-    {
-      memset(stream, 0, len);
-    }
-    else
-    {
-      sdata->tick();
       // Generate square wave at frequency
-      for (int c = 0; c < sdata->spec.channels; c++)
+      const auto freq = sound.data[i];
+      const int freq_interval = freq > 0 ? (65536 / freq) : 0;
+      for (int j = 0, freq_counter = 0; j < freq_len; j++, freq_counter++)
       {
-        for (int b = 0; b < sdata->bps() && i < len; b++, i++)
+        Uint8 amp = dc;
+        // TODO: use vibrate?
+        if (freq == 0)
         {
-          stream[i] = (Uint8)sdata->amp();
+          amp = spec.silence;
+        }
+        else if (freq_counter == freq_interval)
+        {
+          dc = 64 - dc;
+          freq_counter = 0;
+        }
+        freq_counter++;
+        for (int c = 0; c < spec.channels; c++)
+        {
+          for (int b = 0; b < bps; b++)
+          {
+            *ptr++ = dc;
+          }
         }
       }
     }
-  } while (i < len);
-}
+    return s;
+  }
+};
 
 char itoc(int i)
 {
@@ -214,29 +183,43 @@ int main()
   }
   std::cout << "Read " << sdata.sounds.size() << " sounds\n";
 
-  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
+  auto sdl = SDLWrapper::create();
+  if (!sdl)
   {
-    std::cout << "Could not initialize SDL: " << SDL_GetError() << "\n";
+    LOG_CRITICAL("Could not create SDLWrapper");
     return 1;
   }
-
-  SDL_AudioSpec want;
-  want.freq = SAMPLE_RATE;
-  want.format = AUDIO_FMT;
-  want.channels = AUDIO_CHANNELS;
-  want.samples = 4096;
-  want.callback = callback;
-  want.userdata = &sdata;
-  const auto device = SDL_OpenAudioDevice(nullptr, 0, &want, &sdata.spec, SDL_AUDIO_ALLOW_FORMAT_CHANGE);
-  if (device == 0)
+  auto window = Window::create("OpenCrystalCaves", geometry::Size(10, 10), "");
+  if (!window)
   {
-    std::cout << "Could open audio: " << SDL_GetError() << "\n";
+    LOG_CRITICAL("Could not create Window");
     return 1;
   }
+  window->set_size(geometry::Size{100, 100});
 
-  SDL_PauseAudioDevice(device, 0);
+  if (Mix_OpenAudio(SAMPLE_RATE, AUDIO_FMT, AUDIO_CHANNELS, 4096) != 0)
+  {
+    std::cout << "Could not open audio: " << SDL_GetError() << "\n";
+    return 1;
+  }
+  int channels;
+  if (Mix_QuerySpec(&sdata.spec.freq, &sdata.spec.format, &channels) == 0)
+  {
+    std::cout << "Could not get audio spec: " << SDL_GetError() << "\n";
+    return 1;
+  }
+  sdata.spec.channels = static_cast<Uint8>(channels);
 
-  std::cout << "Play sound by pressing 0 - " << itoc((int)sdata.sounds.size()) << "\n";
+  // Convert sounds to chunks
+  std::vector<std::string> raw_chunks;
+  std::vector<Mix_Chunk*> chunks;
+  for (int i = 0; i < sdata.sounds.size(); i++)
+  {
+    raw_chunks.push_back(sdata.to_raw(i));
+    chunks.push_back(Mix_QuickLoad_RAW((Uint8*)raw_chunks[i].data(), (Uint32)raw_chunks[i].size()));
+  }
+
+  std::cout << "Play sound by pressing 0 - " << itoc((int)sdata.sounds.size() - 1) << "\n";
 
   bool quit = false;
   bool keydown = false;
@@ -258,9 +241,15 @@ int main()
         keydown = true;
         const bool shift = !!(SDL_GetModState() & KMOD_SHIFT);
         const int index = keytoi(event.key.keysym.sym, shift);
-        if (index >= 0 && index < (int)sdata.sounds.size())
+        if (index >= 0 && index < (int)chunks.size())
         {
-          sdata.play(index);
+          const auto& sound = sdata.sounds[index];
+          std::cout << "Playing sound " << index << " vibrate=" << std::hex << sound.vibrate << " unknown0=" << sound.unknown0
+                    << " unknown1=" << sound.unknown1 << " unknown2=" << sound.unknown2 << std::dec << "\n";
+          if (Mix_PlayChannel(-1, chunks[index], 0) == -1)
+          {
+            LOG_CRITICAL("Could not play sound: %s", SDL_GetError());
+          }
         }
       }
       else if (event.type == SDL_KEYUP)
@@ -268,10 +257,14 @@ int main()
         keydown = false;
       }
     }
-    SDL_Delay(10);
+    sdl->delay(10);
   }
 
-  SDL_CloseAudioDevice(device);
+  for (const auto& chunk : chunks)
+  {
+    Mix_FreeChunk(chunk);
+  }
+  Mix_CloseAudio();
 
   return 0;
 }

@@ -26,6 +26,7 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/../build")
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
+find_package(SDL2_mixer REQUIRED)
 
 if(MSVC)
   set(COMPILE_OPTIONS -MP -W4 -WX -wd\"4090\" -wd\"4996\" -wd\"4204\" /D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING /Zc:__cplusplus)
@@ -202,11 +203,12 @@ else()
 	# debian specific
 	set(CPACK_DEBIAN_PACKAGE_MAINTAINER "OpenCrystalCaves Team")
 	set(CPACK_DEBIAN_PACKAGE_SECTION Games)
-	set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libsdl2-image")
+	set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libsdl2-image libsdl2-mixer")
 
 	# fedora/suse specific
 	set(CPACK_RPM_PACKAGE_LICENSE "MIT")
 	set(CPACK_RPM_PACKAGE_REQUIRES "sdl_image >= 2")
+	set(CPACK_RPM_PACKAGE_REQUIRES "sdl_mixer >= 2")
 
 endif()
 include(CPack)

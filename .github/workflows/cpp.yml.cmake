@@ -43,7 +43,7 @@ jobs:
         build/macosx/install-sdl2.sh
     - name: Install dependencies (Windows)
       if: matrix.os == 'windows-latest'
-      run: C:\vcpkg\vcpkg.exe install --triplet x64-windows sdl2 sdl2-image --recurse
+      run: C:\vcpkg\vcpkg.exe install --triplet x64-windows sdl2 sdl2-image sdl2-mixer --recurse
     - name: Configure CMake
       if: matrix.os != 'windows-latest'
       run: |

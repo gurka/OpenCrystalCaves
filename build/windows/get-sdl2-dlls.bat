@@ -18,6 +18,8 @@ set SDL2_URL=https://www.libsdl.org/release/%SDL2_ARCHIVE%
 
 set SDL2_IMAGE_ARCHIVE=SDL2_image-%SDL2_IMAGE_VERSION%-win32-x%BITS%.zip
 set SDL2_IMAGE_URL=https://www.libsdl.org/projects/SDL_image/release/%SDL2_IMAGE_ARCHIVE%
+set SDL2_MIXER_ARCHIVE=SDL2_image-%SDL2_MIXER_VERSION%-win32-x%BITS%.zip
+set SDL2_MIXER_URL=https://www.libsdl.org/projects/SDL_mixer/release/%SDL2_MIXER_ARCHIVE%
 
 rem ========================================================
 
@@ -39,9 +41,11 @@ cd "!DESTDIR!"
 
 call :downloadIfNeeded !SDL2_URL!
 call :downloadIfNeeded !SDL2_IMAGE_URL!
+call :downloadIfNeeded !SDL2_MIXER_URL!
 
 %EXTRACT_COMMAND% !SDL2_ARCHIVE!
 %EXTRACT_COMMAND% !SDL2_IMAGE_ARCHIVE!
+%EXTRACT_COMMAND% !SDL2_MIXER_ARCHIVE!
 
 rem Copy optional DLLs within the optional folders
 copy .\optional\*.dll .

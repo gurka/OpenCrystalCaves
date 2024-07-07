@@ -16,7 +16,7 @@ std::unique_ptr<SDLWrapper> SDLWrapper::create()
 bool SDLWrapperImpl::init()
 {
   // Init SDL
-  if (SDL_Init(SDL_INIT_VIDEO) < 0)
+  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
   {
     LOG_CRITICAL("Could not initialize SDL: %s", SDL_GetError());
     return false;

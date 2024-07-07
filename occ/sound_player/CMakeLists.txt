@@ -6,6 +6,7 @@ target_link_libraries(sound_player
   "utils"
   "sdl_wrapper"
   SDL2::SDL2
+  SDL2_mixer::SDL2_mixer
 )
 if(APPLE)
 	set_target_properties(sound_player PROPERTIES
