@@ -36,7 +36,7 @@ jobs:
     - name: Install SDL via homebrew (Linux, macOS)
       # Because ubuntu 22 doesn't have the latest SDL libs
       if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
-      run: brew install sdl2 sdl2_image
+      run: brew install sdl2 sdl2_image sdl2_mixer
     - name: Install packages (macOS)
       if: matrix.os == 'macos-latest'
       run: |
