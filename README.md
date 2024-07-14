@@ -56,11 +56,10 @@ Or in Windows (with [vcpkg](https://vcpkg.io)):
 # In your projects dir
 git clone --recursive https://github.com/gurka/OpenCrystalCaves.git
 cd OpenCrystalCaves
-mkdir debug
-cmake -Bdebug -DCMAKE_BUILD_TYPE=debug -DCMAKE_TOOLCHAIN_FILE=C:/path/to/vcpkg/scripts/buildsystems/vcpkg.cmake ../occ -A x64
+cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=C:/path/to/vcpkg/scripts/buildsystems/vcpkg.cmake occ -A x64
 ```
 
-The Visual Studio project will be available at `OpenCrystalCaves/debug`
+The Visual Studio project will be available at `OpenCrystalCaves/build`
 
 ## Running OCC
 
