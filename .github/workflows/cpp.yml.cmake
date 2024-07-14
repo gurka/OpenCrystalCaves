@@ -3,8 +3,12 @@ name: C/C++ CI
 on:
   push:
     branches: [ "master" ]
+    tags:
+    - '*'
   pull_request:
     branches: [ "master" ]
+  release:
+    types: [published, created, edited]
 
 env:
   VERSION: @VERSION@

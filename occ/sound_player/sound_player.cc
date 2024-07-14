@@ -24,6 +24,46 @@ https://moddingwiki.shikadi.net/wiki/Crystal_Caves_Sound_format
 #define AUDIO_FMT AUDIO_S16
 #define AUDIO_CHANNELS 2
 
+enum class SoundType : int
+{
+  SOUND_DIALOG,
+  SOUND_UNKNOWN1,
+  SOUND_START_LEVEL,
+  SOUND_UNKNOWN3,
+  SOUND_UNKNOWN4,
+  SOUND_UNKNOWN5,
+  SOUND_UNKNOWN6,
+  SOUND_UNKNOWN7,
+  SOUND_PICKUP_GUN,  // also blue mushrooms
+  SOUND_UNKNOWN9,
+  SOUND_CHEST,
+  SOUND_UNKNOWNB,
+  SOUND_UNKNOWNC,
+  SOUND_UNKNOWND,
+  SOUND_ENEMY_DIE,
+  SOUND_TURRET_FIRE,
+  SOUND_UNKNOWNG,
+  SOUND_POISONED,
+  SOUND_UNKNOWNI,
+  SOUND_UNKNOWNJ,
+  SOUND_LEVER,
+  SOUND_UNKNOWNL,
+  SOUND_UNKNOWNM,
+  SOUND_UNKNOWNN,
+  SOUND_UNKNOWNO,
+  SOUND_UNKNOWNP,
+  SOUND_UNKNOWNQ,
+  SOUND_DRILL,
+  SOUND_UNKNOWNS,
+  SOUND_UNKNOWNT,
+  SOUND_UNKNOWNU,
+  SOUND_APOGEE,
+  SOUND_FADE_OUT,
+  SOUND_DIE,
+  SOUND_UNKNOWNY,
+  SOUND_SWITCH,
+};
+
 struct Sound
 {
   uint16_t priority;
@@ -76,7 +116,7 @@ struct SoundData
 
   std::string to_raw(int sound_index) const
   {
-    const int freq_len = 400;
+    const int freq_len = 360;
     // Bytes per sample (single channel)
     const int bps = (spec.format & 0xFF) / 8;
 
@@ -102,7 +142,7 @@ struct SoundData
       for (int j = 0, freq_counter = 0; j < freq_len; j++, freq_counter++)
       {
         Uint8 amp = dc;
-        // TODO: use vibrate?
+        // TODO: vibrate
         if (freq == 0)
         {
           amp = spec.silence;
@@ -244,7 +284,7 @@ int main()
         if (index >= 0 && index < (int)chunks.size())
         {
           const auto& sound = sdata.sounds[index];
-          std::cout << "Playing sound " << index << " vibrate=" << std::hex << sound.vibrate << " unknown0=" << sound.unknown0
+          std::cout << "Playing sound " << itoc(index) << " vibrate=" << std::hex << sound.vibrate << " unknown0=" << sound.unknown0
                     << " unknown1=" << sound.unknown1 << " unknown2=" << sound.unknown2 << std::dec << "\n";
           if (Mix_PlayChannel(-1, chunks[index], 0) == -1)
           {
