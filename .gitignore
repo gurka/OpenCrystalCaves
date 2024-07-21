@@ -21,7 +21,10 @@ Makefile
 CPack*Config.*
 Testing/
 
-# Build
-build/
-!build/macos/
-!build/windows/
+# Windows
+build/*.dll
+build/*.exe
+build/*.pdb
+
+# macOS
+occ/build/
