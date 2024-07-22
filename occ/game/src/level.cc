@@ -15,37 +15,13 @@ std::vector<Sprite> HORIZON{
   Sprite::SPRITE_HORIZON_3,
   Sprite::SPRITE_HORIZON_4,
 };
-// Different levels use different block colours
-std::vector<Sprite> BLOCK_COLORS{
-  // Intro 1-2
-  Sprite::SPRITE_BLOCK_PEBBLE_NW,
-  Sprite::SPRITE_BLOCK_PEBBLE_NW,
-  // Main
-  Sprite::SPRITE_BLOCK_PEBBLE_NW,
-  // 1-8
-  Sprite::SPRITE_BLOCK_BROWN_NW,
-  Sprite::SPRITE_BLOCK_CYAN_NW,
-  Sprite::SPRITE_BLOCK_PEBBLE_NW,
-  Sprite::SPRITE_BLOCK_CYAN_NW,
-  Sprite::SPRITE_BLOCK_CYAN_NW,
-  Sprite::SPRITE_BLOCK_PEBBLE_NW,
-  Sprite::SPRITE_BLOCK_PEBBLE_NW,
-  Sprite::SPRITE_BLOCK_BLUE_NW,
-  // 9-16
-  Sprite::SPRITE_BLOCK_PEBBLE_NW,
-  Sprite::SPRITE_BLOCK_PEBBLE_NW,
-  Sprite::SPRITE_BLOCK_BLUE_NW,
-  Sprite::SPRITE_BLOCK_BLUE_NW,
-  Sprite::SPRITE_BLOCK_GREEN_NW,
-  Sprite::SPRITE_BLOCK_PEBBLE_NW,
-  Sprite::SPRITE_BLOCK_METAL_NW,
-};
 
 Level::Level(LevelId level_id,
              int width,
              int height,
              const Sprite bg_sprite,
              geometry::Size bg_tile_size,
+             const Sprite block_sprite,
              const std::vector<int>& tile_ids,
              std::vector<int>&& item_ids)
   : level_id(level_id),
@@ -64,7 +40,6 @@ Level::Level(LevelId level_id,
   bool is_volcano = false;
   int volcano_sprite = -1;
   int entrance_level = static_cast<int>(LevelId::LEVEL_1);
-  const int first_block = static_cast<int>(BLOCK_COLORS[static_cast<int>(level_id)]);
   for (int i = 0; i < static_cast<int>(tile_ids.size()); i++)
   {
     const int x = i % width;
@@ -199,39 +174,39 @@ Level::Level(LevelId level_id,
           break;
           // Blocks
         case 'r':
-          sprite = first_block;  // NW
+          sprite = static_cast<int>(block_sprite);  // NW
           flags |= TILE_SOLID;
           break;
         case 't':
-          sprite = first_block + 1;  // N
+          sprite = static_cast<int>(block_sprite) + 1;  // N
           flags |= TILE_SOLID;
           break;
         case 'y':
-          sprite = first_block + 2;  // NE
+          sprite = static_cast<int>(block_sprite) + 2;  // NE
           flags |= TILE_SOLID;
           break;
         case '4':
-          sprite = first_block + 8;  // W
+          sprite = static_cast<int>(block_sprite) + 8;  // W
           flags |= TILE_SOLID;
           break;
         case '5':
-          sprite = first_block + 9;  // MID
+          sprite = static_cast<int>(block_sprite) + 9;  // MID
           flags |= TILE_SOLID;
           break;
         case '6':
-          sprite = first_block + 10;  // E
+          sprite = static_cast<int>(block_sprite) + 10;  // E
           flags |= TILE_SOLID;
           break;
         case 'f':
-          sprite = first_block + 4;  // SW
+          sprite = static_cast<int>(block_sprite) + 4;  // SW
           flags |= TILE_SOLID;
           break;
         case 'g':
-          sprite = first_block + 5;  // S
+          sprite = static_cast<int>(block_sprite) + 5;  // S
           flags |= TILE_SOLID;
           break;
         case 'h':
-          sprite = first_block + 6;  // SE
+          sprite = static_cast<int>(block_sprite) + 6;  // SE
           flags |= TILE_SOLID;
           break;
           // Bumpable platforms

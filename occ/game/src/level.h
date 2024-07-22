@@ -16,6 +16,7 @@ struct Level
         int height,
         const Sprite bg_sprite,
         geometry::Size bg_tile_size,
+        const Sprite block_sprite,
         const std::vector<int>& tile_ids,
         std::vector<int>&& item_ids);
 
