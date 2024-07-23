@@ -84,13 +84,7 @@ const Tile& GameImpl::get_tile(int tile_x, int tile_y) const
 
 const Item& GameImpl::get_item(int tile_x, int tile_y) const
 {
-  if (tile_x < 0 || tile_x >= level_->width || tile_y < 0 || tile_y >= level_->height)
-  {
-    return Item::INVALID;
-  }
-
-  // TODO: implement items
-  return Item::INVALID;
+  return level_->get_item(tile_x, tile_y);
 }
 
 std::wstring GameImpl::get_debug_info() const
@@ -420,26 +414,29 @@ void GameImpl::update_items()
     const auto& item = get_item(position.x(), position.y());
     if (item.valid())
     {
-      if (item.get_type() == 0)
+      switch (item.get_type())
       {
-        LOG_DEBUG("Player took item of type crystal (%d)", item.get_type());
-        score_ += 50;
-      }
-      else if (item.get_type() == 1)
-      {
-        LOG_DEBUG("Player took item of type ammo (%d), amount: %d", item.get_type(), item.get_amount());
-        num_ammo_ += item.get_amount();
+        case ItemType::ITEM_TYPE_CRYSTAL:
+          LOG_DEBUG("Player took item of type crystal (%d)", item.get_type());
+          score_ += CRYSTAL_SCORE;
+          break;
+        case ItemType::ITEM_TYPE_AMMO:
+          LOG_DEBUG("Player took item of type ammo (%d), amount: %d", item.get_type(), item.get_amount());
+          num_ammo_ += item.get_amount();
 
-        // 99 is max ammo
-        num_ammo_ = num_ammo_ > 99 ? 99 : num_ammo_;
-      }
-      else if (item.get_type() == 2)
-      {
-        LOG_DEBUG("Player took item of type score (%d), amount: %d", item.get_type(), item.get_amount());
-        score_ += item.get_amount();
+          // 99 is max ammo
+          num_ammo_ = num_ammo_ > MAX_AMMO ? MAX_AMMO : num_ammo_;
+          break;
+        case ItemType::ITEM_TYPE_SCORE:
+          LOG_DEBUG("Player took item of type score (%d), amount: %d", item.get_type(), item.get_amount());
+          score_ += item.get_amount();
+          break;
+        default:
+          LOG_ERROR("unknown item type");
+          break;
       }
 
-      remove_item(position.x(), position.y());
+      level_->remove_item(position.x(), position.y());
     }
   }
 }
@@ -643,9 +640,4 @@ bool GameImpl::player_on_platform(const geometry::Position& player_position)
   }
 
   return false;
-}
-
-void GameImpl::remove_item(int tile_x, int tile_y)
-{
-  level_->item_ids[(tile_y * level_->width) + tile_x] = -1;  // TODO: Item::INVALID_ID (ObjectManager::INVALID_ID?)
 }

@@ -65,8 +65,6 @@ class GameImpl : public Game
   Enemy* collides_enemy(const geometry::Position& position, const geometry::Size& size);
   bool player_on_platform(const geometry::Position& player_position);
 
-  void remove_item(int tile_x, int tile_y);
-
   Player player_;
   std::unique_ptr<Level> level_;
   std::vector<Enemy> enemies_;

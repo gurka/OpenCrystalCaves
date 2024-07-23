@@ -111,7 +111,11 @@ int main(int argc, char* argv[])
           sprite_manager.render_tile(entrance.get_sprite(), entrance.position);
         }
         sprite_manager.render_tile(static_cast<int>(Sprite::SPRITE_STANDING_RIGHT), level.player_spawn);
-        // TODO: load and render enemies
+        const auto& item = level.get_item(x, y);
+        if (item.valid())
+        {
+          sprite_manager.render_tile(static_cast<int>(item.get_sprite()), {x * SPRITE_W, y * SPRITE_H});
+        }
       }
     }
     window->refresh();

@@ -22,14 +22,13 @@ Level::Level(LevelId level_id,
              const Sprite bg_sprite,
              geometry::Size bg_tile_size,
              const Sprite block_sprite,
-             const std::vector<int>& tile_ids,
-             std::vector<int>&& item_ids)
+             const std::vector<int>& tile_ids)
   : level_id(level_id),
     width(width),
     height(height),
-    item_ids(std::move(item_ids)),
     moving_platforms(),
-    entrances()
+    entrances(),
+    items()
 {
   bool is_stars_row = false;
   bool is_horizon_row = false;
@@ -75,6 +74,7 @@ Level::Level(LevelId level_id,
     int sprite = -1;
     int sprite_count = 1;
     int flags = 0;
+    auto item = Item::INVALID;
     if (is_bumpable_platform)
     {
       switch (tile_id)
@@ -171,6 +171,9 @@ Level::Level(LevelId level_id,
       switch (tile_id)
       {
         case ' ':
+          break;
+        case '+':
+          item = Item(Sprite::SPRITE_CRYSTAL_1_Y, ItemType::ITEM_TYPE_CRYSTAL, 0);
           break;
           // Blocks
         case 'r':
@@ -397,6 +400,7 @@ Level::Level(LevelId level_id,
     }
     tiles.push_back(tile);
     bgs.push_back(bg);
+    items.push_back(item);
   }
 }
 
@@ -416,4 +420,18 @@ int Level::get_bg(const int x, const int y) const
     return -1;
   }
   return bgs[(y * width) + x];
+}
+
+const Item& Level::get_item(const int x, const int y) const
+{
+  if (x < 0 || y >= width || y < 0 || y >= height)
+  {
+    return Item::INVALID;
+  }
+  return items[(y * width) + x];
+}
+
+void Level::remove_item(const int x, const int y)
+{
+  items[(y * width) + x].invalidate();
 }

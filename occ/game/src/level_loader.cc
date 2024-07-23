@@ -112,7 +112,6 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
 
   // Read the tile ids of the level
   std::vector<int> tile_ids;
-  std::vector<int> item_ids;
   int width = 0;
   for (int row = 0; row < levelRows[level]; row++)
   {
@@ -127,8 +126,6 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
     for (int i = 0; i < len; i++, ptr++)
     {
       tile_ids.push_back(static_cast<int>(*ptr));
-      // TODO
-      item_ids.push_back(-1);
     }
   }
   const auto background = levelBGs[static_cast<int>(level_id)];
@@ -138,8 +135,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                                  background.first,
                                  background.second,
                                  blockColors[static_cast<int>(level_id)],
-                                 tile_ids,
-                                 std::move(item_ids));
+                                 tile_ids);
 }
 
 }
