@@ -172,8 +172,22 @@ Level::Level(LevelId level_id,
       {
         case ' ':
           break;
+          // Crystals
         case '+':
           item = Item(Sprite::SPRITE_CRYSTAL_1_Y, ItemType::ITEM_TYPE_CRYSTAL, 0);
+          break;
+        case 'b':
+          item = Item(Sprite::SPRITE_CRYSTAL_1_G, ItemType::ITEM_TYPE_CRYSTAL, 0);
+          break;
+        case 'R':
+          item = Item(Sprite::SPRITE_CRYSTAL_1_R, ItemType::ITEM_TYPE_CRYSTAL, 0);
+          break;
+        case 'c':
+          item = Item(Sprite::SPRITE_CRYSTAL_1_B, ItemType::ITEM_TYPE_CRYSTAL, 0);
+          break;
+          // Ammo
+        case 'G':
+          item = Item(Sprite::SPRITE_PISTOL, ItemType::ITEM_TYPE_AMMO, AMMO_AMOUNT);
           break;
           // Blocks
         case 'r':

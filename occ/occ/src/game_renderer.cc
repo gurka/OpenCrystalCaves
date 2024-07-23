@@ -386,7 +386,7 @@ void GameRenderer::render_items() const
         continue;
       }
 
-      sprite_manager_->render_tile(item.get_sprite(), {tile_x * SPRITE_W, tile_y * SPRITE_H}, game_camera_.position);
+      sprite_manager_->render_tile(static_cast<int>(item.get_sprite()), {tile_x * SPRITE_W, tile_y * SPRITE_H}, game_camera_.position);
     }
   }
 }

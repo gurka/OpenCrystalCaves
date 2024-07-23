@@ -11,6 +11,7 @@ enum class ItemType : int
 
 #define CRYSTAL_SCORE 50
 #define MAX_AMMO 99
+#define AMMO_AMOUNT 5
 
 class Item
 {
