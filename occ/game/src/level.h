@@ -15,10 +15,14 @@ struct Level
   Level(LevelId level_id,
         int width,
         int height,
-        const Sprite bg_sprite,
-        geometry::Size bg_tile_size,
-        const Sprite block_sprite,
-        const std::vector<int>& tile_ids);
+        geometry::Position player_spawn,
+        std::vector<MovingPlatform>&& moving_platforms,
+        std::vector<Entrance>&& entrances,
+        std::vector<int>&& bgs,
+        std::vector<Tile>&& tiles,
+        std::vector<Item>&& items,
+        bool has_earth,
+        bool has_moon);
 
   LevelId level_id;
 
