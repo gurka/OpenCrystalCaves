@@ -28,3 +28,4 @@ build/*.pdb
 
 # macOS
 occ/build/
+build/sound_player

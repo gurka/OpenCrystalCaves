@@ -116,25 +116,33 @@ struct SoundData
 
   std::string to_raw(int sound_index) const
   {
-    const int freq_len = 360;
+    // TODO: use vibrate
+    const bool use_vibrate = false;
+    const int freq_len = 180;
     // Bytes per sample (single channel)
     const int bps = (spec.format & 0xFF) / 8;
 
     // Find length of sound
     const auto& sound = sounds[sound_index];
-    size_t len;
-    for (len = 0;; len++)
+    size_t len = 0;
+    size_t src_len;
+    for (src_len = 0, len = 0;; src_len++, len++)
     {
-      const auto freq = sound.data[len];
-      if (len >= 300 || freq == -1)
+      const auto freq = sound.data[src_len];
+      if (src_len >= 300 || freq == -1)
       {
         break;
+      }
+      len++;
+      if (use_vibrate && (src_len % sound.vibrate) != 0)
+      {
+        len++;
       }
     }
     std::string s(len * freq_len * spec.channels * bps, '\0');
     Uint8* ptr = (Uint8*)s.data();
     Uint8 dc = 64;
-    for (int i = 0; i < len; i++)
+    for (int i = 0; i < src_len; i++)
     {
       // Generate square wave at frequency
       const auto freq = sound.data[i];
@@ -150,6 +158,7 @@ struct SoundData
         else if (freq_counter == freq_interval)
         {
           dc = 64 - dc;
+          amp = dc;
           freq_counter = 0;
         }
         freq_counter++;
@@ -157,7 +166,30 @@ struct SoundData
         {
           for (int b = 0; b < bps; b++)
           {
-            *ptr++ = dc;
+            *ptr++ = amp;
+          }
+        }
+      }
+      for (int j = 0, freq_counter = 0; j < freq_len; j++, freq_counter++)
+      {
+        for (int c = 0; c < spec.channels; c++)
+        {
+          for (int b = 0; b < bps; b++)
+          {
+            *ptr++ = spec.silence;
+          }
+        }
+      }
+      if (use_vibrate && (i % sound.vibrate) != 0)
+      {
+        for (int j = 0, freq_counter = 0; j < freq_len; j++, freq_counter++)
+        {
+          for (int c = 0; c < spec.channels; c++)
+          {
+            for (int b = 0; b < bps; b++)
+            {
+              *ptr++ = spec.silence;
+            }
           }
         }
       }
