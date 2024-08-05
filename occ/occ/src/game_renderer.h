@@ -24,7 +24,6 @@ class GameRenderer
  private:
   void render_background() const;
   void render_player() const;
-  void render_enemies() const;
   void render_tiles(bool in_front) const;
   void render_objects() const;
   void render_items() const;

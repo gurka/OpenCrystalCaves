@@ -25,14 +25,6 @@ bool GameImpl::init(const ExeData& exe_data, const LevelId level)
     return false;
   }
 
-  // TODO: Temporary
-  if (level == LevelId::LEVEL_1)
-  {
-    // Spawn enemies
-    enemies_.emplace_back(geometry::Position(14 * 16, 22 * 16), 2);
-    enemies_.emplace_back(geometry::Position(10 * 16, 17 * 16), 2);
-  }
-
   player_.position = level_->player_spawn;
   entering_level = level;
 
@@ -543,7 +535,7 @@ void GameImpl::update_missile()
 
 void GameImpl::update_enemies()
 {
-  for (auto it = enemies_.begin(); it != enemies_.end();)
+  for (auto it = level_->enemies.begin(); it != level_->enemies.end();)
   {
     // TODO: When enemy getting hit and not dying the enemy sprite should turn white for
     //       some time. All colors except black in the sprite should become white.
@@ -566,10 +558,24 @@ void GameImpl::update_enemies()
       score_ += 500;
 
       // Remove enemy
-      it = enemies_.erase(it);
+      it = level_->enemies.erase(it);
     }
     else
+    {
+      // TODO: big enemies
+      // TODO: select frame it->sprites.size()
+      objects_.emplace_back(it->position, it->sprites[0], 1, false);
       it++;
+    }
+  }
+}
+
+void GameImpl::update_hazards()
+{
+  for (auto&& hazard : level_->hazards)
+  {
+    hazard->update();
+    objects_.emplace_back(hazard->position, static_cast<int>(hazard->get_sprite()), 1, false);
   }
 }
 
@@ -596,17 +602,17 @@ bool GameImpl::collides_solid(const geometry::Position& position, const geometry
 /**
  * Checks if given position and size collides with any enemy.
  *
- * If is colliding with an enemy the index in enemies_ to that enemy is returned
+ * If is colliding with an enemy the index in enemies to that enemy is returned
  * otherwise -1 is returned.
  */
 Enemy* GameImpl::collides_enemy(const geometry::Position& position, const geometry::Size& size)
 {
   const auto rect = geometry::Rectangle(position, size);
-  for (auto i = 0u; i < enemies_.size(); i++)
+  for (auto i = 0u; i < level_->enemies.size(); i++)
   {
-    if (geometry::isColliding(rect, geometry::Rectangle(enemies_[i].position, 16, 16)))
+    if (geometry::isColliding(rect, geometry::Rectangle(level_->enemies[i].position, 16, 16)))
     {
-      return &enemies_[i];
+      return &level_->enemies[i];
     }
   }
   return nullptr;

@@ -2,8 +2,10 @@
 
 #include <vector>
 
+#include "enemy.h"
 #include "entrance.h"
 #include "geometry.h"
+#include "hazard.h"
 #include "item.h"
 #include "level_id.h"
 #include "moving_platform.h"
@@ -12,18 +14,6 @@
 
 struct Level
 {
-  Level(LevelId level_id,
-        int width,
-        int height,
-        geometry::Position player_spawn,
-        std::vector<MovingPlatform>&& moving_platforms,
-        std::vector<Entrance>&& entrances,
-        std::vector<int>&& bgs,
-        std::vector<Tile>&& tiles,
-        std::vector<Item>&& items,
-        bool has_earth,
-        bool has_moon);
-
   LevelId level_id;
 
   int width;
@@ -40,6 +30,8 @@ struct Level
   std::vector<Tile> tiles;
   std::vector<Item> items;
 
+  std::vector<Enemy> enemies;
+  std::vector<std::unique_ptr<Hazard>> hazards;
   std::vector<MovingPlatform> moving_platforms;
   std::vector<Entrance> entrances;
   bool has_earth = false;

@@ -109,15 +109,15 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
   LOG_INFO("Loading level %d", static_cast<int>(level_id));
   // Find the location in exe data of the level
   const char* ptr = exe_data.data.c_str() + levelLoc;
-  int level;
-  for (level = static_cast<int>(LevelId::INTRO); level <= static_cast<int>(LevelId::LEVEL_16); level++)
+  int l;
+  for (l = static_cast<int>(LevelId::INTRO); l <= static_cast<int>(LevelId::LEVEL_16); l++)
   {
-    if (level == static_cast<int>(level_id))
+    if (l == static_cast<int>(level_id))
     {
       break;
     }
     // Skip this level's rows
-    for (int row = 0; row < levelRows[level]; row++)
+    for (int row = 0; row < levelRows[l]; row++)
     {
       const size_t len = *ptr;
       ptr++;
@@ -125,15 +125,17 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
     }
   }
 
+  auto level = std::make_unique<Level>();
+
   // Read the tile ids of the level
   std::vector<int> tile_ids;
-  int width = 0;
-  for (int row = 0; row < levelRows[level]; row++)
+  level->width = 0;
+  for (int row = 0; row < levelRows[l]; row++)
   {
     const int len = *ptr;
-    if (width == 0)
+    if (level->width == 0)
     {
-      width = len;
+      level->width = len;
     }
     ptr++;
     const auto row_str = std::string(ptr).substr(0, len);
@@ -143,17 +145,13 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
       tile_ids.push_back(static_cast<int>(*ptr));
     }
   }
-  geometry::Position player_spawn;
+  level->level_id = level_id;
+  level->height = levelRows[static_cast<int>(level_id)];
   const auto background = levelBGs[static_cast<int>(level_id)];
   const auto block_sprite = blockColors[static_cast<int>(level_id)];
-  std::vector<int> bgs;
-  std::vector<Tile> tiles;
-  std::vector<Item> items;
-  std::vector<MovingPlatform> moving_platforms;
-  std::vector<Entrance> entrances;
 
-  bool has_earth = false;
-  bool has_moon = false;
+  level->has_earth = false;
+  level->has_moon = false;
   bool is_stars_row = false;
   bool is_horizon_row = false;
   bool is_bumpable_platform = false;
@@ -165,7 +163,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
   int entrance_level = static_cast<int>(LevelId::LEVEL_1);
   for (int i = 0; i < static_cast<int>(tile_ids.size()); i++)
   {
-    const int x = i % width;
+    const int x = i % level->width;
     if (x == 0)
     {
       is_stars_row = false;
@@ -177,7 +175,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
       is_volcano = false;
       volcano_sprite = -1;
     }
-    const int y = i / width;
+    const int y = i / level->width;
     const auto tile_id = tile_ids[i];
     Tile tile;
     int bg = static_cast<int>(background.first);
@@ -367,7 +365,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           flags |= TILE_SOLID;
           break;
         case 'H':
-          moving_platforms.push_back({
+          level->moving_platforms.push_back({
             geometry::Position{x * 16, y * 16},
             true,
           });
@@ -389,7 +387,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           flags |= TILE_SOLID;
           break;
         case 'm':
-          has_earth = true;
+          level->has_earth = true;
           break;
         case 'n':
           // TODO: volcano spawn point?
@@ -398,7 +396,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           flags |= TILE_ANIMATED;
           break;
         case 'N':
-          has_moon = true;
+          level->has_moon = true;
           break;
         case 'u':
           // TODO: volcano spawn point?
@@ -407,22 +405,25 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           flags |= TILE_ANIMATED;
           break;
         case 'V':
-          moving_platforms.push_back({
+          level->moving_platforms.push_back({
             geometry::Position{x * 16, y * 16},
             false,
           });
+          break;
+        case 'w':
+          level->hazards.emplace_back(new Laser(geometry::Position{x * 16, y * 16}, false));
           break;
         case 'x':
           // TODO: remember completion state
           // Everything is under construction...
           sprite = static_cast<int>(Sprite::SPRITE_CONES);
           flags |= TILE_RENDER_IN_FRONT;
-          entrances.push_back({geometry::Position{x * 16, y * 16}, entrance_level, EntranceState::CLOSED});
+          level->entrances.push_back({geometry::Position{x * 16, y * 16}, entrance_level, EntranceState::CLOSED});
           entrance_level++;
           break;
         case 'Y':
           // Player spawn
-          player_spawn = geometry::Position(x * 16, y * 16);
+          level->player_spawn = geometry::Position(x * 16, y * 16);
           break;
         case 'z':
           if (is_horizon_row || (x == 0 && tile_ids[i + 1] == 'Z'))
@@ -536,22 +537,12 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
     {
       tile = Tile(sprite, sprite_count, flags);
     }
-    tiles.push_back(tile);
-    bgs.push_back(bg);
-    items.push_back(item);
+    level->tiles.push_back(tile);
+    level->bgs.push_back(bg);
+    level->items.push_back(item);
   }
 
-  return std::make_unique<Level>(level_id,
-                                 width,
-                                 levelRows[static_cast<int>(level_id)],
-                                 player_spawn,
-                                 std::move(moving_platforms),
-                                 std::move(entrances),
-                                 std::move(bgs),
-                                 std::move(tiles),
-                                 std::move(items),
-                                 has_earth,
-                                 has_moon);
+  return level;
 }
 
 }

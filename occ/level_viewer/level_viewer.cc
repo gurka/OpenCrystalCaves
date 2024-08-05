@@ -48,11 +48,11 @@ int main(int argc, char* argv[])
     return 1;
   }
   ExeData exe_data{episode};
-  std::vector<Level> levels;
+  std::vector<std::unique_ptr<Level>> levels;
   for (int level_id = static_cast<int>(LevelId::INTRO); level_id <= static_cast<int>(LevelId::LEVEL_16); level_id++)
   {
     auto l = LevelLoader::load(exe_data, static_cast<LevelId>(level_id));
-    levels.push_back(*l);
+    levels.emplace_back(std::move(l));
   }
   int index = 0;
   auto event = Event::create();
@@ -89,29 +89,33 @@ int main(int argc, char* argv[])
     const auto& level = levels[index];
 
     window->fill_rect(geometry::Rectangle(0, 0, WIN_SIZE), {33u, 33u, 33u});
-    for (int y = 0; y < level.height; y++)
+    for (int y = 0; y < level->height; y++)
     {
-      for (int x = 0; x < level.width; x++)
+      for (int x = 0; x < level->width; x++)
       {
-        const auto bg_id = level.get_bg(x, y);
+        const auto bg_id = level->get_bg(x, y);
         if (bg_id != -1)
         {
           sprite_manager.render_tile(bg_id, {x * SPRITE_W, y * SPRITE_H});
         }
 
-        const auto tile = level.get_tile(x, y);
+        const auto tile = level->get_tile(x, y);
         const auto sprite_id = tile.get_sprite();
         sprite_manager.render_tile(sprite_id, {x * SPRITE_W, y * SPRITE_H});
-        for (const auto& platform : level.moving_platforms)
+        for (const auto& hazard : level->hazards)
+        {
+          sprite_manager.render_tile(static_cast<int>(hazard->get_sprite()), hazard->position);
+        }
+        for (const auto& platform : level->moving_platforms)
         {
           sprite_manager.render_tile(platform.sprite_id, platform.position);
         }
-        for (const auto& entrance : level.entrances)
+        for (const auto& entrance : level->entrances)
         {
           sprite_manager.render_tile(entrance.get_sprite(), entrance.position);
         }
-        sprite_manager.render_tile(static_cast<int>(Sprite::SPRITE_STANDING_RIGHT), level.player_spawn);
-        const auto& item = level.get_item(x, y);
+        sprite_manager.render_tile(static_cast<int>(Sprite::SPRITE_STANDING_RIGHT), level->player_spawn);
+        const auto& item = level->get_item(x, y);
         if (item.valid())
         {
           sprite_manager.render_tile(static_cast<int>(item.get_sprite()), {x * SPRITE_W, y * SPRITE_H});

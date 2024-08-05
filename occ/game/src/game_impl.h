@@ -7,6 +7,7 @@
 
 #include "enemy.h"
 #include "explosion.h"
+#include "hazard.h"
 #include "level.h"
 #include "missile.h"
 #include "player.h"
@@ -15,19 +16,7 @@
 class GameImpl : public Game
 {
  public:
-  GameImpl()
-    : player_(),
-      level_(),
-      enemies_(),
-      objects_(),
-      score_(0u),
-      num_ammo_(0u),
-      num_lives_(0u),
-      has_key_(false),
-      missile_(),
-      explosion_()
-  {
-  }
+  GameImpl() : player_(), level_(), objects_(), score_(0u), num_ammo_(0u), num_lives_(0u), has_key_(false), missile_(), explosion_() {}
 
   bool init(const ExeData& exe_data, const LevelId level) override;
   void update(unsigned game_tick, const PlayerInput& player_input) override;
@@ -42,8 +31,6 @@ class GameImpl : public Game
   int get_bg_sprite(const int x, const int y) const override;
   const Tile& get_tile(int tile_x, int tile_y) const override;
   const Item& get_item(int tile_x, int tile_y) const override;
-
-  const std::vector<Enemy>& get_enemies() const override { return enemies_; }
 
   const std::vector<Object>& get_objects() const override { return objects_; }
 
@@ -60,6 +47,7 @@ class GameImpl : public Game
   void update_items();
   void update_missile();
   void update_enemies();
+  void update_hazards();
 
   bool collides_solid(const geometry::Position& position, const geometry::Size& size);
   Enemy* collides_enemy(const geometry::Position& position, const geometry::Size& size);
@@ -67,9 +55,7 @@ class GameImpl : public Game
 
   Player player_;
   std::unique_ptr<Level> level_;
-  std::vector<Enemy> enemies_;
   std::vector<Object> objects_;
-  std::vector<Entrance> entrances_;
 
   unsigned score_;
   unsigned num_ammo_;

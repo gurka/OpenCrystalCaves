@@ -5,6 +5,7 @@
 
 #include "enemy.h"
 #include "exe_data.h"
+#include "hazard.h"
 #include "item.h"
 #include "level_id.h"
 #include "object.h"
@@ -34,8 +35,6 @@ class Game
   virtual int get_bg_sprite(const int x, const int y) const = 0;
   virtual const Tile& get_tile(int tile_x, int tile_y) const = 0;
   virtual const Item& get_item(int tile_x, int tile_y) const = 0;
-
-  virtual const std::vector<Enemy>& get_enemies() const = 0;
 
   virtual const std::vector<Object>& get_objects() const = 0;
 

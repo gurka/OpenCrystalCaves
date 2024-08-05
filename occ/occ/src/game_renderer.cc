@@ -76,7 +76,6 @@ void GameRenderer::render_game() const
   render_tiles(false);
   render_objects();
   render_player();
-  render_enemies();
   render_tiles(true);
   render_items();
   render_statusbar();
@@ -284,26 +283,6 @@ void GameRenderer::render_player() const
   if (debug_)
   {
     window_.render_rectangle(dest_rect, {255, 0, 0});
-  }
-}
-
-void GameRenderer::render_enemies() const
-{
-  for (const auto& enemy : game_->get_enemies())
-  {
-    static constexpr geometry::Size object_size = geometry::Size(16, 16);
-    if (geometry::isColliding(geometry::Rectangle(enemy.position, object_size), game_camera_))
-    {
-      const auto sprite_id = enemy.sprites[game_tick_ % enemy.sprites.size()];
-      sprite_manager_->render_tile(sprite_id, enemy.position, game_camera_.position);
-
-      if (debug_)
-      {
-        const geometry::Rectangle dest_rect{
-          enemy.position.x() - game_camera_.position.x(), enemy.position.y() - game_camera_.position.y(), object_size.x(), object_size.y()};
-        window_.render_rectangle(dest_rect, {255, 0, 0});
-      }
-    }
   }
 }
 

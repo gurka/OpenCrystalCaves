@@ -117,7 +117,7 @@ struct SoundData
   std::string to_raw(int sound_index) const
   {
     // TODO: use vibrate
-    const bool use_vibrate = false;
+    constexpr bool use_vibrate = false;
     const int freq_len = 180;
     // Bytes per sample (single channel)
     const int bps = (spec.format & 0xFF) / 8;
