@@ -250,6 +250,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           flags |= TILE_SOLID_TOP;
           is_sign = false;
           break;
+        case '#':  // [# = 2x2 grille
+          sprite = static_cast<int>(Sprite::SPRITE_GRILLE_2);
+          is_sign = false;
+          break;
         default:
           break;
       }
@@ -293,6 +297,11 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
       switch (tile_id)
       {
         case ' ':
+          break;
+        case '#':
+          // Spider
+          level->enemies.emplace_back(new Spider(geometry::Position{x * 16, y * 16}, false));
+          break;
           break;
           // Crystals
         case '+':
@@ -460,6 +469,11 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             case 'd':
               sprite = static_cast<int>(Sprite::SPRITE_DANGER_1);
               flags |= TILE_SOLID_TOP;
+              is_sign = true;
+              break;
+            case '#':
+              // [# = 2x2 grille
+              sprite = static_cast<int>(Sprite::SPRITE_GRILLE_1);
               is_sign = true;
               break;
             default:

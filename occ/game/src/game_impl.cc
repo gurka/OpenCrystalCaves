@@ -542,9 +542,10 @@ void GameImpl::update_enemies()
     //       This is applicable for when the player gets hit as well
     //       Modify the sprite on the fly / some kind of filter, or pre-create white sprites
     //       for all player and enemy sprite when loading sprites?
+    (*it)->update();
 
     // Check if enemy died
-    if (it->health == 0)
+    if ((*it)->health == 0)
     {
       // TODO: When an enemy dies there should be another type of explosion
       //       or bones spawning. The explosion/bones should move during animation
@@ -552,7 +553,7 @@ void GameImpl::update_enemies()
       // Create explosion where enemy is
       explosion_.alive = true;
       explosion_.frame = 0;
-      explosion_.position = it->position;
+      explosion_.position = (*it)->position;
 
       // Give score (?)
       score_ += 500;
@@ -563,8 +564,7 @@ void GameImpl::update_enemies()
     else
     {
       // TODO: big enemies
-      // TODO: select frame it->sprites.size()
-      objects_.emplace_back(it->position, it->sprites[0], 1, false);
+      objects_.emplace_back((*it)->position, static_cast<int>((*it)->get_sprite()), 1, false);
       it++;
     }
   }
@@ -610,9 +610,9 @@ Enemy* GameImpl::collides_enemy(const geometry::Position& position, const geomet
   const auto rect = geometry::Rectangle(position, size);
   for (auto i = 0u; i < level_->enemies.size(); i++)
   {
-    if (geometry::isColliding(rect, geometry::Rectangle(level_->enemies[i].position, 16, 16)))
+    if (geometry::isColliding(rect, geometry::Rectangle(level_->enemies[i]->position, 16, 16)))
     {
-      return &level_->enemies[i];
+      return level_->enemies[i].get();
     }
   }
   return nullptr;

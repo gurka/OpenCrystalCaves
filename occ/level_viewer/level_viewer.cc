@@ -102,6 +102,10 @@ int main(int argc, char* argv[])
         const auto tile = level->get_tile(x, y);
         const auto sprite_id = tile.get_sprite();
         sprite_manager.render_tile(sprite_id, {x * SPRITE_W, y * SPRITE_H});
+        for (const auto& enemy : level->enemies)
+        {
+          sprite_manager.render_tile(static_cast<int>(enemy->get_sprite()), enemy->position);
+        }
         for (const auto& hazard : level->hazards)
         {
           sprite_manager.render_tile(static_cast<int>(hazard->get_sprite()), hazard->position);

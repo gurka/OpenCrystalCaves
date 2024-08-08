@@ -30,7 +30,7 @@ struct Level
   std::vector<Tile> tiles;
   std::vector<Item> items;
 
-  std::vector<Enemy> enemies;
+  std::vector<std::unique_ptr<Enemy>> enemies;
   std::vector<std::unique_ptr<Hazard>> hazards;
   std::vector<MovingPlatform> moving_platforms;
   std::vector<Entrance> entrances;

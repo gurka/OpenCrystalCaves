@@ -26,7 +26,7 @@ https://moddingwiki.shikadi.net/wiki/Crystal_Caves_Sound_format
 
 enum class SoundType : int
 {
-  SOUND_DIALOG,
+  SOUND_JUMP,
   SOUND_UNKNOWN1,
   SOUND_START_LEVEL,
   SOUND_UNKNOWN3,
@@ -42,10 +42,10 @@ enum class SoundType : int
   SOUND_UNKNOWND,
   SOUND_ENEMY_DIE,
   SOUND_TURRET_FIRE,
-  SOUND_UNKNOWNG,
+  SOUND_ICE_BREAK,
   SOUND_POISONED,
   SOUND_UNKNOWNI,
-  SOUND_UNKNOWNJ,
+  SOUND_SWITCH,
   SOUND_LEVER,
   SOUND_UNKNOWNL,
   SOUND_UNKNOWNM,
@@ -61,7 +61,7 @@ enum class SoundType : int
   SOUND_FADE_OUT,
   SOUND_DIE,
   SOUND_UNKNOWNY,
-  SOUND_SWITCH,
+  SOUND_UNKNOWNZ,
 };
 
 struct Sound
@@ -116,8 +116,6 @@ struct SoundData
 
   std::string to_raw(int sound_index) const
   {
-    // TODO: use vibrate
-    constexpr bool use_vibrate = false;
     const int freq_len = 180;
     // Bytes per sample (single channel)
     const int bps = (spec.format & 0xFF) / 8;
@@ -134,7 +132,7 @@ struct SoundData
         break;
       }
       len++;
-      if (use_vibrate && (src_len % sound.vibrate) != 0)
+      if ((src_len % sound.vibrate) != 0)
       {
         len++;
       }
@@ -150,7 +148,6 @@ struct SoundData
       for (int j = 0, freq_counter = 0; j < freq_len; j++, freq_counter++)
       {
         Uint8 amp = dc;
-        // TODO: vibrate
         if (freq == 0)
         {
           amp = spec.silence;
@@ -170,17 +167,7 @@ struct SoundData
           }
         }
       }
-      for (int j = 0, freq_counter = 0; j < freq_len; j++, freq_counter++)
-      {
-        for (int c = 0; c < spec.channels; c++)
-        {
-          for (int b = 0; b < bps; b++)
-          {
-            *ptr++ = spec.silence;
-          }
-        }
-      }
-      if (use_vibrate && (i % sound.vibrate) != 0)
+      if ((i % sound.vibrate) != 0)
       {
         for (int j = 0, freq_counter = 0; j < freq_len; j++, freq_counter++)
         {

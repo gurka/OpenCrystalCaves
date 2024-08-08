@@ -1,23 +1,34 @@
-#ifndef ENEMY_H_
-#define ENEMY_H_
-
+#pragma once
 #include <utility>
 
 #include "geometry.h"
 #include "misc.h"
+#include "sprite.h"
 
-struct Enemy
+class Enemy
 {
-  Enemy(geometry::Position position, int health)
-    : position(std::move(position)),
-      health(health)
-  {
-  }
+ public:
+  Enemy(geometry::Position position, int health, int points) : position(std::move(position)), health(health), points(points) {}
+  virtual ~Enemy() = default;
+
+  virtual void update() = 0;
+  virtual Sprite get_sprite() const = 0;
 
   geometry::Position position;
   int health;
-
-  static constexpr auto sprites = misc::make_array(68, 69, 70, 71);
+  int points;
 };
 
-#endif  // ENEMY_H_
+class Spider : public Enemy
+{
+  // Moves up and down, shoots webs ahead
+ public:
+  Spider(geometry::Position position, bool up) : Enemy(position, 1, 100), up_(up), frame_(0) {}
+
+  virtual void update() override;
+  virtual Sprite get_sprite() const override;
+
+ private:
+  bool up_;
+  int frame_;
+};
