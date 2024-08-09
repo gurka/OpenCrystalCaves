@@ -305,7 +305,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             break;
           case '#':
             // Spider
-            level->enemies.emplace_back(new Spider(geometry::Position{x * 16, y * 16}, false));
+            level->enemies.emplace_back(new Spider(geometry::Position{x * 16, y * 16}));
             break;
             // Crystals
           case '+':
@@ -417,6 +417,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case 'N':
             level->has_moon = true;
             break;
+          case 'S':
+            // Snake
+            level->enemies.emplace_back(new Snake(geometry::Position{x * 16, y * 16}));
+            break;
           case 'u':
             // TODO: volcano spawn point?
             sprite = static_cast<int>(Sprite::SPRITE_VOLCANO_EJECTA_R_1);
@@ -492,7 +496,11 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             }
             break;
           case '/':
-            level->enemies.emplace_back(new Hopper(geometry::Position{x * 16, y * 16}, false));
+            level->enemies.emplace_back(new Hopper(geometry::Position{x * 16, y * 16}));
+            break;
+          case '_':
+            sprite = static_cast<int>(Sprite::SPRITE_PLATFORM_BLUE);
+            flags |= TILE_SOLID_TOP;
             break;
           case -6:
             sprite = static_cast<int>(Sprite::SPRITE_BARREL_CRACKED);
