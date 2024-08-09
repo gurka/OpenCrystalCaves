@@ -104,6 +104,17 @@ std::vector<Sprite> HORIZON{
   Sprite::SPRITE_HORIZON_4,
 };
 
+enum class TileMode
+{
+  NONE,
+  BUMPABLE_PLATFORM,
+  SIGN,
+  WOOD_STRUT,
+  WOOD_PILLAR,
+  VOLCANO,
+  EJECTA,
+};
+
 std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
 {
   LOG_INFO("Loading level %d", static_cast<int>(level_id));
@@ -154,11 +165,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
   level->has_moon = false;
   bool is_stars_row = false;
   bool is_horizon_row = false;
-  bool is_bumpable_platform = false;
-  bool is_sign = false;
-  bool is_wood_strut = false;
-  bool is_wood_pillar = false;
-  bool is_volcano = false;
+  auto mode = TileMode::NONE;
   int volcano_sprite = -1;
   int entrance_level = static_cast<int>(LevelId::LEVEL_1);
   for (int i = 0; i < static_cast<int>(tile_ids.size()); i++)
@@ -168,11 +175,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
     {
       is_stars_row = false;
       is_horizon_row = false;
-      is_bumpable_platform = false;
-      is_sign = false;
-      is_wood_strut = false;
-      is_wood_pillar = false;
-      is_volcano = false;
+      mode = TileMode::NONE;
       volcano_sprite = -1;
     }
     const int y = i / level->width;
@@ -197,351 +200,381 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
     int sprite_count = 1;
     int flags = 0;
     auto item = Item::INVALID;
-    if (is_bumpable_platform)
+    switch (mode)
     {
-      switch (tile_id)
-      {
-        case 'd':
-        case -103:
-          sprite = static_cast<int>(Sprite::SPRITE_BUMP_PLATFORM_RED_MID);
-          flags |= TILE_SOLID;
-          if (tile_ids[i] == -103)
-          {
-            // TODO: add hidden crystal
-          }
-          break;
-        case 'n':
-        case -102:
-          sprite = static_cast<int>(Sprite::SPRITE_BUMP_PLATFORM_RED_MID);
-          flags |= TILE_SOLID;
-          if (tile_ids[i] == -102)
-          {
-            // TODO: add hidden crystal
-          }
-          is_bumpable_platform = false;
-          break;
-        default:
-          break;
-      }
-    }
-    else if (is_sign)
-    {
-      switch (tile_id)
-      {
-          // [4n = winners drugs sign
-        case '4':
-          sprite = static_cast<int>(Sprite::SPRITE_WINNERS_2);
-          flags |= TILE_SOLID_TOP;
-          break;
-        case 'n':
-          sprite = static_cast<int>(Sprite::SPRITE_WINNERS_3);
-          flags |= TILE_SOLID_TOP;
-          is_sign = false;
-          break;
-          // [m = mine sign
-        case 'm':
-          sprite = static_cast<int>(Sprite::SPRITE_MINE_SIGN_2);
-          flags |= TILE_RENDER_IN_FRONT;
-          is_sign = false;
-          break;
-          // [d = danger sign
-        case 'd':
-          sprite = static_cast<int>(Sprite::SPRITE_DANGER_2);
-          flags |= TILE_SOLID_TOP;
-          is_sign = false;
-          break;
-        case '#':  // [# = 2x2 grille
-          sprite = static_cast<int>(Sprite::SPRITE_GRILLE_2);
-          is_sign = false;
-          break;
-        default:
-          break;
-      }
-    }
-    else if (is_wood_strut)
-    {
-      switch (tile_id)
-      {
-        case 'n':
-          sprite = static_cast<int>(Sprite::SPRITE_WOOD_STRUT_2);
-          is_wood_strut = false;
-          break;
-        default:
-          break;
-      }
-    }
-    else if (is_wood_pillar)
-    {
-      switch (tile_id)
-      {
-        case 'n':
-          sprite = static_cast<int>(Sprite::SPRITE_WOOD_PILLAR_2);
-          is_wood_pillar = false;
-          break;
-        default:
-          break;
-      }
-    }
-    else if (is_volcano)
-    {
-      sprite = volcano_sprite;
-      volcano_sprite++;
-      if (tile_ids[i + 1] != 'n')
-      {
-        is_volcano = false;
-        volcano_sprite = -1;
-      }
-    }
-    else
-    {
-      switch (tile_id)
-      {
-        case ' ':
-          break;
-        case '#':
-          // Spider
-          level->enemies.emplace_back(new Spider(geometry::Position{x * 16, y * 16}, false));
-          break;
-          break;
-          // Crystals
-        case '+':
-          item = Item(Sprite::SPRITE_CRYSTAL_1_Y, ItemType::ITEM_TYPE_CRYSTAL, 0);
-          break;
-        case 'b':
-          item = Item(Sprite::SPRITE_CRYSTAL_1_G, ItemType::ITEM_TYPE_CRYSTAL, 0);
-          break;
-        case 'R':
-          item = Item(Sprite::SPRITE_CRYSTAL_1_R, ItemType::ITEM_TYPE_CRYSTAL, 0);
-          break;
-        case 'c':
-          item = Item(Sprite::SPRITE_CRYSTAL_1_B, ItemType::ITEM_TYPE_CRYSTAL, 0);
-          break;
-          // Ammo
-        case 'G':
-          item = Item(Sprite::SPRITE_PISTOL, ItemType::ITEM_TYPE_AMMO, AMMO_AMOUNT);
-          break;
-          // Blocks
-        case 'r':
-          sprite = static_cast<int>(block_sprite);  // NW
-          flags |= TILE_SOLID;
-          break;
-        case 't':
-          sprite = static_cast<int>(block_sprite) + 1;  // N
-          flags |= TILE_SOLID;
-          break;
-        case 'y':
-          sprite = static_cast<int>(block_sprite) + 2;  // NE
-          flags |= TILE_SOLID;
-          break;
-        case '4':
-          sprite = static_cast<int>(block_sprite) + 8;  // W
-          flags |= TILE_SOLID;
-          break;
-        case '5':
-          sprite = static_cast<int>(block_sprite) + 9;  // MID
-          flags |= TILE_SOLID;
-          break;
-        case '6':
-          sprite = static_cast<int>(block_sprite) + 10;  // E
-          flags |= TILE_SOLID;
-          break;
-        case 'f':
-          sprite = static_cast<int>(block_sprite) + 4;  // SW
-          flags |= TILE_SOLID;
-          break;
-        case 'g':
-          sprite = static_cast<int>(block_sprite) + 5;  // S
-          flags |= TILE_SOLID;
-          break;
-        case 'h':
-          sprite = static_cast<int>(block_sprite) + 6;  // SE
-          flags |= TILE_SOLID;
-          break;
-          // Bumpable platforms
-        case 'D':
-        case -104:
-          // Keep adding bumpable platforms until we get an 'n'
-          sprite = static_cast<int>(Sprite::SPRITE_BUMP_PLATFORM_RED_L);
-          flags |= TILE_SOLID;
-          if (tile_id == -104)
-          {
-            // TODO: add hidden crystal
-          }
-          is_bumpable_platform = true;
-          break;
-        case 'd':
-          sprite = static_cast<int>(Sprite::SPRITE_BUMP_PLATFORM_RED_MID);
-          flags |= TILE_SOLID;
-          break;
-        case 'H':
-          level->moving_platforms.push_back({
-            geometry::Position{x * 16, y * 16},
-            true,
-          });
-          break;
-        case 'k':
-          sprite = static_cast<int>(Sprite::SPRITE_CONCRETE_V);
-          flags |= TILE_SOLID;
-          break;
-        case 'K':
-          sprite = static_cast<int>(Sprite::SPRITE_CONCRETE);
-          flags |= TILE_SOLID;
-          break;
-        case 'l':
-          sprite = static_cast<int>(Sprite::SPRITE_CONCRETE_X);
-          flags |= TILE_SOLID;
-          break;
-        case 'L':
-          sprite = static_cast<int>(Sprite::SPRITE_CONCRETE_H);
-          flags |= TILE_SOLID;
-          break;
-        case 'm':
-          level->has_earth = true;
-          break;
-        case 'n':
-          // TODO: volcano spawn point?
-          sprite = static_cast<int>(Sprite::SPRITE_VOLCANO_EJECTA_L_1);
-          sprite_count = 4;
-          flags |= TILE_ANIMATED;
-          break;
-        case 'N':
-          level->has_moon = true;
-          break;
-        case 'u':
-          // TODO: volcano spawn point?
-          sprite = static_cast<int>(Sprite::SPRITE_VOLCANO_EJECTA_R_1);
-          sprite_count = 4;
-          flags |= TILE_ANIMATED;
-          break;
-        case 'V':
-          level->moving_platforms.push_back({
-            geometry::Position{x * 16, y * 16},
-            false,
-          });
-          break;
-        case 'w':
-          level->hazards.emplace_back(new Laser(geometry::Position{x * 16, y * 16}, false));
-          break;
-        case 'x':
-          // TODO: remember completion state
-          // Everything is under construction...
-          sprite = static_cast<int>(Sprite::SPRITE_CONES);
-          flags |= TILE_RENDER_IN_FRONT;
-          level->entrances.push_back({geometry::Position{x * 16, y * 16}, entrance_level, EntranceState::CLOSED});
-          entrance_level++;
-          break;
-        case 'Y':
-          // Player spawn
-          level->player_spawn = geometry::Position(x * 16, y * 16);
-          break;
-        case 'z':
-          if (is_horizon_row || (x == 0 && tile_ids[i + 1] == 'Z'))
-          {
-            // Random horizon tile
-            bg = static_cast<int>(HORIZON[rand() % HORIZON.size()]);
-            is_horizon_row = true;
-          }
-          else
-          {
-            // Random star tile
-            bg = static_cast<int>(STARS[rand() % STARS.size()]);
-            is_stars_row = true;
-          }
-          break;
-        case 'Z':
-          break;
-        case '[':
-          switch (tile_ids[i + 1])
-          {
-              // [4n = winners drugs sign
-            case '4':
-              sprite = static_cast<int>(Sprite::SPRITE_WINNERS_1);
-              flags |= TILE_SOLID_TOP;
-              is_sign = true;
-              break;
-              // [m = mine sign
-            case 'm':
-              sprite = static_cast<int>(Sprite::SPRITE_MINE_SIGN_1);
-              flags |= TILE_RENDER_IN_FRONT;
-              is_sign = true;
-              break;
-              // [d = danger sign
-            case 'd':
-              sprite = static_cast<int>(Sprite::SPRITE_DANGER_1);
-              flags |= TILE_SOLID_TOP;
-              is_sign = true;
-              break;
-            case '#':
-              // [# = 2x2 grille
-              sprite = static_cast<int>(Sprite::SPRITE_GRILLE_1);
-              is_sign = true;
-              break;
-            default:
-              break;
-          }
-          break;
-        case -6:
-          sprite = static_cast<int>(Sprite::SPRITE_BARREL_CRACKED);
-          flags |= TILE_SOLID_TOP;
-          break;
-        case -7:
-          sprite = static_cast<int>(Sprite::SPRITE_BARREL);
-          flags |= TILE_SOLID_TOP;
-          break;
-        case -16:
-          if (tile_ids[i + 1] == 'n')
-          {
-            // Wood struts
-            sprite = static_cast<int>(Sprite::SPRITE_WOOD_STRUT_1);
-            is_wood_strut = true;
-          }
-          break;
-        case -43:
-          // TODO: animated
-          sprite = static_cast<int>(Sprite::SPRITE_TORCH_1);
-          sprite_count = 4;
-          flags |= TILE_ANIMATED;
-          break;
-        case -58:
-          sprite = static_cast<int>(Sprite::SPRITE_SIGN_DOWN);
-          break;
-        case -77:
-          if (tile_ids[i + 1] == 'n')
-          {
-            // Wood pillar
-            sprite = static_cast<int>(Sprite::SPRITE_WOOD_PILLAR_1);
-            is_wood_pillar = true;
-          }
-          break;
-        case -78:
-          sprite = static_cast<int>(Sprite::SPRITE_WOOD_V);
-          flags |= TILE_SOLID;
-          break;
-        case -79:
-          sprite = static_cast<int>(Sprite::SPRITE_WOOD_H);
-          flags |= TILE_SOLID;
-          break;
-        case -113:
-          if (tile_ids[i + 1] == 'n')
-          {
-            // -113 nnn = bottom of volcano
-            sprite = static_cast<int>(Sprite::SPRITE_VOLCANO_BOTTOM_1);
-            is_volcano = true;
-            volcano_sprite = sprite + 1;
-          }
-          break;
-        case -114:
-          if (tile_ids[i + 1] == 'n')
-          {
-            // -114 n = top of volcano
-            sprite = static_cast<int>(Sprite::SPRITE_VOLCANO_TOP_1);
-            is_volcano = true;
-            volcano_sprite = sprite + 1;
-          }
-          break;
-        default:
-          break;
-      }
+      case TileMode::BUMPABLE_PLATFORM:
+        switch (tile_id)
+        {
+          case 'd':
+          case -103:
+            sprite = static_cast<int>(Sprite::SPRITE_BUMP_PLATFORM_RED_MID);
+            flags |= TILE_SOLID;
+            if (tile_ids[i] == -103)
+            {
+              // TODO: add hidden crystal
+            }
+            break;
+          case 'n':
+          case -102:
+            sprite = static_cast<int>(Sprite::SPRITE_BUMP_PLATFORM_RED_MID);
+            flags |= TILE_SOLID;
+            if (tile_ids[i] == -102)
+            {
+              // TODO: add hidden crystal
+            }
+            mode = TileMode::NONE;
+            break;
+          default:
+            break;
+        }
+        break;
+      case TileMode::SIGN:
+        switch (tile_id)
+        {
+            // [4n = winners drugs sign
+          case '4':
+            sprite = static_cast<int>(Sprite::SPRITE_WINNERS_2);
+            flags |= TILE_SOLID_TOP;
+            break;
+          case 'n':
+            sprite = static_cast<int>(Sprite::SPRITE_WINNERS_3);
+            flags |= TILE_SOLID_TOP;
+            mode = TileMode::NONE;
+            break;
+            // [m = mine sign
+          case 'm':
+            sprite = static_cast<int>(Sprite::SPRITE_MINE_SIGN_2);
+            flags |= TILE_RENDER_IN_FRONT;
+            mode = TileMode::NONE;
+            break;
+            // [d = danger sign
+          case 'd':
+            sprite = static_cast<int>(Sprite::SPRITE_DANGER_2);
+            flags |= TILE_SOLID_TOP;
+            mode = TileMode::NONE;
+            break;
+          case '#':  // [# = 2x2 grille
+            sprite = static_cast<int>(Sprite::SPRITE_GRILLE_2);
+            mode = TileMode::NONE;
+            break;
+          default:
+            break;
+        }
+        break;
+      case TileMode::WOOD_STRUT:
+        switch (tile_id)
+        {
+          case 'n':
+            sprite = static_cast<int>(Sprite::SPRITE_WOOD_STRUT_2);
+            mode = TileMode::NONE;
+            break;
+          default:
+            break;
+        }
+        break;
+      case TileMode::WOOD_PILLAR:
+        switch (tile_id)
+        {
+          case 'n':
+            sprite = static_cast<int>(Sprite::SPRITE_WOOD_PILLAR_2);
+            mode = TileMode::NONE;
+            break;
+          default:
+            break;
+        }
+        break;
+      case TileMode::VOLCANO:
+        sprite = volcano_sprite;
+        volcano_sprite++;
+        if (tile_ids[i + 1] != 'n')
+        {
+          mode = TileMode::NONE;
+          volcano_sprite = -1;
+        }
+        break;
+      case TileMode::EJECTA:
+        sprite = static_cast<int>(Sprite::SPRITE_VOLCANO_EJECTA_L_1);
+        sprite_count = 4;
+        flags |= TILE_ANIMATED;
+        mode = TileMode::NONE;
+        break;
+      default:
+        switch (tile_id)
+        {
+          case ' ':
+            break;
+          case '#':
+            // Spider
+            level->enemies.emplace_back(new Spider(geometry::Position{x * 16, y * 16}, false));
+            break;
+            // Crystals
+          case '+':
+            item = Item(Sprite::SPRITE_CRYSTAL_1_Y, ItemType::ITEM_TYPE_CRYSTAL, 0);
+            break;
+          case 'b':
+            item = Item(Sprite::SPRITE_CRYSTAL_1_G, ItemType::ITEM_TYPE_CRYSTAL, 0);
+            break;
+          case 'R':
+            item = Item(Sprite::SPRITE_CRYSTAL_1_R, ItemType::ITEM_TYPE_CRYSTAL, 0);
+            break;
+          case 'c':
+            item = Item(Sprite::SPRITE_CRYSTAL_1_B, ItemType::ITEM_TYPE_CRYSTAL, 0);
+            break;
+            // Ammo
+          case 'G':
+            item = Item(Sprite::SPRITE_PISTOL, ItemType::ITEM_TYPE_AMMO, AMMO_AMOUNT);
+            break;
+            // Blocks
+          case 'r':
+            sprite = static_cast<int>(block_sprite);  // NW
+            flags |= TILE_SOLID;
+            break;
+          case 't':
+            sprite = static_cast<int>(block_sprite) + 1;  // N
+            flags |= TILE_SOLID;
+            break;
+          case 'y':
+            sprite = static_cast<int>(block_sprite) + 2;  // NE
+            flags |= TILE_SOLID;
+            break;
+          case '4':
+            sprite = static_cast<int>(block_sprite) + 8;  // W
+            flags |= TILE_SOLID;
+            break;
+          case '5':
+            sprite = static_cast<int>(block_sprite) + 9;  // MID
+            flags |= TILE_SOLID;
+            break;
+          case '6':
+            sprite = static_cast<int>(block_sprite) + 10;  // E
+            flags |= TILE_SOLID;
+            break;
+          case 'f':
+            sprite = static_cast<int>(block_sprite) + 4;  // SW
+            flags |= TILE_SOLID;
+            break;
+          case 'g':
+            sprite = static_cast<int>(block_sprite) + 5;  // S
+            flags |= TILE_SOLID;
+            break;
+          case 'h':
+            sprite = static_cast<int>(block_sprite) + 6;  // SE
+            flags |= TILE_SOLID;
+            break;
+            // Bumpable platforms
+          case 'D':
+          case -104:
+            // Keep adding bumpable platforms until we get an 'n'
+            sprite = static_cast<int>(Sprite::SPRITE_BUMP_PLATFORM_RED_L);
+            flags |= TILE_SOLID;
+            if (tile_id == -104)
+            {
+              // TODO: add hidden crystal
+            }
+            mode = TileMode::BUMPABLE_PLATFORM;
+            break;
+          case 'd':
+            sprite = static_cast<int>(Sprite::SPRITE_BUMP_PLATFORM_RED_MID);
+            flags |= TILE_SOLID;
+            break;
+          case 'H':
+            level->moving_platforms.push_back({
+              geometry::Position{x * 16, y * 16},
+              true,
+            });
+            break;
+          case 'k':
+            sprite = static_cast<int>(Sprite::SPRITE_CONCRETE_V);
+            flags |= TILE_SOLID;
+            break;
+          case 'K':
+            sprite = static_cast<int>(Sprite::SPRITE_CONCRETE);
+            flags |= TILE_SOLID;
+            break;
+          case 'l':
+            sprite = static_cast<int>(Sprite::SPRITE_CONCRETE_X);
+            flags |= TILE_SOLID;
+            break;
+          case 'L':
+            sprite = static_cast<int>(Sprite::SPRITE_CONCRETE_H);
+            flags |= TILE_SOLID;
+            break;
+          case 'm':
+            level->has_earth = true;
+            break;
+          case 'n':
+            if (tile_ids[i - level->width] == '[' && tile_ids[i - level->width + 1] == '#')
+            {
+              // Bottom left of grille
+              sprite = static_cast<int>(Sprite::SPRITE_GRILLE_3);
+            }
+            else if (tile_ids[i - level->width - 1] == '[' && tile_ids[i - level->width] == '#')
+            {
+              // Bottom right of grille
+              sprite = static_cast<int>(Sprite::SPRITE_GRILLE_4);
+            }
+            break;
+          case 'N':
+            level->has_moon = true;
+            break;
+          case 'u':
+            // TODO: volcano spawn point?
+            sprite = static_cast<int>(Sprite::SPRITE_VOLCANO_EJECTA_R_1);
+            sprite_count = 4;
+            flags |= TILE_ANIMATED;
+            mode = TileMode::EJECTA;
+            break;
+          case 'V':
+            level->moving_platforms.push_back({
+              geometry::Position{x * 16, y * 16},
+              false,
+            });
+            break;
+          case 'w':
+            level->hazards.emplace_back(new Laser(geometry::Position{x * 16, y * 16}, false));
+            break;
+          case 'x':
+            // TODO: remember completion state
+            // Everything is under construction...
+            sprite = static_cast<int>(Sprite::SPRITE_CONES);
+            flags |= TILE_RENDER_IN_FRONT;
+            level->entrances.push_back({geometry::Position{x * 16, y * 16}, entrance_level, EntranceState::CLOSED});
+            entrance_level++;
+            break;
+          case 'Y':
+            // Player spawn
+            level->player_spawn = geometry::Position(x * 16, y * 16);
+            break;
+          case 'z':
+            if (is_horizon_row || (x == 0 && tile_ids[i + 1] == 'Z'))
+            {
+              // Random horizon tile
+              bg = static_cast<int>(HORIZON[rand() % HORIZON.size()]);
+              is_horizon_row = true;
+            }
+            else
+            {
+              // Random star tile
+              bg = static_cast<int>(STARS[rand() % STARS.size()]);
+              is_stars_row = true;
+            }
+            break;
+          case 'Z':
+            break;
+          case '[':
+            switch (tile_ids[i + 1])
+            {
+                // [4n = winners drugs sign
+              case '4':
+                sprite = static_cast<int>(Sprite::SPRITE_WINNERS_1);
+                flags |= TILE_SOLID_TOP;
+                mode = TileMode::SIGN;
+                break;
+                // [m = mine sign
+              case 'm':
+                sprite = static_cast<int>(Sprite::SPRITE_MINE_SIGN_1);
+                flags |= TILE_RENDER_IN_FRONT;
+                mode = TileMode::SIGN;
+                break;
+                // [d = danger sign
+              case 'd':
+                sprite = static_cast<int>(Sprite::SPRITE_DANGER_1);
+                flags |= TILE_SOLID_TOP;
+                mode = TileMode::SIGN;
+                break;
+              case '#':
+                // [# = 2x2 grille
+                sprite = static_cast<int>(Sprite::SPRITE_GRILLE_1);
+                mode = TileMode::SIGN;
+                break;
+              default:
+                break;
+            }
+            break;
+          case '/':
+            level->enemies.emplace_back(new Hopper(geometry::Position{x * 16, y * 16}, false));
+            break;
+          case -6:
+            sprite = static_cast<int>(Sprite::SPRITE_BARREL_CRACKED);
+            flags |= TILE_SOLID_TOP;
+            break;
+          case -7:
+            sprite = static_cast<int>(Sprite::SPRITE_BARREL);
+            flags |= TILE_SOLID_TOP;
+            break;
+          case -16:
+            if (tile_ids[i + 1] == 'n')
+            {
+              // Wood struts
+              sprite = static_cast<int>(Sprite::SPRITE_WOOD_STRUT_1);
+              mode = TileMode::WOOD_STRUT;
+            }
+            break;
+          case -19:
+            sprite = static_cast<int>(Sprite::SPRITE_PIPE_DR);
+            break;
+          case -20:
+            sprite = static_cast<int>(Sprite::SPRITE_PIPE_DL);
+            break;
+          case -21:
+            sprite = static_cast<int>(Sprite::SPRITE_PIPE_UL);
+            break;
+          case -22:
+            sprite = static_cast<int>(Sprite::SPRITE_PIPE_UR);
+            break;
+          case -23:
+            sprite = static_cast<int>(Sprite::SPRITE_PIPE_H);
+            break;
+          case -24:
+            sprite = static_cast<int>(Sprite::SPRITE_PIPE_V);
+            break;
+          case -43:
+            // TODO: animated
+            sprite = static_cast<int>(Sprite::SPRITE_TORCH_1);
+            sprite_count = 4;
+            flags |= TILE_ANIMATED;
+            break;
+          case -58:
+            sprite = static_cast<int>(Sprite::SPRITE_SIGN_DOWN);
+            break;
+          case -77:
+            if (tile_ids[i + 1] == 'n')
+            {
+              // Wood pillar
+              sprite = static_cast<int>(Sprite::SPRITE_WOOD_PILLAR_1);
+              mode = TileMode::WOOD_PILLAR;
+            }
+            break;
+          case -78:
+            sprite = static_cast<int>(Sprite::SPRITE_WOOD_V);
+            flags |= TILE_SOLID;
+            break;
+          case -79:
+            sprite = static_cast<int>(Sprite::SPRITE_WOOD_H);
+            flags |= TILE_SOLID;
+            break;
+          case -113:
+            if (tile_ids[i + 1] == 'n')
+            {
+              // -113 nnn = bottom of volcano
+              sprite = static_cast<int>(Sprite::SPRITE_VOLCANO_BOTTOM_1);
+              mode = TileMode::VOLCANO;
+              volcano_sprite = sprite + 1;
+            }
+            break;
+          case -114:
+            if (tile_ids[i + 1] == 'n')
+            {
+              // -114 n = top of volcano
+              sprite = static_cast<int>(Sprite::SPRITE_VOLCANO_TOP_1);
+              mode = TileMode::VOLCANO;
+              volcano_sprite = sprite + 1;
+            }
+            break;
+          default:
+            break;
+        }
+        break;
     }
     if (sprite == -1)
     {

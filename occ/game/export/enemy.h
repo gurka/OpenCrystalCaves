@@ -19,6 +19,20 @@ class Enemy
   int points;
 };
 
+class Hopper : public Enemy
+{
+  // Moves left and right erratically
+ public:
+  Hopper(geometry::Position position, bool left) : Enemy(position, 1, 100), left_(left), frame_(0) {}
+
+  virtual void update() override;
+  virtual Sprite get_sprite() const override;
+
+ private:
+  bool left_;
+  int frame_;
+};
+
 class Spider : public Enemy
 {
   // Moves up and down, shoots webs ahead
