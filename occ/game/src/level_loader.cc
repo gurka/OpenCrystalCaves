@@ -409,15 +409,47 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             level->has_earth = true;
             break;
           case 'n':
-            if (tile_ids[i - level->width] == '[' && tile_ids[i - level->width + 1] == '#')
+            // Check tile above for continuation tile
+            switch (tile_ids[i - level->width])
             {
-              // Bottom left of grille
-              sprite = static_cast<int>(Sprite::SPRITE_GRILLE_3);
-            }
-            else if (tile_ids[i - level->width - 1] == '[' && tile_ids[i - level->width] == '#')
-            {
-              // Bottom right of grille
-              sprite = static_cast<int>(Sprite::SPRITE_GRILLE_4);
+              case '[':
+                // Bottom left of grille
+                sprite = static_cast<int>(Sprite::SPRITE_GRILLE_3);
+                break;
+              case '#':
+                // Bottom right of grille
+                sprite = static_cast<int>(Sprite::SPRITE_GRILLE_4);
+                break;
+              case 'X':
+                // Bottom-left of exit
+                // TODO: exit
+                sprite = static_cast<int>(Sprite::SPRITE_EXIT_BOTTOM_LEFT_1);
+                break;
+              case -91:
+                // Bottom of blue door
+                // TODO: door object
+                sprite = static_cast<int>(Sprite::SPRITE_DOOR_CLOSED_B_2);
+                flags |= TILE_SOLID;
+                break;
+              case -92:
+                // Bottom of green door
+                // TODO: door object
+                sprite = static_cast<int>(Sprite::SPRITE_DOOR_CLOSED_G_2);
+                flags |= TILE_SOLID;
+                break;
+              default:
+                // Check tile above-left
+                switch (tile_ids[i - level->width - 1])
+                {
+                  case 'X':
+                    // Bottom-right of exit
+                    // TODO: exit
+                    sprite = static_cast<int>(Sprite::SPRITE_EXIT_BOTTOM_RIGHT_1);
+                    flags |= TILE_ANIMATED;
+                    sprite_count = 4;
+                    break;
+                }
+                break;
             }
             break;
           case 'N':
@@ -522,6 +554,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             sprite = static_cast<int>(Sprite::SPRITE_BARREL);
             flags |= TILE_SOLID_TOP;
             break;
+          case -11:
+            // Shovel
+            item = Item(Sprite::SPRITE_SHOVEL, ItemType::ITEM_TYPE_SCORE, 800);
+            break;
           case -12:
             // Pickaxe
             item = Item(Sprite::SPRITE_PICKAXE, ItemType::ITEM_TYPE_SCORE, 5000);
@@ -590,9 +626,14 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             flags |= TILE_SOLID;
             break;
           case -94:
-            // Lever
+            // Blue lever
             // TODO: lever object
             sprite = static_cast<int>(Sprite::SPRITE_LEVER_B_OFF);
+            break;
+          case -95:
+            // Green lever
+            // TODO: lever object
+            sprite = static_cast<int>(Sprite::SPRITE_LEVER_G_OFF);
             break;
           case -113:
             if (tile_ids[i + 1] == 'n')
