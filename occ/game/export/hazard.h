@@ -30,3 +30,16 @@ class Laser : public Hazard
  private:
   bool left_;
 };
+
+class Thorn : public Hazard
+{
+  // Thrusts up when player is above
+ public:
+  Thorn(geometry::Position position) : Hazard(position) {}
+
+  virtual void update() override;
+  virtual Sprite get_sprite() const override { return static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_THORN_1) + frame_); }
+
+ private:
+  int frame_ = 0;
+};
