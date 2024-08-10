@@ -113,6 +113,7 @@ enum class TileMode
   WOOD_PILLAR,
   VOLCANO,
   EJECTA,
+  EXIT,
 };
 
 std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
@@ -298,6 +299,11 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
         flags |= TILE_ANIMATED;
         mode = TileMode::NONE;
         break;
+      case TileMode::EXIT:
+        sprite = static_cast<int>(Sprite::SPRITE_EXIT_TOP_RIGHT_1);
+        flags |= TILE_SOLID;
+        mode = TileMode::NONE;
+        break;
       default:
         switch (tile_id)
         {
@@ -445,6 +451,12 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             level->entrances.push_back({geometry::Position{x * 16, y * 16}, entrance_level, EntranceState::CLOSED});
             entrance_level++;
             break;
+          case 'X':
+            // Xn = exit
+            // TODO: exit
+            sprite = static_cast<int>(Sprite::SPRITE_EXIT_TOP_LEFT_1);
+            mode = TileMode::EXIT;
+            break;
           case 'Y':
             // Player spawn
             level->player_spawn = geometry::Position(x * 16, y * 16);
@@ -510,6 +522,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             sprite = static_cast<int>(Sprite::SPRITE_BARREL);
             flags |= TILE_SOLID_TOP;
             break;
+          case -12:
+            // Pickaxe
+            item = Item(Sprite::SPRITE_PICKAXE, ItemType::ITEM_TYPE_SCORE, 5000);
+            break;
           case -16:
             if (tile_ids[i + 1] == 'n')
             {
@@ -561,6 +577,23 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             sprite = static_cast<int>(Sprite::SPRITE_WOOD_H);
             flags |= TILE_SOLID;
             break;
+          case -91:
+            // Top of blue door
+            // TODO: door object
+            sprite = static_cast<int>(Sprite::SPRITE_DOOR_CLOSED_B_1);
+            flags |= TILE_SOLID;
+            break;
+          case -92:
+            // Top of green door
+            // TODO: door object
+            sprite = static_cast<int>(Sprite::SPRITE_DOOR_CLOSED_G_1);
+            flags |= TILE_SOLID;
+            break;
+          case -94:
+            // Lever
+            // TODO: lever object
+            sprite = static_cast<int>(Sprite::SPRITE_LEVER_B_OFF);
+            break;
           case -113:
             if (tile_ids[i + 1] == 'n')
             {
@@ -578,6 +611,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
               mode = TileMode::VOLCANO;
               volcano_sprite = sprite + 1;
             }
+            break;
+          case -117:
+            // Candle
+            item = Item(Sprite::SPRITE_CANDLE, ItemType::ITEM_TYPE_SCORE, 1000);
             break;
           default:
             break;
