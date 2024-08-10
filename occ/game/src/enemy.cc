@@ -15,6 +15,38 @@ Sprite Hopper::get_sprite() const
   return static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_HOPPER_1) + frame_);
 }
 
+void Slime::update()
+{
+  frame_++;
+  if (frame_ == 4)
+  {
+    frame_ = 0;
+  }
+  // TODO: move, pause
+}
+
+Sprite Slime::get_sprite() const
+{
+  Sprite s = Sprite::SPRITE_SLIME_R_1;
+  if (dx_ == 1)
+  {
+    s = Sprite::SPRITE_SLIME_R_1;
+  }
+  else if (dx_ == -1)
+  {
+    s = Sprite::SPRITE_SLIME_L_1;
+  }
+  else if (dy_ == 1)
+  {
+    s = Sprite::SPRITE_SLIME_U_1;
+  }
+  else
+  {
+    s = Sprite::SPRITE_SLIME_D_1;
+  }
+  return static_cast<Sprite>(static_cast<int>(s) + frame_);
+}
+
 void Snake::update()
 {
   frame_++;

@@ -33,6 +33,21 @@ class Hopper : public Enemy
   int frame_ = 0;
 };
 
+class Slime : public Enemy
+{
+  // Flies around, pauses and changes directions erratically
+ public:
+  Slime(geometry::Position position) : Enemy(position, 1, 100) {}
+
+  virtual void update() override;
+  virtual Sprite get_sprite() const override;
+
+ private:
+  int dx_ = 1;
+  int dy_ = 0;
+  int frame_ = 0;
+};
+
 class Snake : public Enemy
 {
   // Moves left/right, pauses, leaves slime

@@ -383,11 +383,12 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             sprite = static_cast<int>(Sprite::SPRITE_BUMP_PLATFORM_RED_MID);
             flags |= TILE_SOLID;
             break;
+          case 'A':
+            // Green slime
+            level->enemies.emplace_back(new Slime(geometry::Position{x * 16, y * 16}));
+            break;
           case 'H':
-            level->moving_platforms.push_back({
-              geometry::Position{x * 16, y * 16},
-              true,
-            });
+            level->moving_platforms.push_back({geometry::Position{x * 16, y * 16}, true, true});
             break;
           case 'I':
             // Thorn
@@ -471,10 +472,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             mode = TileMode::EJECTA;
             break;
           case 'V':
-            level->moving_platforms.push_back({
-              geometry::Position{x * 16, y * 16},
-              false,
-            });
+            level->moving_platforms.push_back({geometry::Position{x * 16, y * 16}, false, true});
             break;
           case 'w':
             level->hazards.emplace_back(new Laser(geometry::Position{x * 16, y * 16}, false));
@@ -592,11 +590,18 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case -24:
             sprite = static_cast<int>(Sprite::SPRITE_PIPE_V);
             break;
+          case -41:
+            // Stopped vertical moving platform
+            level->moving_platforms.push_back({geometry::Position{x * 16, y * 16}, false, false});
+            break;
           case -43:
-            // TODO: animated
             sprite = static_cast<int>(Sprite::SPRITE_TORCH_1);
             sprite_count = 4;
             flags |= TILE_ANIMATED;
+            break;
+          case -56:
+            // TODO: not sure what this is - slime barrier?
+            sprite = static_cast<int>(Sprite::SPRITE_100);
             break;
           case -57:
             sprite = static_cast<int>(Sprite::SPRITE_SIGN_UP);

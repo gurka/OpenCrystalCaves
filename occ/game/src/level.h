@@ -25,6 +25,7 @@ struct Level
   int get_bg(const int x, const int y) const;
   const Item& get_item(const int x, const int y) const;
   void remove_item(const int x, const int y);
+  bool collides_solid(const geometry::Position& position, const geometry::Size& size) const;
 
   std::vector<int> bgs;
   std::vector<Tile> tiles;

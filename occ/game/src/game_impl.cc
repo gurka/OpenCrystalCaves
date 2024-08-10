@@ -105,21 +105,13 @@ void GameImpl::update_level()
     const auto player_on_platform = (player_.position.y() + player_.size.y() == platform.position.y()) &&
       (player_.position.x() < platform.position.x() + 16) && (player_.position.x() + player_.size.x() > platform.position.x());
 
-    // Move platform
-    const auto new_platform_pos = platform.collide_position() + platform.velocity;
-
-    if (collides_solid(new_platform_pos, platform.collide_size))
-    {
-      // Change direction
-      platform.velocity = -platform.velocity;
-    }
-    platform.position += platform.velocity;
+    platform.update(*level_);
 
     // Move player if standing on platform
     if (player_on_platform)
     {
       // Only move player if not colliding with any static objects
-      const auto new_player_pos = player_.position + platform.velocity;
+      const auto new_player_pos = player_.position + platform.get_velocity();
       if (!collides_solid(new_player_pos, player_.size))
       {
         player_.position = new_player_pos;
@@ -579,24 +571,10 @@ void GameImpl::update_hazards()
   }
 }
 
+// TODO: move to Level completely
 bool GameImpl::collides_solid(const geometry::Position& position, const geometry::Size& size)
 {
-  // Note: this function only works with size x and y <= 16
-  // With size 16x16 the object can cover at maximum 4 tiles
-  // Check all 4 tiles, even though we might check the same tile multiple times
-  const std::array<geometry::Position, 4> positions = {
-    geometry::Position((position.x() + 0) / 16, (position.y() + 0) / 16),
-    geometry::Position((position.x() + size.x() - 1) / 16, (position.y() + 0) / 16),
-    geometry::Position((position.x() + 0) / 16, (position.y() + size.y() - 1) / 16),
-    geometry::Position((position.x() + size.x() - 1) / 16, (position.y() + size.y() - 1) / 16)};
-  for (const auto& p : positions)
-  {
-    if (get_tile(p.x(), p.y()).is_solid())
-    {
-      return true;
-    }
-  }
-  return false;
+  return level_->collides_solid(position, size);
 }
 
 /**
