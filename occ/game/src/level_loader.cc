@@ -232,8 +232,8 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
       case TileMode::SIGN:
         switch (tile_id)
         {
-            // [4n = winners drugs sign
           case '4':
+            // [4n = winners drugs sign
             sprite = static_cast<int>(Sprite::SPRITE_WINNERS_2);
             flags |= TILE_SOLID_TOP;
             break;
@@ -242,15 +242,21 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             flags |= TILE_SOLID_TOP;
             mode = TileMode::NONE;
             break;
-            // [m = mine sign
           case 'm':
+            // [m = mine sign
             sprite = static_cast<int>(Sprite::SPRITE_MINE_SIGN_2);
             flags |= TILE_RENDER_IN_FRONT;
             mode = TileMode::NONE;
             break;
-            // [d = danger sign
           case 'd':
+            // [d = danger sign
             sprite = static_cast<int>(Sprite::SPRITE_DANGER_2);
+            flags |= TILE_SOLID_TOP;
+            mode = TileMode::NONE;
+            break;
+          case 'r':
+            // [r = red crate
+            sprite = static_cast<int>(Sprite::SPRITE_RED_CRATE_2);
             flags |= TILE_SOLID_TOP;
             mode = TileMode::NONE;
             break;
@@ -471,6 +477,11 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             flags |= TILE_ANIMATED;
             mode = TileMode::EJECTA;
             break;
+          case 'v':
+            // Vertical switch (off)
+            // TODO: switches
+            sprite = static_cast<int>(Sprite::SPRITE_SWITCH_OFF);
+            break;
           case 'V':
             level->moving_platforms.push_back({geometry::Position{x * 16, y * 16}, false, true});
             break;
@@ -532,6 +543,12 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                 flags |= TILE_SOLID_TOP;
                 mode = TileMode::SIGN;
                 break;
+              case 'r':
+                // [r = red crate
+                sprite = static_cast<int>(Sprite::SPRITE_RED_CRATE_1);
+                flags |= TILE_SOLID_TOP;
+                mode = TileMode::SIGN;
+                break;
               case '#':
                 // [# = 2x2 grille
                 sprite = static_cast<int>(Sprite::SPRITE_GRILLE_1);
@@ -563,6 +580,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case -12:
             // Pickaxe
             item = Item(Sprite::SPRITE_PICKAXE, ItemType::ITEM_TYPE_SCORE, 5000);
+            break;
+          case -14:
+            // Tall Green Monster
+            level->enemies.emplace_back(new Bigfoot(geometry::Position{x * 16, y * 16}));
             break;
           case -16:
             if (tile_ids[i + 1] == 'n')

@@ -555,8 +555,10 @@ void GameImpl::update_enemies()
     }
     else
     {
-      // TODO: big enemies
-      objects_.emplace_back((*it)->position, static_cast<int>((*it)->get_sprite()), 1, false);
+      for (const auto& sprite_pos : (*it)->get_sprites())
+      {
+        objects_.emplace_back(sprite_pos.first, static_cast<int>(sprite_pos.second), 1, false);
+      }
       it++;
     }
   }

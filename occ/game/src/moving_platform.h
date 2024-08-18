@@ -3,7 +3,7 @@
 #include "geometry.h"
 #include "vector.h"
 
-class Level;
+struct Level;
 
 struct MovingPlatform
 {

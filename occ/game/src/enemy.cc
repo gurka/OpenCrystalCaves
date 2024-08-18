@@ -1,5 +1,28 @@
 #include "enemy.h"
 
+void Bigfoot::update()
+{
+  frame_++;
+  if (frame_ == 4)
+  {
+    frame_ = 0;
+  }
+  // TODO: move, detect player/run
+}
+
+std::vector<std::pair<geometry::Position, Sprite>> Bigfoot::get_sprites() const
+{
+  Sprite s = Sprite::SPRITE_BIGFOOT_HEAD_R_1;
+  if (left_)
+  {
+    s = Sprite::SPRITE_BIGFOOT_HEAD_L_1;
+  }
+  return {
+    std::make_pair(position - geometry::Position(0, 16), static_cast<Sprite>(static_cast<int>(s) + frame_)),
+    std::make_pair(position, static_cast<Sprite>(static_cast<int>(s) + 4 + frame_)),
+  };
+}
+
 void Hopper::update()
 {
   frame_++;
@@ -10,9 +33,9 @@ void Hopper::update()
   // TODO: move, randomly change directions
 }
 
-Sprite Hopper::get_sprite() const
+std::vector<std::pair<geometry::Position, Sprite>> Hopper::get_sprites() const
 {
-  return static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_HOPPER_1) + frame_);
+  return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_HOPPER_1) + frame_))};
 }
 
 void Slime::update()
@@ -25,7 +48,7 @@ void Slime::update()
   // TODO: move, pause
 }
 
-Sprite Slime::get_sprite() const
+std::vector<std::pair<geometry::Position, Sprite>> Slime::get_sprites() const
 {
   Sprite s = Sprite::SPRITE_SLIME_R_1;
   if (dx_ == 1)
@@ -44,7 +67,7 @@ Sprite Slime::get_sprite() const
   {
     s = Sprite::SPRITE_SLIME_D_1;
   }
-  return static_cast<Sprite>(static_cast<int>(s) + frame_);
+  return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(s) + frame_))};
 }
 
 void Snake::update()
@@ -57,10 +80,10 @@ void Snake::update()
   // TODO: move, pause
 }
 
-Sprite Snake::get_sprite() const
+std::vector<std::pair<geometry::Position, Sprite>> Snake::get_sprites() const
 {
   const auto s = paused_ ? Sprite::SPRITE_SNAKE_PAUSE_1 : (left_ ? Sprite::SPRITE_SNAKE_WALK_L_1 : Sprite::SPRITE_SNAKE_WALK_R_1);
-  return static_cast<Sprite>(static_cast<int>(s) + frame_);
+  return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(s) + frame_))};
 }
 
 void Spider::update()
@@ -73,7 +96,8 @@ void Spider::update()
   // TODO: move, fire webs
 }
 
-Sprite Spider::get_sprite() const
+std::vector<std::pair<geometry::Position, Sprite>> Spider::get_sprites() const
 {
-  return static_cast<Sprite>(static_cast<int>(up_ ? Sprite::SPRITE_SPIDER_UP_1 : Sprite::SPRITE_SPIDER_DOWN_1) + frame_);
+  return {std::make_pair(position,
+                         static_cast<Sprite>(static_cast<int>(up_ ? Sprite::SPRITE_SPIDER_UP_1 : Sprite::SPRITE_SPIDER_DOWN_1) + frame_))};
 }

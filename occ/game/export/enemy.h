@@ -12,11 +12,26 @@ class Enemy
   virtual ~Enemy() = default;
 
   virtual void update() = 0;
-  virtual Sprite get_sprite() const = 0;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const = 0;
 
   geometry::Position position;
   int health;
   int points;
+};
+
+class Bigfoot : public Enemy
+{
+  // 2-tile tall enemy, runs if they see player
+ public:
+  Bigfoot(geometry::Position position) : Enemy(position, 5, 5000) {}
+
+  virtual void update() override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
+
+ private:
+  bool left_ = false;
+  bool running_ = false;
+  int frame_ = 0;
 };
 
 class Hopper : public Enemy
@@ -26,7 +41,7 @@ class Hopper : public Enemy
   Hopper(geometry::Position position) : Enemy(position, 1, 100) {}
 
   virtual void update() override;
-  virtual Sprite get_sprite() const override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
 
  private:
   bool left_ = false;
@@ -40,7 +55,7 @@ class Slime : public Enemy
   Slime(geometry::Position position) : Enemy(position, 1, 100) {}
 
   virtual void update() override;
-  virtual Sprite get_sprite() const override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
 
  private:
   int dx_ = 1;
@@ -55,7 +70,7 @@ class Snake : public Enemy
   Snake(geometry::Position position) : Enemy(position, 2, 100) {}
 
   virtual void update() override;
-  virtual Sprite get_sprite() const override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
 
  private:
   bool left_ = false;
@@ -70,7 +85,7 @@ class Spider : public Enemy
   Spider(geometry::Position position) : Enemy(position, 1, 100) {}
 
   virtual void update() override;
-  virtual Sprite get_sprite() const override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
 
  private:
   bool up_ = false;
