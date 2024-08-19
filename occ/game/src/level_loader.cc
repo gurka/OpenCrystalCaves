@@ -319,6 +319,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             // Spider
             level->enemies.emplace_back(new Spider(geometry::Position{x * 16, y * 16}));
             break;
+          case '$':
+            // Air tank (top)
+            level->hazards.emplace_back(new AirTank(geometry::Position{x * 16, y * 16}, true));
+            break;
             // Crystals
           case '+':
             item = Item(Sprite::SPRITE_CRYSTAL_1_Y, ItemType::ITEM_TYPE_CRYSTAL, 0);
@@ -430,6 +434,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
               case '#':
                 // Bottom right of grille
                 sprite = static_cast<int>(Sprite::SPRITE_GRILLE_4);
+                break;
+              case '$':
+                // Air tank (bottom)
+                level->hazards.emplace_back(new AirTank(geometry::Position{x * 16, y * 16}, false));
                 break;
               case 'X':
                 // Bottom-left of exit
@@ -565,6 +573,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             sprite = static_cast<int>(Sprite::SPRITE_PLATFORM_BLUE);
             flags |= TILE_SOLID_TOP;
             break;
+          case -5:
+            sprite = static_cast<int>(Sprite::SPRITE_BARREL_BROKEN);
+            flags |= TILE_SOLID_TOP;
+            break;
           case -6:
             sprite = static_cast<int>(Sprite::SPRITE_BARREL_CRACKED);
             flags |= TILE_SOLID_TOP;
@@ -645,6 +657,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case -79:
             sprite = static_cast<int>(Sprite::SPRITE_WOOD_H);
             flags |= TILE_SOLID;
+            break;
+          case -86:
+            // Blue mushroom
+            item = Item(Sprite::SPRITE_MUSHROOM_BLUE, ItemType::ITEM_TYPE_SCORE, 1000);
             break;
           case -91:
             // Top of blue door

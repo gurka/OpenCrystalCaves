@@ -18,6 +18,20 @@ class Hazard
   geometry::Position position;
 };
 
+class AirTank : public Hazard
+{
+  // Die if shot
+ public:
+  AirTank(geometry::Position position, bool top) : Hazard(position), top_(top) {}
+
+  virtual void update() override;
+  virtual Sprite get_sprite() const override;
+
+ private:
+  bool top_;
+  int frame_ = 0;
+};
+
 class Laser : public Hazard
 {
   // Faces left/right, fires slow laser at player when they enter line
