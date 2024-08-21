@@ -2,7 +2,7 @@
 
 const Tile& Level::get_tile(const int x, const int y) const
 {
-  if (x < 0 || y >= width || y < 0 || y >= height)
+  if (x < 0 || x >= width || y < 0 || y >= height)
   {
     return Tile::INVALID;
   }
@@ -11,7 +11,7 @@ const Tile& Level::get_tile(const int x, const int y) const
 
 int Level::get_bg(const int x, const int y) const
 {
-  if (x < 0 || y >= width || y < 0 || y >= height)
+  if (x < 0 || x >= width || y < 0 || y >= height)
   {
     return -1;
   }
@@ -20,7 +20,7 @@ int Level::get_bg(const int x, const int y) const
 
 const Item& Level::get_item(const int x, const int y) const
 {
-  if (x < 0 || y >= width || y < 0 || y >= height)
+  if (x < 0 || x >= width || y < 0 || y >= height)
   {
     return Item::INVALID;
   }

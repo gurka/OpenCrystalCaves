@@ -18,4 +18,5 @@ struct PlayerInput
   bool ammo_pressed = false;
   bool godmode_pressed = false;
   bool reverse_gravity_pressed = false;
+  bool level_warp_pressed = false;
 };

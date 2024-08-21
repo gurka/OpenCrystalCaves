@@ -327,7 +327,8 @@ GameState::GameState(Game& game, SpriteManager& sprite_manager, Surface& game_su
             {3, {PanelType::PANEL_TYPE_QUIT_TO_TITLE}},
             {4, {PanelType::PANEL_TYPE_QUIT_TO_MAIN_LEVEL}},
           }}},
-      })
+      }),
+    warp_panel_({PanelText::PANEL_TEXT_WARP, exe_data, {}, {}, PanelType::PANEL_TYPE_WARP_TO_LEVEL})
 {
 }
 
@@ -354,6 +355,10 @@ void GameState::update(const Input& input)
     {
       panel_current_ = &panel_;
     }
+    else if (input.level_warp.pressed())
+    {
+      panel_current_ = &warp_panel_;
+    }
   }
   else if (input.escape.pressed())
   {
@@ -365,32 +370,92 @@ void GameState::update(const Input& input)
   }
   if (panel_current_)
   {
-    switch (panel_current_->get_type())
+    if (panel_current_ == &warp_panel_)
     {
-      case PanelType::PANEL_TYPE_QUIT_TO_OS:
-        panel_next_ = panel_current_;
-        panel_current_ = nullptr;
-        paused_ = true;
-        finish();
-        break;
-      case PanelType::PANEL_TYPE_QUIT_TO_TITLE:
-        panel_next_ = panel_current_;
-        panel_current_ = nullptr;
-        paused_ = true;
-        finish();
-        break;
-      case PanelType::PANEL_TYPE_QUIT_TO_MAIN_LEVEL:
-        panel_current_ = nullptr;
-        if (level_ != LevelId::MAIN_LEVEL)
+      if (input.num_1.pressed())
+      {
+        warp_panel_.add_input('1');
+      }
+      else if (input.num_2.pressed())
+      {
+        warp_panel_.add_input('2');
+      }
+      else if (input.num_3.pressed())
+      {
+        warp_panel_.add_input('3');
+      }
+      else if (input.num_4.pressed())
+      {
+        warp_panel_.add_input('4');
+      }
+      else if (input.num_5.pressed())
+      {
+        warp_panel_.add_input('5');
+      }
+      else if (input.num_6.pressed())
+      {
+        warp_panel_.add_input('6');
+      }
+      else if (input.num_7.pressed())
+      {
+        warp_panel_.add_input('7');
+      }
+      else if (input.num_8.pressed())
+      {
+        warp_panel_.add_input('8');
+      }
+      else if (input.num_9.pressed())
+      {
+        warp_panel_.add_input('9');
+      }
+      else if (input.num_0.pressed())
+      {
+        warp_panel_.add_input('0');
+      }
+      else if (input.backspace.pressed())
+      {
+        // backspace
+        warp_panel_.add_input('\x8');
+      }
+      if (input.enter.pressed())
+      {
+        const int i = std::stoi(warp_panel_.get_input());
+        if (i >= 1 && i <= 16)
         {
-          game_.entering_level = LevelId::MAIN_LEVEL;
+          panel_current_ = nullptr;
+          game_.entering_level = static_cast<LevelId>(i + static_cast<int>(LevelId::LEVEL_1) - 1);
+        }
+      }
+    }
+    else
+    {
+      switch (panel_current_->get_type())
+      {
+        case PanelType::PANEL_TYPE_QUIT_TO_OS:
+          panel_next_ = panel_current_;
+          panel_current_ = nullptr;
           paused_ = true;
           finish();
-        }
-        break;
-      default:
-        break;
-        // TODO: handle other types
+          break;
+        case PanelType::PANEL_TYPE_QUIT_TO_TITLE:
+          panel_next_ = panel_current_;
+          panel_current_ = nullptr;
+          paused_ = true;
+          finish();
+          break;
+        case PanelType::PANEL_TYPE_QUIT_TO_MAIN_LEVEL:
+          panel_current_ = nullptr;
+          if (level_ != LevelId::MAIN_LEVEL)
+          {
+            game_.entering_level = LevelId::MAIN_LEVEL;
+            paused_ = true;
+            finish();
+          }
+          break;
+        default:
+          break;
+          // TODO: handle other types
+      }
     }
   }
   else

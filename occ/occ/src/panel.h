@@ -88,6 +88,7 @@ enum class PanelType
   PANEL_TYPE_QUIT_TO_OS,
   PANEL_TYPE_QUIT_TO_TITLE,
   PANEL_TYPE_QUIT_TO_MAIN_LEVEL,
+  PANEL_TYPE_WARP_TO_LEVEL,
 };
 
 class Panel
@@ -102,13 +103,15 @@ class Panel
   // Panel from decoded text from the EXE
   Panel(const char* ucsd,
         const std::vector<std::pair<int, geometry::Position>> sprites = {},
-        const std::vector<std::pair<Icon, geometry::Position>> icons = {});
+        const std::vector<std::pair<Icon, geometry::Position>> icons = {},
+        const PanelType type = PanelType::PANEL_TYPE_NORMAL);
   // Panel from EXE text
   Panel(const PanelText pt,
         const ExeData& exe_data,
         const std::vector<std::pair<int, geometry::Position>> sprites = {},
-        const std::vector<std::pair<Icon, geometry::Position>> icons = {})
-    : Panel(exe_data.data.c_str() + static_cast<int>(pt), sprites, icons)
+        const std::vector<std::pair<Icon, geometry::Position>> icons = {},
+        const PanelType type = PanelType::PANEL_TYPE_NORMAL)
+    : Panel(exe_data.data.c_str() + static_cast<int>(pt), sprites, icons, type)
   {
   }
   // Basic panel
@@ -122,6 +125,9 @@ class Panel
 
   PanelType get_type() const { return type_; }
 
+  void add_input(char c);
+  const std::string& get_input() const { return input_str_; }
+
  private:
   std::vector<std::wstring> strings_;
   std::vector<std::pair<int, Panel>> children_;
@@ -134,4 +140,5 @@ class Panel
   unsigned ticks_ = 0;
   PanelType type_;
   Panel* parent_ = nullptr;
+  std::string input_str_ = "";
 };

@@ -74,8 +74,9 @@ Panel::Panel(const std::vector<std::wstring> strings, const std::vector<std::pai
 
 Panel::Panel(const char* ucsd,
              const std::vector<std::pair<int, geometry::Position>> sprites,
-             const std::vector<std::pair<Icon, geometry::Position>> icons)
-  : type_(PanelType::PANEL_TYPE_NORMAL),
+             const std::vector<std::pair<Icon, geometry::Position>> icons,
+             const PanelType type)
+  : type_(type),
     sprites_(std::move(sprites)),
     icons_(std::move(icons))
 {
@@ -309,7 +310,14 @@ Panel* Panel::update(const Input& input)
   {
     if (pinput.jump_pressed || pinput.shoot_pressed || input.enter.pressed())
     {
-      next = parent_;
+      if (type_ == PanelType::PANEL_TYPE_WARP_TO_LEVEL)
+      {
+        // Ignore
+      }
+      else
+      {
+        next = parent_;
+      }
     }
   }
   if (input.escape.pressed())
@@ -440,7 +448,16 @@ void Panel::draw(const SpriteManager& sprite_manager) const
   // Spinning question mark
   if (question_pos_ != geometry::Position(0, 0))
   {
-    sprite_manager.render_icon(q_icons[q_frame], frame_pos + question_pos_, q_flip);
+    auto pos = frame_pos + question_pos_;
+    // If there's input text, render it just before the question mark
+    if (!input_str_.empty())
+    {
+      std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+      std::wstring panel_input = converter.from_bytes(input_str_);
+      Color tint{0xff, 0xff, 0xff};
+      pos = sprite_manager.render_text(panel_input, pos, tint);
+    }
+    sprite_manager.render_icon(q_icons[q_frame], pos, q_flip);
   }
 
   // Sparkle
@@ -458,5 +475,45 @@ void Panel::draw(const SpriteManager& sprite_manager) const
   for (const auto& icon : icons_)
   {
     sprite_manager.render_icon(icon.first, icon.second);
+  }
+}
+
+void Panel::add_input(char c)
+{
+  if (c == '\x8')
+  {
+    // backspace
+    if (!input_str_.empty())
+    {
+      input_str_ = input_str_.substr(0, input_str_.size() - 1);
+    }
+  }
+  else
+  {
+    input_str_ += c;
+  }
+  if (type_ == PanelType::PANEL_TYPE_WARP_TO_LEVEL)
+  {
+    if (input_str_.size() > 0)
+    {
+      // Only allow inputs between 1-16; otherwise delete the last character
+      try
+      {
+        const int i = std::stoi(input_str_);
+        if (i > 16 || i < 1)
+        {
+          input_str_ = input_str_.substr(0, input_str_.size() - 1);
+        }
+        else
+        {
+          // Sanitise the input string
+          input_str_ = std::to_string(i);
+        }
+      }
+      catch (std::invalid_argument const&)
+      {
+        input_str_ = "";
+      }
+    }
   }
 }

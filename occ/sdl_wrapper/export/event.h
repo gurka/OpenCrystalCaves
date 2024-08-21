@@ -42,16 +42,26 @@ struct Input
 
   Button num_1 = Button();
   Button num_2 = Button();
+  Button num_3 = Button();
+  Button num_4 = Button();
+  Button num_5 = Button();
+  Button num_6 = Button();
+  Button num_7 = Button();
+  Button num_8 = Button();
+  Button num_9 = Button();
+  Button num_0 = Button();
 
   Button enter = Button();
   Button space = Button();
   Button escape = Button();
+  Button backspace = Button();
 
   // Cheat code buttons
   Button noclip = Button();
   Button ammo = Button();
   Button godmode = Button();
   Button reverse_gravity = Button();
+  Button level_warp = Button();
 
   geometry::Position mouse;
 };

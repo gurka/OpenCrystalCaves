@@ -125,6 +125,7 @@ class GameState : public State
   unsigned game_tick_ = 0;
   LevelId level_ = LevelId::MAIN_LEVEL;
   Panel panel_;
+  Panel warp_panel_;
   Panel* panel_current_ = nullptr;
   Panel* panel_next_ = nullptr;
 };
