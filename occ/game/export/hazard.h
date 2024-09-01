@@ -9,13 +9,17 @@
 class Hazard
 {
  public:
-  Hazard(geometry::Position position) : position(position) {}
+  Hazard(geometry::Position position) : position(position), detection_rect_() {}
   virtual ~Hazard() = default;
 
-  virtual void update() = 0;
+  virtual void update(const geometry::Rectangle& player_rect) = 0;
   virtual Sprite get_sprite() const = 0;
+  const geometry::Rectangle& get_detection_rect() const { return detection_rect_; }
 
   geometry::Position position;
+
+ protected:
+  geometry::Rectangle detection_rect_;
 };
 
 class AirTank : public Hazard
@@ -24,7 +28,7 @@ class AirTank : public Hazard
  public:
   AirTank(geometry::Position position, bool top) : Hazard(position), top_(top) {}
 
-  virtual void update() override;
+  virtual void update(const geometry::Rectangle& player_rect) override;
   virtual Sprite get_sprite() const override;
 
  private:
@@ -38,7 +42,7 @@ class Laser : public Hazard
  public:
   Laser(geometry::Position position, bool left) : Hazard(position), left_(left) {}
 
-  virtual void update() override;
+  virtual void update(const geometry::Rectangle& player_rect) override;
   virtual Sprite get_sprite() const override { return left_ ? Sprite::SPRITE_LASER_L : Sprite::SPRITE_LASER_R; }
 
  private:
@@ -49,9 +53,9 @@ class Thorn : public Hazard
 {
   // Thrusts up when player is above
  public:
-  Thorn(geometry::Position position) : Hazard(position) {}
+  Thorn(geometry::Position position) : Hazard(position) { detection_rect_ = geometry::Rectangle(position.x(), 0, 16, position.y() + 16); }
 
-  virtual void update() override;
+  virtual void update(const geometry::Rectangle& player_rect) override;
   virtual Sprite get_sprite() const override { return static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_THORN_1) + frame_); }
 
  private:

@@ -337,12 +337,17 @@ void GameRenderer::render_objects() const
 
       if (debug_)
       {
-        const geometry::Rectangle dest_rect{object.position.x() - game_camera_.position.x(),
-                                            object.position.y() - game_camera_.position.y(),
-                                            object_size.x(),
-                                            object_size.y()};
+        const geometry::Rectangle dest_rect{object.position - game_camera_.position, object_size};
         window_.render_rectangle(dest_rect, {255, 0, 0});
       }
+    }
+  }
+  for (const auto& hazard : game_->get_level().hazards)
+  {
+    if (debug_)
+    {
+      const geometry::Rectangle dest_rect{hazard->get_detection_rect().position - game_camera_.position, hazard->get_detection_rect().size};
+      window_.render_rectangle(dest_rect, {255, 128, 0});
     }
   }
 }

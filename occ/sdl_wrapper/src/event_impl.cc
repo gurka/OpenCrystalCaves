@@ -17,6 +17,7 @@ void EventImpl::poll_event(Input* input)
   input->down.tick();
   input->left.tick();
   input->right.tick();
+  input->d.tick();
   input->z.tick();
   input->x.tick();
   input->num_1.tick();
@@ -68,6 +69,10 @@ void EventImpl::poll_event(Input* input)
 
         case SDLK_RIGHT:
           input->right.set_down(event.type == SDL_KEYDOWN);
+          break;
+
+        case SDLK_d:
+          input->d.set_down(event.type == SDL_KEYDOWN);
           break;
 
         case SDLK_z:

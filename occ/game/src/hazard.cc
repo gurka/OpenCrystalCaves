@@ -1,6 +1,6 @@
 #include "hazard.h"
 
-void AirTank::update()
+void AirTank::update(const geometry::Rectangle& player_rect)
 {
   // TODO: check if shot
   frame_++;
@@ -19,12 +19,12 @@ Sprite AirTank::get_sprite() const
   return Sprite::SPRITE_AIR_TANK_BOTTOM;
 }
 
-void Laser::update()
+void Laser::update(const geometry::Rectangle& player_rect)
 {
   // TODO: check if player in line and there are no laser beams
 }
 
-void Thorn::update()
+void Thorn::update(const geometry::Rectangle& player_rect)
 {
   // TODO: check if player above
 }

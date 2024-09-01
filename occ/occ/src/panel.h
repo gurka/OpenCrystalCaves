@@ -129,6 +129,7 @@ class Panel
   const std::string& get_input() const { return input_str_; }
 
  private:
+  PanelType type_;
   std::vector<std::wstring> strings_;
   std::vector<std::pair<int, Panel>> children_;
   std::vector<std::pair<int, geometry::Position>> sprites_;
@@ -138,7 +139,6 @@ class Panel
   geometry::Position question_pos_ = {0, 0};
   geometry::Position sparkle_pos_ = {0, 0};
   unsigned ticks_ = 0;
-  PanelType type_;
   Panel* parent_ = nullptr;
   std::string input_str_ = "";
 };

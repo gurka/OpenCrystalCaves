@@ -1,5 +1,4 @@
-#ifndef GEOMETRY_H_
-#define GEOMETRY_H_
+#pragma once
 
 #include <utility>
 
@@ -16,49 +15,29 @@ using Size = Vector<int>;
 
 struct Rectangle
 {
-  constexpr Rectangle()
-    : position(),
-      size()
-  {
-  }
+  constexpr Rectangle() : position(), size() {}
 
-  constexpr Rectangle(Position position, Size size)
-    : position(std::move(position)),
-      size(std::move(size))
-  {
-  }
+  constexpr Rectangle(Position position, Size size) : position(std::move(position)), size(std::move(size)) {}
 
-  constexpr Rectangle(Position position, int width, int height)
-    : position(std::move(position)),
-      size(width, height)
-  {
-  }
+  constexpr Rectangle(Position position, int width, int height) : position(std::move(position)), size(width, height) {}
 
-  constexpr Rectangle(int x, int y, Size size)
-    : position(x, y),
-      size(std::move(size))
-  {
-  }
+  constexpr Rectangle(int x, int y, Size size) : position(x, y), size(std::move(size)) {}
 
-  constexpr Rectangle(int x, int y, int width, int height)
-    : position(x, y),
-      size(width, height)
-  {
-  }
+  constexpr Rectangle(int x, int y, int width, int height) : position(x, y), size(width, height) {}
 
   Position position;
   Size size;
+
+  constexpr Rectangle operator+(const Vector<int>& v) const { return Rectangle(position + v, size); }
+
+  constexpr Rectangle operator-(const Vector<int>& v) const { return Rectangle(position - v, size); }
 };
 
 // Returns true if Rectangle a and Rectangle b intersect
 constexpr bool isColliding(const Rectangle& a, const Rectangle& b)
 {
-  return a.position.x() < b.position.x() + b.size.x() &&
-         a.position.y() < b.position.y() + b.size.y() &&
-         a.position.x() + a.size.x() > b.position.x() &&
-         a.position.y() + a.size.y() > b.position.y();
+  return a.position.x() < b.position.x() + b.size.x() && a.position.y() < b.position.y() + b.size.y() &&
+    a.position.x() + a.size.x() > b.position.x() && a.position.y() + a.size.y() > b.position.y();
 }
 
 }
-
-#endif  // GEOMETRY_H_

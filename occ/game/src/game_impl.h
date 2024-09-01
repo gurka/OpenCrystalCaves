@@ -49,7 +49,6 @@ class GameImpl : public Game
   void update_enemies();
   void update_hazards();
 
-  bool collides_solid(const geometry::Position& position, const geometry::Size& size);
   Enemy* collides_enemy(const geometry::Position& position, const geometry::Size& size);
   bool player_on_platform(const geometry::Position& player_position);
 

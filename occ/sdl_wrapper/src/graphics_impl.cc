@@ -89,19 +89,19 @@ void WindowImpl::fill_rect(const geometry::Rectangle& rect, const Color& color)
 void WindowImpl::render_rectangle(const geometry::Rectangle& rect, const Color& color)
 {
   // top
-  render_line(rect.position, geometry::Position(rect.position.x() + rect.size.x(), rect.position.y()), color);
+  render_line(rect.position, geometry::Position(rect.position.x() + rect.size.x() - 1, rect.position.y()), color);
 
   // bottom
   render_line(geometry::Position(rect.position.x(), rect.position.y() + rect.size.y() - 1),
-              geometry::Position(rect.position.x() + rect.size.x(), rect.position.y() + rect.size.y() - 1),
+              geometry::Position(rect.position.x() + rect.size.x() - 1, rect.position.y() + rect.size.y() - 1),
               color);
 
   // left
-  render_line(rect.position, geometry::Position(rect.position.x(), rect.position.y() + rect.size.y()), color);
+  render_line(rect.position, geometry::Position(rect.position.x(), rect.position.y() + rect.size.y() - 1), color);
 
   // right
   render_line(geometry::Position(rect.position.x() + rect.size.x() - 1, rect.position.y()),
-              geometry::Position(rect.position.x() + rect.size.x() - 1, rect.position.y() + rect.size.y()),
+              geometry::Position(rect.position.x() + rect.size.x() - 1, rect.position.y() + rect.size.y() - 1),
               color);
 }
 

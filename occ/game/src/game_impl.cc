@@ -47,21 +47,11 @@ void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
 
   // Update the level (e.g. moving platforms and other objects)
   update_level();
-
-  // Update the player
   update_player(player_input);
-
-  // Update items
   update_items();
-
-  // Update missile
   update_missile();
-
-  // Update enemies
   update_enemies();
-
-  // Update more?
-  // ...
+  update_hazards();
 }
 
 int GameImpl::get_bg_sprite(const int x, const int y) const
@@ -112,7 +102,7 @@ void GameImpl::update_level()
     {
       // Only move player if not colliding with any static objects
       const auto new_player_pos = player_.position + platform.get_velocity();
-      if (!collides_solid(new_player_pos, player_.size))
+      if (!level_->collides_solid(new_player_pos, player_.size))
       {
         player_.position = new_player_pos;
       }
@@ -233,7 +223,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
   if (!player_.noclip)
   {
     if (player_input.jump && !player_.jumping && !player_.falling &&
-        !collides_solid(player_.position + geometry::Position(0, player_.reverse_gravity ? 1 : -1), player_.size))
+        !level_->collides_solid(player_.position + geometry::Position(0, player_.reverse_gravity ? 1 : -1), player_.size))
     {
       // Player wants to jump
       player_.jumping = true;
@@ -304,7 +294,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
     const auto new_player_pos = player_.position + geometry::Position(step_x, 0);
 
     if (!player_.noclip &&
-        (collides_solid(new_player_pos, player_.size) ||
+        (level_->collides_solid(new_player_pos, player_.size) ||
          // collide with world edges
          new_player_pos.x() < 0 || new_player_pos.x() >= level_->width * 16 - player_.size.x()))
     {
@@ -322,7 +312,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
     const auto new_player_pos = player_.position + geometry::Position(0, step_y);
 
     // If player is falling down (step_y == 1) we need to check for collision with platforms
-    if (!player_.noclip && (collides_solid(new_player_pos, player_.size) || (step_y == 1 && player_on_platform(new_player_pos))))
+    if (!player_.noclip && (level_->collides_solid(new_player_pos, player_.size) || (step_y == 1 && player_on_platform(new_player_pos))))
     {
       player_.collide_y = true;
       break;
@@ -365,7 +355,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
       player_.jumping = false;
     }
     else if (player_.jump_tick != 0 &&
-             collides_solid(player_.position + geometry::Position(0, player_.reverse_gravity ? -1 : 1), player_.size))
+             level_->collides_solid(player_.position + geometry::Position(0, player_.reverse_gravity ? -1 : 1), player_.size))
     {
       // Player did not actually collide with the ground, but standing directly above it
       // and this isn't the first tick in the jump, so we can consider the jump to have
@@ -378,7 +368,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
   if (!player_.noclip)
   {
     player_.falling = !player_.jumping && player_.velocity.y() > 0 && !player_.collide_y &&
-      !collides_solid(player_.position + geometry::Position(0, 1), player_.size);
+      !level_->collides_solid(player_.position + geometry::Position(0, 1), player_.size);
   }
 }
 
@@ -447,7 +437,7 @@ void GameImpl::update_missile()
       missile_.position += geometry::Position((missile_.right ? 1 : -1), 0);
 
       // Adjust position due to collision size being smaller than sprite size
-      if (collides_solid(missile_.position + geometry::Position(0, 3), missile_.size))
+      if (level_->collides_solid(missile_.position + geometry::Position(0, 3), missile_.size))
       {
         missile_.alive = false;
 
@@ -568,15 +558,9 @@ void GameImpl::update_hazards()
 {
   for (auto&& hazard : level_->hazards)
   {
-    hazard->update();
+    hazard->update({player_.position, player_.size});
     objects_.emplace_back(hazard->position, static_cast<int>(hazard->get_sprite()), 1, false);
   }
-}
-
-// TODO: move to Level completely
-bool GameImpl::collides_solid(const geometry::Position& position, const geometry::Size& size)
-{
-  return level_->collides_solid(position, size);
 }
 
 /**

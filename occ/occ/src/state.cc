@@ -464,7 +464,7 @@ void GameState::update(const Input& input)
     {
       debug_info_ = !debug_info_;
     }
-    if (input.num_2.pressed())
+    if (input.d.pressed())
     {
       game_renderer_.set_debug(!game_renderer_.get_debug());
     }

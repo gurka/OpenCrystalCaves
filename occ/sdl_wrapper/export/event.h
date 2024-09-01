@@ -37,6 +37,7 @@ struct Input
   Button down = Button();
   Button left = Button();
   Button right = Button();
+  Button d = Button();
   Button z = Button();
   Button x = Button();
 
