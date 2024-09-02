@@ -53,7 +53,10 @@ class Thorn : public Hazard
 {
   // Thrusts up when player is above
  public:
-  Thorn(geometry::Position position) : Hazard(position) { detection_rect_ = geometry::Rectangle(position.x(), 0, 16, position.y() + 16); }
+  Thorn(geometry::Position position) : Hazard(position)
+  {
+    detection_rect_ = geometry::Rectangle(position.x(), position.y() - 16 * 2, 16, 16 * 3);
+  }
 
   virtual void update(const geometry::Rectangle& player_rect) override;
   virtual Sprite get_sprite() const override { return static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_THORN_1) + frame_); }

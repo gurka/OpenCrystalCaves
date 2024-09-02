@@ -28,9 +28,9 @@ struct Rectangle
   Position position;
   Size size;
 
-  constexpr Rectangle operator+(const Vector<int>& v) const { return Rectangle(position + v, size); }
+  constexpr Rectangle operator+(const Position& p) const { return Rectangle(position + p, size); }
 
-  constexpr Rectangle operator-(const Vector<int>& v) const { return Rectangle(position - v, size); }
+  constexpr Rectangle operator-(const Position& p) const { return Rectangle(position - p, size); }
 };
 
 // Returns true if Rectangle a and Rectangle b intersect
