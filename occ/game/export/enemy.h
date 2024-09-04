@@ -5,13 +5,15 @@
 #include "misc.h"
 #include "sprite.h"
 
+class Level;
+
 class Enemy
 {
  public:
   Enemy(geometry::Position position, int health, int points) : position(std::move(position)), health(health), points(points) {}
   virtual ~Enemy() = default;
 
-  virtual void update() = 0;
+  virtual void update(const Level& level) = 0;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const = 0;
 
   geometry::Position position;
@@ -25,7 +27,7 @@ class Bigfoot : public Enemy
  public:
   Bigfoot(geometry::Position position) : Enemy(position, 5, 5000) {}
 
-  virtual void update() override;
+  virtual void update(const Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
 
  private:
@@ -40,7 +42,7 @@ class Hopper : public Enemy
  public:
   Hopper(geometry::Position position) : Enemy(position, 1, 100) {}
 
-  virtual void update() override;
+  virtual void update(const Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
 
  private:
@@ -54,7 +56,7 @@ class Slime : public Enemy
  public:
   Slime(geometry::Position position) : Enemy(position, 1, 100) {}
 
-  virtual void update() override;
+  virtual void update(const Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
 
  private:
@@ -69,7 +71,7 @@ class Snake : public Enemy
  public:
   Snake(geometry::Position position) : Enemy(position, 2, 100) {}
 
-  virtual void update() override;
+  virtual void update(const Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
 
  private:
@@ -84,7 +86,7 @@ class Spider : public Enemy
  public:
   Spider(geometry::Position position) : Enemy(position, 1, 100) {}
 
-  virtual void update() override;
+  virtual void update(const Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
 
  private:

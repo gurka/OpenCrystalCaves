@@ -524,7 +524,7 @@ void GameImpl::update_enemies()
     //       This is applicable for when the player gets hit as well
     //       Modify the sprite on the fly / some kind of filter, or pre-create white sprites
     //       for all player and enemy sprite when loading sprites?
-    (*it)->update();
+    (*it)->update(*level_);
 
     // Check if enemy died
     if ((*it)->health == 0)
