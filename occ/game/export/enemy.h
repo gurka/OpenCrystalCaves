@@ -5,7 +5,7 @@
 #include "misc.h"
 #include "sprite.h"
 
-class Level;
+struct Level;
 
 class Enemy
 {
@@ -48,6 +48,7 @@ class Hopper : public Enemy
  private:
   bool left_ = false;
   int frame_ = 0;
+  int next_reverse_ = 0;
 };
 
 class Slime : public Enemy

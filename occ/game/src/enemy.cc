@@ -46,13 +46,15 @@ void Hopper::update(const Level& level)
   }
   // Reverse direction if colliding left/right or about to fall
   // Note: falling looks at two points near the left- and right- bottom corners
-  if (level.collides_solid(position, geometry::Size(16, 16)) ||
+  if (next_reverse_ == 0 || level.collides_solid(position, geometry::Size(16, 16)) ||
       !level.collides_solid(position + geometry::Position(1, 1), geometry::Size(1, 16)) ||
       !level.collides_solid(position + geometry::Position(16 - 1, 1), geometry::Size(1, 16)))
   {
     left_ = !left_;
+    // Change directions every 1-20 seconds
+    next_reverse_ = 17 * (1 + static_cast<int>(rand() % 19));
   }
-  // TODO: move, randomly change directions
+  next_reverse_--;
 }
 
 std::vector<std::pair<geometry::Position, Sprite>> Hopper::get_sprites() const

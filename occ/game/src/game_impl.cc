@@ -46,6 +46,7 @@ void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
   objects_.clear();
 
   // Update the level (e.g. moving platforms and other objects)
+  // TODO: don't update enemies off screen
   update_level();
   update_player(player_input);
   update_items();
