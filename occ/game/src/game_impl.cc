@@ -557,10 +557,20 @@ void GameImpl::update_enemies()
 
 void GameImpl::update_hazards()
 {
-  for (auto&& hazard : level_->hazards)
+  for (auto it = level_->hazards.begin(); it != level_->hazards.end();)
   {
-    hazard->update({player_.position, player_.size});
-    objects_.emplace_back(hazard->position, static_cast<int>(hazard->get_sprite()), 1, false);
+    (*it)->update({player_.position, player_.size}, *level_);
+
+    // Check if hazard died
+    if (!(*it)->is_alive())
+    {
+      it = level_->hazards.erase(it);
+    }
+    else
+    {
+      objects_.emplace_back((*it)->position, static_cast<int>((*it)->get_sprite()), 1, false);
+      it++;
+    }
   }
 }
 
