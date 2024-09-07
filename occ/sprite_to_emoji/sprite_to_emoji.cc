@@ -35,14 +35,8 @@ const std::string colors[] = {
   "⬜",
 };
 
-int main(int argc, char* argv[])
+int main()
 {
-  if (argc != 2)
-  {
-    std::cerr << "Usage: sprite_to_emoji <sprite_id>" << std::endl;
-    return 1;
-  }
-  const int sprite = atoi(argv[1]);
   const int episode = 1;
   const auto path = get_data_path(misc::string_format(GFX_FILENAME_FMT, episode));
   std::ifstream input{path, std::ios::binary};
@@ -58,10 +52,6 @@ int main(int argc, char* argv[])
       uint8_t* pp = (uint8_t*)(&pixels[0]);
       for (int i = 0; i < header.count; i++, idx++)
       {
-        /*if (idx != sprite)
-        {
-          continue;
-        }*/
         for (int h = 0; h < header.height; h++)
         {
           for (int w = 0; w < header.width; w++)
