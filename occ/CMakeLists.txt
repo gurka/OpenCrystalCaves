@@ -121,6 +121,14 @@ target_include_directories(sprite_viewer SYSTEM PUBLIC
   "utils/export"
 )
 
+add_subdirectory("sprite_to_emoji")
+target_compile_options(sprite_to_emoji PRIVATE ${COMPILE_OPTIONS})
+target_include_directories(sprite_to_emoji SYSTEM PUBLIC
+  "occ/src"
+  "sdl_wrapper/export"
+  "utils/export"
+)
+
 # tests
 enable_testing()
 add_subdirectory(external/googletest)
