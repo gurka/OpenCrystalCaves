@@ -1,3 +1,9 @@
+# Ignore all
+*
+
+# Unignore all with extensions
+!*.*
+
 debug/
 release/
 eclipse/
@@ -28,6 +34,3 @@ build/*.pdb
 
 # macOS
 occ/build/
-build/*_viewer
-build/sound_player
-build/occ

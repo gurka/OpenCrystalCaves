@@ -1,4 +1,4 @@
-﻿/*
+/*
 https://moddingwiki.shikadi.net/wiki/ProGraphx_Toolbox_tileset_format
 */
 #include <fstream>
@@ -16,23 +16,23 @@ struct Header
   uint8_t height;
 };
 
-const std::wstring colors[] = {
-  L"⚫",
-  L"🔵",
-  L"🟢",
-  L"💧",
-  L"🔴",
-  L"🟣",
-  L"🟠",
-  L"⚪",
-  L"⬛",
-  L"🟦",
-  L"🟩",
-  L"🐬",
-  L"🟥",
-  L"🟪",
-  L"🟨",
-  L"⬜",
+const std::string colors[] = {
+  "⬛",
+  "🇪🇺",
+  "🦚",
+  "📘",
+  "🟥",
+  "🟣",
+  "🟠",
+  "⚪",
+  "🪦",
+  "🟦",
+  "🟩",
+  "🩵",
+  "🚨",
+  "🟪",
+  "🟨",
+  "⬜",
 };
 
 int main(int argc, char* argv[])
@@ -58,10 +58,10 @@ int main(int argc, char* argv[])
       uint8_t* pp = (uint8_t*)(&pixels[0]);
       for (int i = 0; i < header.count; i++, idx++)
       {
-        if (idx != sprite)
+        /*if (idx != sprite)
         {
           continue;
-        }
+        }*/
         for (int h = 0; h < header.height; h++)
         {
           for (int w = 0; w < header.width; w++)
@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
               const bool t = (t_plane >> bit) & 1;
               if (!t)
               {
-                std::wcout << colors[0];
+                std::cout << colors[0];
               }
               else
               {
@@ -84,7 +84,7 @@ int main(int argc, char* argv[])
                 const bool g = (g_plane >> bit) & 1;
                 const bool r = (r_plane >> bit) & 1;
                 const bool i_ = (i_plane >> bit) & 1;
-                std::wcout
+                std::cout
                   << colors[(static_cast<int>(i_) << 3) | (static_cast<int>(r) << 2) | (static_cast<int>(g) << 1) | static_cast<int>(b)];
               }
             }

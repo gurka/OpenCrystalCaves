@@ -116,7 +116,7 @@ struct SoundData
 
   std::string to_raw(int sound_index) const
   {
-    const int freq_len = 180;
+    const int freq_len = 320;
     // Bytes per sample (single channel)
     const int bps = (spec.format & 0xFF) / 8;
 
