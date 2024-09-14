@@ -13,6 +13,7 @@ add_library(utils
   "export/vector.h"
   "src/exe_data.cc"
   "src/logger.cc"
+  "src/misc.cc"
   "src/path.cc"
 )
 target_include_directories(utils PUBLIC

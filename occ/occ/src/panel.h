@@ -89,6 +89,7 @@ enum class PanelType
   PANEL_TYPE_QUIT_TO_TITLE,
   PANEL_TYPE_QUIT_TO_MAIN_LEVEL,
   PANEL_TYPE_WARP_TO_LEVEL,
+  PANEL_TYPE_WEBSITE,
 };
 
 class Panel
@@ -115,7 +116,7 @@ class Panel
   {
   }
   // Basic panel
-  Panel(const PanelType type) : children_({}), type_(type) {}
+  Panel(const PanelType type) : type_(type), children_({}) {}
 
   Panel* update(const Input& input);
 

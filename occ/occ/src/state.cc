@@ -187,7 +187,7 @@ TitleState::TitleState(SpriteManager& sprite_manager,
            {PanelText::PANEL_TEXT_STORY_2, exe_data},
          }}},
         {7, {PanelType::PANEL_TYPE_DISABLED}},
-        {8, {PanelType::PANEL_TYPE_DISABLED}},
+        {8, {PanelType::PANEL_TYPE_WEBSITE}},
         {9, {PanelText::PANEL_TEXT_ABOUT, exe_data}},
         {10, {PanelType::PANEL_TYPE_QUIT_TO_OS}},
       })
@@ -223,6 +223,10 @@ void TitleState::update(const Input& input)
         break;
       case PanelType::PANEL_TYPE_QUIT_TO_OS:
         finish();
+        break;
+      case PanelType::PANEL_TYPE_WEBSITE:
+        misc::open_url("https://congusbongus.itch.io/opencrystalcaves");
+        panel_current_ = &panel_;
         break;
       default:
         break;
