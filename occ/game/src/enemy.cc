@@ -17,17 +17,12 @@ void Bigfoot::update(const Level& level)
   {
     frame_ = 0;
   }
-  if (left_)
-  {
-    position -= geometry::Position(2, 0);
-  }
-  else
-  {
-    position += geometry::Position(2, 0);
-  }
+  const auto d = geometry::Position(left_ ? -2 : 2, 0);
+  position += d;
   if (should_reverse(level))
   {
     left_ = !left_;
+    position -= d;
   }
   // TODO: detect player/run
 }
@@ -57,17 +52,12 @@ void Hopper::update(const Level& level)
   {
     frame_ = 17;
   }
-  if (left_)
-  {
-    position -= geometry::Position(4, 0);
-  }
-  else
-  {
-    position += geometry::Position(4, 0);
-  }
+  const auto d = geometry::Position(left_ ? -4 : 4, 0);
+  position += d;
   if (next_reverse_ == 0 || should_reverse(level))
   {
     left_ = !left_;
+    position -= d;
     // Change directions every 1-20 seconds
     next_reverse_ = 17 * (1 + static_cast<int>(rand() % 19));
   }
@@ -118,17 +108,12 @@ void Snake::update(const Level& level)
   {
     frame_ = 0;
   }
-  if (left_)
-  {
-    position -= geometry::Position(2, 0);
-  }
-  else
-  {
-    position += geometry::Position(2, 0);
-  }
+  const auto d = geometry::Position(left_ ? -2 : 2, 0);
+  position += d;
   if (should_reverse(level))
   {
     left_ = !left_;
+    position -= d;
   }
   // TODO: pause
 }
@@ -146,7 +131,14 @@ void Spider::update([[maybe_unused]] const Level& level)
   {
     frame_ = 0;
   }
-  // TODO: move, fire webs
+  const auto d = geometry::Position(0, up_ ? -2 : 2);
+  position += d;
+  if (level.collides_solid(position, size))
+  {
+    up_ = !up_;
+    position -= d;
+  }
+  // TODO: fire webs
 }
 
 std::vector<std::pair<geometry::Position, Sprite>> Spider::get_sprites() const
