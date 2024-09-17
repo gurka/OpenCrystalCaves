@@ -10,15 +10,25 @@ struct Level;
 class Enemy
 {
  public:
-  Enemy(geometry::Position position, int health, int points) : position(std::move(position)), health(health), points(points) {}
+  Enemy(geometry::Position position, geometry::Size size, int health, int points)
+    : position(std::move(position)),
+      size(std::move(size)),
+      health(health),
+      points(points)
+  {
+  }
   virtual ~Enemy() = default;
 
   virtual void update(const Level& level) = 0;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const = 0;
 
   geometry::Position position;
+  geometry::Size size;
   int health;
   int points;
+
+ protected:
+  bool should_reverse(const Level& level) const;
 };
 
 class Bigfoot : public Enemy
@@ -55,7 +65,7 @@ class Bigfoot : public Enemy
   // ⚫⚫⚫⚫⚫⚫🟢⚫⚫⬛🟢⬛🟢⬛🟢⚫
   // 2-tile tall enemy, runs if they see player
  public:
-  Bigfoot(geometry::Position position) : Enemy(position, 5, 5000) {}
+  Bigfoot(geometry::Position position) : Enemy(position - geometry::Position(0, 16), geometry::Size(16, 32), 5, 5000) {}
 
   virtual void update(const Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
@@ -79,7 +89,7 @@ class Hopper : public Enemy
   // ⚫⚫⬜⬜⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫
   // Moves left and right erratically
  public:
-  Hopper(geometry::Position position) : Enemy(position, 1, 100) {}
+  Hopper(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 1, 100) {}
 
   virtual void update(const Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
@@ -103,7 +113,7 @@ class Slime : public Enemy
   // ⬛⬛⬛⬛⬛⬛⬛⬛⬛🦚🦚🦚🦚🦚⬛⬛
   // Flies around, pauses and changes directions erratically
  public:
-  Slime(geometry::Position position) : Enemy(position, 1, 100) {}
+  Slime(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 1, 100) {}
 
   virtual void update(const Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
@@ -131,7 +141,7 @@ class Snake : public Enemy
   // ⚫⚫⚫🟣🟪🟪🟪🟪⚫⚫🟪🟪🟪🟪🟪⚫
   // Moves left/right, pauses, leaves slime
  public:
-  Snake(geometry::Position position) : Enemy(position, 2, 100) {}
+  Snake(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 2, 100) {}
 
   virtual void update(const Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
@@ -160,7 +170,7 @@ class Spider : public Enemy
   // 🟢⚫⚫⚫⚫⚫🔵🔵🔵🔵⚫⚫⚫⚫⚫🟢
   // Moves up and down, shoots webs ahead
  public:
-  Spider(geometry::Position position) : Enemy(position, 1, 100) {}
+  Spider(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 1, 100) {}
 
   virtual void update(const Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
