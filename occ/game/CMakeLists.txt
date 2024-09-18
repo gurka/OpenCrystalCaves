@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.5)
 project(game)
 
 add_library(game
+  "export/actor.h"
   "export/enemy.h"
   "export/entrance.h"
   "export/game.h"
@@ -13,6 +14,7 @@ add_library(game
   "export/player_input.h"
   "export/player.h"
   "export/tile.h"
+  "src/actor.cc"
   "src/enemy.cc"
   "src/entrance.cc"
   "src/explosion.cc"

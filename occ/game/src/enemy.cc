@@ -10,7 +10,7 @@ bool Enemy::should_reverse(const Level& level) const
     !level.collides_solid(position + geometry::Position(size.x() - 1, 1), geometry::Size(1, size.y()));
 }
 
-void Bigfoot::update(const Level& level)
+void Bigfoot::update([[maybe_unused]] const geometry::Rectangle& player_rect, Level& level)
 {
   frame_++;
   if (frame_ == 8)
@@ -41,7 +41,7 @@ std::vector<std::pair<geometry::Position, Sprite>> Bigfoot::get_sprites() const
   };
 }
 
-void Hopper::update(const Level& level)
+void Hopper::update([[maybe_unused]] const geometry::Rectangle& player_rect, Level& level)
 {
   frame_ += left_ ? -1 : 1;
   if (frame_ == 18)
@@ -69,7 +69,7 @@ std::vector<std::pair<geometry::Position, Sprite>> Hopper::get_sprites() const
   return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_HOPPER_1) + frame_))};
 }
 
-void Slime::update([[maybe_unused]] const Level& level)
+void Slime::update([[maybe_unused]] const geometry::Rectangle& player_rect, [[maybe_unused]] Level& level)
 {
   frame_++;
   if (frame_ == 4)
@@ -101,7 +101,7 @@ std::vector<std::pair<geometry::Position, Sprite>> Slime::get_sprites() const
   return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(s) + frame_))};
 }
 
-void Snake::update(const Level& level)
+void Snake::update([[maybe_unused]] const geometry::Rectangle& player_rect, Level& level)
 {
   frame_++;
   if (frame_ >= (paused_ ? 7 : 9))
@@ -124,7 +124,7 @@ std::vector<std::pair<geometry::Position, Sprite>> Snake::get_sprites() const
   return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(s) + frame_))};
 }
 
-void Spider::update([[maybe_unused]] const Level& level)
+void Spider::update([[maybe_unused]] const geometry::Rectangle& player_rect, [[maybe_unused]] Level& level)
 {
   frame_++;
   if (frame_ == 8)

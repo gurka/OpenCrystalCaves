@@ -1,29 +1,22 @@
 #pragma once
 #include <utility>
 
+#include "actor.h"
 #include "geometry.h"
 #include "misc.h"
 #include "sprite.h"
 
 struct Level;
 
-class Enemy
+class Enemy : public Actor
 {
  public:
-  Enemy(geometry::Position position, geometry::Size size, int health, int points)
-    : position(std::move(position)),
-      size(std::move(size)),
-      health(health),
-      points(points)
-  {
-  }
+  Enemy(geometry::Position position, geometry::Size size, int health, int points) : Actor(position, size), health(health), points(points) {}
   virtual ~Enemy() = default;
 
-  virtual void update(const Level& level) = 0;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const = 0;
+  virtual bool is_alive() const override { return health > 0; }
+  virtual int get_points() const override { return points; }
 
-  geometry::Position position;
-  geometry::Size size;
   int health;
   int points;
 
@@ -67,7 +60,7 @@ class Bigfoot : public Enemy
  public:
   Bigfoot(geometry::Position position) : Enemy(position - geometry::Position(0, 16), geometry::Size(16, 32), 5, 5000) {}
 
-  virtual void update(const Level& level) override;
+  virtual void update(const geometry::Rectangle& player_rect, Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
 
  private:
@@ -91,7 +84,7 @@ class Hopper : public Enemy
  public:
   Hopper(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 1, 100) {}
 
-  virtual void update(const Level& level) override;
+  virtual void update(const geometry::Rectangle& player_rect, Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
 
  private:
@@ -115,7 +108,7 @@ class Slime : public Enemy
  public:
   Slime(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 1, 100) {}
 
-  virtual void update(const Level& level) override;
+  virtual void update(const geometry::Rectangle& player_rect, Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
 
  private:
@@ -143,7 +136,7 @@ class Snake : public Enemy
  public:
   Snake(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 2, 100) {}
 
-  virtual void update(const Level& level) override;
+  virtual void update(const geometry::Rectangle& player_rect, Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
 
  private:
@@ -172,8 +165,12 @@ class Spider : public Enemy
  public:
   Spider(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 1, 100) {}
 
-  virtual void update(const Level& level) override;
+  virtual void update(const geometry::Rectangle& player_rect, Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
+  virtual geometry::Rectangle get_detection_rect(const Level& level) const override
+  {
+    return create_detection_rect(0, up_ ? -1 : 1, level);
+  }
 
  private:
   bool up_ = false;

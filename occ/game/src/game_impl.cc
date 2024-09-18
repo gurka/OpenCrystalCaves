@@ -520,15 +520,16 @@ void GameImpl::update_enemies()
 {
   for (auto it = level_->enemies.begin(); it != level_->enemies.end();)
   {
+    auto e = it->get();
     // TODO: When enemy getting hit and not dying the enemy sprite should turn white for
     //       some time. All colors except black in the sprite should become white.
     //       This is applicable for when the player gets hit as well
     //       Modify the sprite on the fly / some kind of filter, or pre-create white sprites
     //       for all player and enemy sprite when loading sprites?
-    (*it)->update(*level_);
+    e->update({player_.position, player_.size}, *level_);
 
     // Check if enemy died
-    if ((*it)->health == 0)
+    if (!e->is_alive())
     {
       // TODO: When an enemy dies there should be another type of explosion
       //       or bones spawning. The explosion/bones should move during animation
@@ -536,17 +537,17 @@ void GameImpl::update_enemies()
       // Create explosion where enemy is
       explosion_.alive = true;
       explosion_.frame = 0;
-      explosion_.position = (*it)->position;
+      explosion_.position = e->position;
 
-      // Give score (?)
-      score_ += 500;
+      // Give score: TODO: score particle
+      score_ += e->get_points();
 
       // Remove enemy
       it = level_->enemies.erase(it);
     }
     else
     {
-      for (const auto& sprite_pos : (*it)->get_sprites())
+      for (const auto& sprite_pos : e->get_sprites())
       {
         objects_.emplace_back(sprite_pos.first, static_cast<int>(sprite_pos.second), 1, false);
       }
@@ -559,16 +560,20 @@ void GameImpl::update_hazards()
 {
   for (auto it = level_->hazards.begin(); it != level_->hazards.end();)
   {
-    (*it)->update({player_.position, player_.size}, *level_);
+    auto h = it->get();
+    h->update({player_.position, player_.size}, *level_);
 
     // Check if hazard died
-    if (!(*it)->is_alive())
+    if (!h->is_alive())
     {
       it = level_->hazards.erase(it);
     }
     else
     {
-      objects_.emplace_back((*it)->position, static_cast<int>((*it)->get_sprite()), 1, false);
+      for (const auto& sprite_pos : h->get_sprites())
+      {
+        objects_.emplace_back(sprite_pos.first, static_cast<int>(sprite_pos.second), 1, false);
+      }
       it++;
     }
   }

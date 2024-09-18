@@ -1,28 +1,18 @@
-// TODO: refactor and combine with Enemy
 #pragma once
 #include <utility>
 
+#include "actor.h"
 #include "geometry.h"
 #include "misc.h"
 #include "sprite.h"
 
 struct Level;
 
-class Hazard
+class Hazard : public Actor
 {
  public:
-  Hazard(geometry::Position position) : position(position), detection_rect_() {}
+  Hazard(geometry::Position position) : Actor(position, geometry::Size(16, 16)) {}
   virtual ~Hazard() = default;
-
-  virtual void update(const geometry::Rectangle& player_rect, Level& level) = 0;
-  virtual Sprite get_sprite() const = 0;
-  const geometry::Rectangle& get_detection_rect() const { return detection_rect_; }
-  virtual bool is_alive() const { return true; }
-
-  geometry::Position position;
-
- protected:
-  geometry::Rectangle detection_rect_;
 };
 
 class AirTank : public Hazard
@@ -48,7 +38,7 @@ class AirTank : public Hazard
   AirTank(geometry::Position position, bool top) : Hazard(position), top_(top) {}
 
   virtual void update(const geometry::Rectangle& player_rect, Level& level) override;
-  virtual Sprite get_sprite() const override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
 
  private:
   bool top_;
@@ -73,20 +63,17 @@ class Laser : public Hazard
   // ⚫🪦🪦⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫
   // Faces left/right, fires slow laser at player when they enter line
  public:
-  Laser(geometry::Position position, bool left) : Hazard(position), left_(left)
-  {
-    if (left)
-    {
-      detection_rect_ = geometry::Rectangle(position.x() - 16 * 20, position.y(), 16 * 20 + 2, 16);
-    }
-    else
-    {
-      detection_rect_ = geometry::Rectangle(position.x() + 14, position.y(), 16 * 20, 16);
-    }
-  }
+  Laser(geometry::Position position, bool left) : Hazard(position), left_(left) {}
 
   virtual void update(const geometry::Rectangle& player_rect, Level& level) override;
-  virtual Sprite get_sprite() const override { return left_ ? Sprite::SPRITE_LASER_L : Sprite::SPRITE_LASER_R; }
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override
+  {
+    return {std::make_pair(position, left_ ? Sprite::SPRITE_LASER_L : Sprite::SPRITE_LASER_R)};
+  }
+  virtual geometry::Rectangle get_detection_rect(const Level& level) const override
+  {
+    return create_detection_rect(left_ ? -1 : 1, 0, level);
+  }
   void remove_child() { child_ = nullptr; }
 
  private:
@@ -106,7 +93,10 @@ class LaserBeam : public Hazard
   LaserBeam(geometry::Position position, bool left, Laser& parent) : Hazard(position), left_(left), parent_(parent) {}
 
   virtual void update(const geometry::Rectangle& player_rect, Level& level) override;
-  virtual Sprite get_sprite() const override { return frame_ == 0 ? Sprite::SPRITE_LASER_BEAM_1 : Sprite::SPRITE_LASER_BEAM_2; }
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override
+  {
+    return {std::make_pair(position, frame_ == 0 ? Sprite::SPRITE_LASER_BEAM_1 : Sprite::SPRITE_LASER_BEAM_2)};
+  }
   virtual bool is_alive() const override { return alive_; }
 
  private:
@@ -130,13 +120,14 @@ class Thorn : public Hazard
   // ⬛⬛⬛⬛⬛🦚🟩🦚🦚⬛⬛⬛⬛⬛⬛⬛
   // Thrusts up when player is above
  public:
-  Thorn(geometry::Position position) : Hazard(position)
-  {
-    detection_rect_ = geometry::Rectangle(position.x(), position.y() - 16 * 2, 16, 16 * 3);
-  }
+  Thorn(geometry::Position position) : Hazard(position) {}
 
   virtual void update(const geometry::Rectangle& player_rect, Level& level) override;
-  virtual Sprite get_sprite() const override { return static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_THORN_1) + frame_); }
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override
+  {
+    return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_THORN_1) + frame_))};
+  }
+  virtual geometry::Rectangle get_detection_rect(const Level& level) const override { return create_detection_rect(0, -1, level); }
 
  private:
   int frame_ = 0;

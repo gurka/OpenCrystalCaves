@@ -39,5 +39,11 @@ constexpr bool isColliding(const Rectangle& a, const Rectangle& b)
   return a.position.x() < b.position.x() + b.size.x() && a.position.y() < b.position.y() + b.size.y() &&
     a.position.x() + a.size.x() > b.position.x() && a.position.y() + a.size.y() > b.position.y();
 }
+// Returns true if A is within B
+constexpr bool is_inside(const Rectangle& a, const Rectangle& b)
+{
+  return a.position.x() >= b.position.x() && a.position.y() >= b.position.y() &&
+    a.position.x() + a.size.x() <= b.position.x() + b.size.x() && a.position.y() + a.size.y() <= b.position.y() + b.size.y();
+}
 
 }

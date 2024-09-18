@@ -12,18 +12,15 @@ void AirTank::update([[maybe_unused]] const geometry::Rectangle& player_rect, [[
   }
 }
 
-Sprite AirTank::get_sprite() const
+std::vector<std::pair<geometry::Position, Sprite>> AirTank::get_sprites() const
 {
-  if (top_)
-  {
-    return static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_AIR_TANK_TOP_1) + frame_);
-  }
-  return Sprite::SPRITE_AIR_TANK_BOTTOM;
+  return {std::make_pair(
+    position, top_ ? static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_AIR_TANK_TOP_1) + frame_) : Sprite::SPRITE_AIR_TANK_BOTTOM)};
 }
 
 void Laser::update(const geometry::Rectangle& player_rect, Level& level)
 {
-  if (child_ == nullptr && isColliding(detection_rect_, player_rect))
+  if (child_ == nullptr && isColliding(get_detection_rect(level), player_rect))
   {
     geometry::Position child_pos = position + geometry::Position(left_ ? -12 : 12, -1);
     child_ = new LaserBeam(child_pos, left_, *this);
@@ -42,9 +39,9 @@ void LaserBeam::update([[maybe_unused]] const geometry::Rectangle& player_rect, 
   }
 }
 
-void Thorn::update(const geometry::Rectangle& player_rect, [[maybe_unused]] Level& level)
+void Thorn::update(const geometry::Rectangle& player_rect, Level& level)
 {
-  if (isColliding(detection_rect_, player_rect))
+  if (isColliding(get_detection_rect(level), player_rect))
   {
     if (frame_ < 4)
     {
