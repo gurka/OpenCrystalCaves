@@ -111,7 +111,10 @@ int main(int argc, char* argv[])
         }
         for (const auto& hazard : level->hazards)
         {
-          sprite_manager.render_tile(static_cast<int>(hazard->get_sprite()), hazard->position);
+          for (const auto& sprite_pos : hazard->get_sprites())
+          {
+            sprite_manager.render_tile(static_cast<int>(sprite_pos.second), sprite_pos.first);
+          }
         }
         for (const auto& platform : level->moving_platforms)
         {

@@ -425,6 +425,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             break;
           case 'n':
             // Check tile above for continuation tile
+            if (i < level->width)
+            {
+              break;
+            }
             switch (tile_ids[i - level->width])
             {
               case '[':

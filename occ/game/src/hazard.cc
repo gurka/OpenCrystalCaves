@@ -20,7 +20,7 @@ std::vector<std::pair<geometry::Position, Sprite>> AirTank::get_sprites() const
 
 void Laser::update(const geometry::Rectangle& player_rect, Level& level)
 {
-  if (child_ == nullptr && isColliding(get_detection_rect(level), player_rect))
+  if (child_ == nullptr && is_any_colliding(get_detection_rects(level), player_rect))
   {
     geometry::Position child_pos = position + geometry::Position(left_ ? -12 : 12, -1);
     child_ = new LaserBeam(child_pos, left_, *this);
@@ -41,7 +41,7 @@ void LaserBeam::update([[maybe_unused]] const geometry::Rectangle& player_rect, 
 
 void Thorn::update(const geometry::Rectangle& player_rect, Level& level)
 {
-  if (isColliding(get_detection_rect(level), player_rect))
+  if (is_any_colliding(get_detection_rects(level), player_rect))
   {
     if (frame_ < 4)
     {

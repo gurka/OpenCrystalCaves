@@ -70,9 +70,9 @@ class Laser : public Hazard
   {
     return {std::make_pair(position, left_ ? Sprite::SPRITE_LASER_L : Sprite::SPRITE_LASER_R)};
   }
-  virtual geometry::Rectangle get_detection_rect(const Level& level) const override
+  virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override
   {
-    return create_detection_rect(left_ ? -1 : 1, 0, level);
+    return create_detection_rects(left_ ? -1 : 1, 0, level);
   }
   void remove_child() { child_ = nullptr; }
 
@@ -127,7 +127,10 @@ class Thorn : public Hazard
   {
     return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_THORN_1) + frame_))};
   }
-  virtual geometry::Rectangle get_detection_rect(const Level& level) const override { return create_detection_rect(0, -1, level); }
+  virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override
+  {
+    return create_detection_rects(0, -1, level);
+  }
 
  private:
   int frame_ = 0;

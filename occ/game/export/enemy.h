@@ -62,6 +62,10 @@ class Bigfoot : public Enemy
 
   virtual void update(const geometry::Rectangle& player_rect, Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
+  virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override
+  {
+    return create_detection_rects(left_ ? -1 : 1, 0, level);
+  }
 
  private:
   bool left_ = false;
@@ -167,9 +171,9 @@ class Spider : public Enemy
 
   virtual void update(const geometry::Rectangle& player_rect, Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
-  virtual geometry::Rectangle get_detection_rect(const Level& level) const override
+  virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override
   {
-    return create_detection_rect(0, up_ ? -1 : 1, level);
+    return create_detection_rects(0, up_ ? -1 : 1, level);
   }
 
  private:
