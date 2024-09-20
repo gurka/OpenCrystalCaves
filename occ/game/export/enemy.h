@@ -7,6 +7,7 @@
 #include "sprite.h"
 
 struct Level;
+class SpiderWeb;
 
 class Enemy : public Actor
 {
@@ -165,7 +166,7 @@ class Spider : public Enemy
   // ⚫🟢⚫🔵🔵🟦🟦🟦🟦🟦🟦🔵🔵⚫🟢⚫
   // ⚫🟢⚫⚫🔵🔵🔵🔵🔵🔵🔵🔵⚫⚫🟢⚫
   // 🟢⚫⚫⚫⚫⚫🔵🔵🔵🔵⚫⚫⚫⚫⚫🟢
-  // Moves up and down, shoots webs ahead
+  // Moves up and down, shoots webs below
  public:
   Spider(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 1, 100) {}
 
@@ -173,10 +174,12 @@ class Spider : public Enemy
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
   virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override
   {
-    return create_detection_rects(0, up_ ? -1 : 1, level);
+    return create_detection_rects(0, 1, level);
   }
+  void remove_child() { child_ = nullptr; }
 
  private:
   bool up_ = false;
   int frame_ = 0;
+  SpiderWeb* child_ = nullptr;
 };

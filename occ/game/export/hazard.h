@@ -7,6 +7,7 @@
 #include "sprite.h"
 
 struct Level;
+class Spider;
 
 class Hazard : public Actor
 {
@@ -134,4 +135,36 @@ class Thorn : public Hazard
 
  private:
   int frame_ = 0;
+};
+
+class SpiderWeb : public Hazard
+{
+  // ⬛⚪⬛⬛⬛⬛⬛⚪⬛⬛⬛⬛⬛⬛⚪⬛
+  // ⬛⚪⬜⬜⬛⬛⬛⚪⬛⬛⬛⬛⬛⬛⚪⬛
+  // ⬛⚪⬛⬛⬜⬜⬜⚪⬛⬛⬛⬜⬜⬜⚪⬛
+  // ⬛⚪⬛⬛⬛⬛⬛⚪⬜⬜⬜⬛⬛⬛⚪⬛
+  // ⬛⚪⬛⬛⬛⬛⬛⚪⬛⬛⬛⬛⬛⚪⬛⬛
+  // ⬛⬛⚪⬜⬜⬛⬛⬛⚪⬛⬛⬜⬜⚪⬛⬛
+  // ⬛⬛⚪⬛⬛⬜⬜⬜⚪⬜⬜⬛⬛⬛⚪⬛
+  // ⬛⬛⚪⬛⬛⬛⬛⬛⚪⬛⬛⬛⬛⬛⚪⬛
+  // ⬛⬛⚪⬜⬜⬛⬛⬛⬛⚪⬛⬛⬛⬛⚪⬛
+  // ⬛⚪⬛⬛⬛⬜⬜⬜⬜⚪⬛⬛⬜⬜⚪⬛
+  // ⬛⚪⬛⬛⬛⬛⬛⬛⬛⚪⬜⬜⬛⬛⚪⬛
+  // ⬛⚪⬛⬛⬛⬛⬛⬛⚪⬛⬛⬛⬛⬛⚪⬛
+  // ⬛⚪⬛⬛⬜⬜⬜⬜⚪⬜⬜⬛⬛⚪⬛⬛
+  // ⬛⚪⬜⬜⬛⬛⬛⬛⚪⬛⬛⬜⬜⚪⬛⬛
+  // Moves down, disappear on collide or out of frame
+ public:
+  SpiderWeb(geometry::Position position, Spider& parent) : Hazard(position), parent_(parent) {}
+
+  virtual void update(const geometry::Rectangle& player_rect, Level& level) override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override
+  {
+    return {std::make_pair(position, Sprite::SPRITE_SPIDER_WEB)};
+  }
+  virtual bool is_alive() const override { return alive_; }
+
+ private:
+  Spider& parent_;
+  bool alive_ = true;
 };

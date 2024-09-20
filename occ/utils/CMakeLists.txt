@@ -12,6 +12,7 @@ add_library(utils
   "export/sprite.h"
   "export/vector.h"
   "src/exe_data.cc"
+  "src/geometry.cc"
   "src/logger.cc"
   "src/misc.cc"
   "src/path.cc"

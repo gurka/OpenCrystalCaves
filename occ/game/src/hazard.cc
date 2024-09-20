@@ -53,3 +53,13 @@ void Thorn::update(const geometry::Rectangle& player_rect, Level& level)
     frame_ = 0;
   }
 }
+
+void SpiderWeb::update([[maybe_unused]] const geometry::Rectangle& player_rect, Level& level)
+{
+  position += geometry::Position(0, 4);
+  if (level.collides_solid(position + geometry::Position(0, -6), geometry::Size(16, 16)))
+  {
+    alive_ = false;
+    parent_.remove_child();
+  }
+}

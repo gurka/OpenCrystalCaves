@@ -1,5 +1,6 @@
 #include "enemy.h"
 
+#include "hazard.h"
 #include "level.h"
 
 bool Enemy::should_reverse(const Level& level) const
@@ -144,7 +145,12 @@ void Spider::update([[maybe_unused]] const geometry::Rectangle& player_rect, [[m
     up_ = !up_;
     position -= d;
   }
-  // TODO: fire webs
+  // fire webs
+  if (child_ == nullptr && is_any_colliding(get_detection_rects(level), player_rect))
+  {
+    child_ = new SpiderWeb(position, *this);
+    level.hazards.emplace_back(child_);
+  }
 }
 
 std::vector<std::pair<geometry::Position, Sprite>> Spider::get_sprites() const
