@@ -162,7 +162,7 @@ std::unique_ptr<Surface> load_surface(const std::filesystem::path& path,
     LOG_CRITICAL("Could not find game data!");
     return nullptr;
   }
-  int sheet_w, sheet_h;
+  int sheet_w = 0, sheet_h = 0;
   const auto all_pixels = load_pixels(path, sprite_w, sprite_h, stride, filler, sheet_w, sheet_h);
   if (all_pixels.empty())
   {

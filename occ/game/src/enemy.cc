@@ -110,25 +110,39 @@ std::vector<std::pair<geometry::Position, Sprite>> Slime::get_sprites() const
 
 void Snake::update([[maybe_unused]] const geometry::Rectangle& player_rect, Level& level)
 {
+  // State changes / pause
   frame_++;
-  if (frame_ >= (paused_ ? 7 : 9))
+  if (paused_)
   {
+    if (frame_ == 14)
+    {
+      paused_ = false;
+      frame_ = 0;
+    }
+  }
+  else if (frame_ == 100)
+  {
+    paused_ = true;
     frame_ = 0;
   }
-  const auto d = geometry::Position(left_ ? -2 : 2, 0);
-  position += d;
-  if (should_reverse(level))
+
+  if (!paused_)
   {
-    left_ = !left_;
-    position -= d;
+    const auto d = geometry::Position(left_ ? -2 : 2, 0);
+    position += d;
+    if (should_reverse(level))
+    {
+      left_ = !left_;
+      position -= d;
+    }
   }
-  // TODO: pause
 }
 
 std::vector<std::pair<geometry::Position, Sprite>> Snake::get_sprites() const
 {
   const auto s = paused_ ? Sprite::SPRITE_SNAKE_PAUSE_1 : (left_ ? Sprite::SPRITE_SNAKE_WALK_L_1 : Sprite::SPRITE_SNAKE_WALK_R_1);
-  return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(s) + frame_))};
+  const int frame = frame_ % (paused_ ? 7 : 9);
+  return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(s) + frame))};
 }
 
 void Spider::update([[maybe_unused]] const geometry::Rectangle& player_rect, [[maybe_unused]] Level& level)
