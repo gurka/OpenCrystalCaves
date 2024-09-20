@@ -10,21 +10,27 @@ bool Enemy::should_reverse(const Level& level) const
     !level.collides_solid(position + geometry::Position(size.x() - 1, 1), geometry::Size(1, size.y()));
 }
 
-void Bigfoot::update([[maybe_unused]] const geometry::Rectangle& player_rect, Level& level)
+void Bigfoot::update(const geometry::Rectangle& player_rect, Level& level)
 {
   frame_++;
   if (frame_ == 8)
   {
     frame_ = 0;
   }
-  const auto d = geometry::Position(left_ ? -2 : 2, 0);
+  const int speed = running_ ? 4 : 2;
+  const auto d = geometry::Position(left_ ? -speed : speed, 0);
   position += d;
   if (should_reverse(level))
   {
     left_ = !left_;
+    running_ = false;
     position -= d;
   }
-  // TODO: detect player/run
+  // detect player/run
+  if (is_any_colliding(get_detection_rects(level), player_rect))
+  {
+    running_ = true;
+  }
 }
 
 std::vector<std::pair<geometry::Position, Sprite>> Bigfoot::get_sprites() const
