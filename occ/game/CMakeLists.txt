@@ -34,6 +34,9 @@ add_library(game
   "src/player.cc"
   "src/tile.cc"
 )
+target_link_libraries(game
+  "utils"
+)
 target_include_directories(game PUBLIC
   "export"
 )

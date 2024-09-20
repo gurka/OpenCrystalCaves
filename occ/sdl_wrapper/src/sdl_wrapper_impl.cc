@@ -34,5 +34,5 @@ unsigned SDLWrapperImpl::get_tick()
 
 void SDLWrapperImpl::delay(const int ms)
 {
-	return SDL_Delay(ms);
+	SDL_Delay(ms);
 }

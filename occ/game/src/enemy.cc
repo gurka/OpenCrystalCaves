@@ -28,7 +28,7 @@ void Bigfoot::update(const geometry::Rectangle& player_rect, Level& level)
     position -= d;
   }
   // detect player/run
-  if (is_any_colliding(get_detection_rects(level), player_rect))
+  if (geometry::is_any_colliding(get_detection_rects(level), player_rect))
   {
     running_ = true;
   }
@@ -146,7 +146,7 @@ void Spider::update([[maybe_unused]] const geometry::Rectangle& player_rect, [[m
     position -= d;
   }
   // fire webs
-  if (child_ == nullptr && is_any_colliding(get_detection_rects(level), player_rect))
+  if (child_ == nullptr && geometry::is_any_colliding(get_detection_rects(level), player_rect))
   {
     child_ = new SpiderWeb(position, *this);
     level.hazards.emplace_back(child_);
