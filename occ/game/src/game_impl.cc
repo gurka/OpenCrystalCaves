@@ -527,6 +527,11 @@ void GameImpl::update_enemies()
 
       // Give score: TODO: score particle
       score_ += e->get_points();
+      // Don't even bother showing score particle unless it is high enough (>= 1000?)
+      if (e->get_points() >= 1000)
+      {
+        particles_.emplace_back(new ScoreParticle(e->position, e->get_points()));
+      }
 
       // Remove enemy
       it = level_->enemies.erase(it);
