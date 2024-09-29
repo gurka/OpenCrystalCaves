@@ -531,6 +531,8 @@ void GameImpl::update_enemies()
     // Check if enemy died
     if (!e->is_alive())
     {
+      e->on_death(*level_);
+
       // TODO: When an enemy dies there should be another type of explosion
       //       or bones spawning. The explosion/bones should move during animation
       //       in the same direction as the missile coming from

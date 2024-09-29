@@ -3,6 +3,8 @@
 #include "hazard.h"
 #include "level.h"
 
+// TODO: hurt player on touch, all enemy types
+
 bool Enemy::should_reverse(const Level& level) const
 {
   // Reverse direction if colliding left/right or about to fall
@@ -143,6 +145,13 @@ std::vector<std::pair<geometry::Position, Sprite>> Snake::get_sprites() const
   const auto s = paused_ ? Sprite::SPRITE_SNAKE_PAUSE_1 : (left_ ? Sprite::SPRITE_SNAKE_WALK_L_1 : Sprite::SPRITE_SNAKE_WALK_R_1);
   const int frame = frame_ % (paused_ ? 7 : 9);
   return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(s) + frame))};
+}
+
+void Snake::on_death(Level& level)
+{
+  // Create a corpse
+  level.hazards.emplace_back(new CorpseSlime(position, Sprite::SPRITE_SNAKE_SLIME));
+  // TODO: authentic mode, align corpse to tile coord
 }
 
 void Spider::update([[maybe_unused]] const geometry::Rectangle& player_rect, [[maybe_unused]] Level& level)

@@ -168,3 +168,24 @@ class SpiderWeb : public Hazard
   Spider& parent_;
   bool alive_ = true;
 };
+
+
+class CorpseSlime : public Hazard
+{
+  // ⬛⬛⬛⬛⬛⬛⬛⬛⬛🟪🟪🟪🟪⬛⬛⬛
+  // ⬛⬛🟪🟪🟪🟪🟪🟪🟪🟣🟣🟣🟣🟪⬛⬛
+  // ⬛🟪🟣🟣🟣🟣🟣🟣🟣🟣🟣🟣🟣🟣🟣⬛
+  //
+  // ⬛⬛⬛🟩🟩🟩🟩🟩⬛⬛⬛⬛⬛⬛⬛⬛
+  // ⬛⬛🟩🦚🦚🦚🦚🦚🦚🟩🟩🟩🟩⬛⬛⬛
+  // ⬛🟩🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚⬛⬛
+  // Hurts player if they step on it; created by dead snake/tentacle
+ public:
+  CorpseSlime(geometry::Position position, Sprite sprite) : Hazard(position), sprite_(sprite) {}
+
+  virtual void update(const geometry::Rectangle& player_rect, Level& level) override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override { return {std::make_pair(position, sprite_)}; }
+
+ private:
+  Sprite sprite_;
+};

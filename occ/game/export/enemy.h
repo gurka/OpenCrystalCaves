@@ -17,6 +17,7 @@ class Enemy : public Actor
 
   virtual bool is_alive() const override { return health > 0; }
   virtual int get_points() const override { return points; }
+  virtual void on_death(Level& level) {}
 
   int health;
   int points;
@@ -143,6 +144,7 @@ class Snake : public Enemy
 
   virtual void update(const geometry::Rectangle& player_rect, Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
+  virtual void on_death(Level& level) override;
 
  private:
   bool left_ = false;

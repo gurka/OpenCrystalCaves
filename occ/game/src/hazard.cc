@@ -62,4 +62,11 @@ void SpiderWeb::update([[maybe_unused]] const geometry::Rectangle& player_rect, 
     alive_ = false;
     parent_.remove_child();
   }
+
+  // TODO: hurt player
+}
+
+void CorpseSlime::update([[maybe_unused]] const geometry::Rectangle& player_rect, [[maybe_unused]] Level& level)
+{
+  // TODO: hurt player
 }
