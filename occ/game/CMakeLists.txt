@@ -17,8 +17,6 @@ add_library(game
   "src/actor.cc"
   "src/enemy.cc"
   "src/entrance.cc"
-  "src/explosion.cc"
-  "src/explosion.h"
   "src/game_impl.cc"
   "src/game_impl.h"
   "src/hazard.cc"
@@ -31,6 +29,8 @@ add_library(game
   "src/missile.h"
   "src/moving_platform.h"
   "src/moving_platform.cc"
+  "src/particle.cc"
+  "src/particle.h"
   "src/player.cc"
   "src/tile.cc"
 )

@@ -17,7 +17,7 @@ class Enemy : public Actor
 
   virtual bool is_alive() const override { return health > 0; }
   virtual int get_points() const override { return points; }
-  virtual void on_death(Level& level) {}
+  virtual void on_death([[maybe_unused]] Level& level) {}
 
   int health;
   int points;

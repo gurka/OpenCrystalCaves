@@ -418,14 +418,20 @@ void GameImpl::update_items()
 
 void GameImpl::update_missile()
 {
-  // Check current explosion (if alive)
-  if (explosion_.alive)
+  // Update particles (explosions etc.)
+  for (auto it = particles_.begin(); it != particles_.end();)
   {
-    explosion_.frame += 1;
+    auto p = it->get();
+    p->update();
 
-    if (explosion_.frame >= explosion_.sprites.size())
+    if (!p->is_alive())
     {
-      explosion_.alive = false;
+      it = particles_.erase(it);
+    }
+    else
+    {
+      objects_.emplace_back(p->position, p->get_sprite(), 1, false);
+      it++;
     }
   }
 
@@ -441,11 +447,8 @@ void GameImpl::update_missile()
       if (level_->collides_solid(missile_.position + geometry::Position(0, 3), missile_.size))
       {
         missile_.alive = false;
-
-        explosion_.alive = true;
-        explosion_.frame = 0;
-        explosion_.position = missile_.position;
-
+        missile_.set_cooldown();
+        particles_.emplace_back(new Explosion(missile_.position));
         break;
       }
 
@@ -462,23 +465,10 @@ void GameImpl::update_missile()
       }
     }
   }
-
-  // Check if missile is alive after movement
-  if (missile_.alive)
-  {
-    missile_.frame += 1;
-
-    // TODO: Missile doesn't disappear after a certain number of frames, but rather
-    //       when it's outside of the screen. So we might need to make GameImpl aware
-    //       of the game camera...
-    if (missile_.frame > 27)
-    {
-      missile_.alive = false;
-    }
-  }
+  missile_.update();
 
   // Player wants to shoot new missile
-  if (player_.shooting && !missile_.alive && !explosion_.alive)
+  if (player_.shooting && !missile_.is_in_cooldown())
   {
     if (num_ammo_ > 0)
     {
@@ -501,12 +491,6 @@ void GameImpl::update_missile()
     {
       // Play "no ammo" sound when we have audio
     }
-  }
-
-  // Add explosion to objects_ if alive
-  if (explosion_.alive)
-  {
-    objects_.emplace_back(explosion_.position, explosion_.sprites[explosion_.frame], 1, false);
   }
 
   // Add missile to objects_ if alive
@@ -537,9 +521,9 @@ void GameImpl::update_enemies()
       //       or bones spawning. The explosion/bones should move during animation
       //       in the same direction as the missile coming from
       // Create explosion where enemy is
-      explosion_.alive = true;
-      explosion_.frame = 0;
-      explosion_.position = e->position;
+      // explosion_.alive = true;
+      // explosion_.frame = 0;
+      // explosion_.position = e->position;
 
       // Give score: TODO: score particle
       score_ += e->get_points();
