@@ -31,6 +31,21 @@ Features that are missing:
 - Enemies.
 - (and much more).
 
+## Differences with Crystal Caves
+
+OCC aims to be a better, modern remake of Crystal Caves while preserving the same gameplay experience. Therefore there are some changes and improvements made where they make sense. Below is a list of differences:
+
+| Feature                      | Crystal Caves                                                                                       | OpenCrystalCaves                                                                                          |
+| ---------------------------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| BBS menu item                | ![](/screenshots/bbs_cc.png) "Call our BBS" menu item which shows BBS phone numbers                 | ![](/screenshots/bbs_occ.png) "Visit our Website" which opens the browser to the OCC game page            |
+| Earth and moon orbits        | ![](/screenshots/earthmoon_cc.gif?raw=true) Earth and Moon move at constant speed                   | ![](/screenshots/earthmoon_occ.gif?raw=true) Earth and Moon move in a circular arc                        |
+| Head bump momentum           | ![](/screenshots/headbump_cc.gif?raw=true) Horizontal momentum is lost when player bumps their head | ![](/screenshots/headbump_occ.gif?raw=true) Horizontal momentum is preserved when player bumps their head |
+| Instructions                 | ![](/screenshots/instructions_cc.png) Sequential, text-only instructions                            | ![](/screenshots/instructions_occ.png) Added inline icons showing what game objects look like             |
+| Moving platform animation    | ![](/screenshots/movingplatform_cc.gif?raw=true) Animation is the same regardless of direction      | ![](/screenshots/movingplatform_occ.gif?raw=true) Animation reverses so that monitor follows background   |
+| Transitions                  | ![](/screenshots/transition_cc.gif?raw=true) Fade by palette color                                  | ![](/screenshots/transition_occ.gif?raw=true) Fade to black                                               |
+| Question mark spin animation | ![](/screenshots/question_cc.gif?raw=true) Animation repeats and skips some frames                  | ![](/screenshots/question_occ.gif?raw=true) Animation shows fully rotating question mark                  |
+| Quit To OS menu label        | ![](/screenshots/quitto_cc.png) Quit to DOS                                                         | ![](/screenshots/quitto_occ.png) Quit to OS depending on build                                            |
+
 ## Compiling OCC
 
 OCC is built using C++17 and requires external libraries: [SDL 2.0](https://www.libsdl.org/), [SDL_image](https://www.libsdl.org/projects/old/SDL_image/) and [SDL_mixer](https://www.libsdl.org/projects/old/SDL_mixer/) and . SDL2 must be installed and available in `/usr/include/SDL2`. Additionally the build system `cmake` must be installed.

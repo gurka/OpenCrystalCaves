@@ -525,7 +525,7 @@ void GameImpl::update_enemies()
       // explosion_.frame = 0;
       // explosion_.position = e->position;
 
-      // Give score: TODO: score particle
+      // Give score
       score_ += e->get_points();
       // Don't even bother showing score particle unless it is high enough (>= 1000?)
       if (e->get_points() >= 1000)
