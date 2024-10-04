@@ -46,6 +46,7 @@ OCC aims to be a better, modern remake of Crystal Caves while preserving the sam
 | Transitions                  | ![](/screenshots/transition_cc.gif?raw=true) Fade by palette color                                  | ![](/screenshots/transition_occ.gif?raw=true) Fade to black                                               |
 | Question mark spin animation | ![](/screenshots/question_cc.gif?raw=true) Animation repeats and skips some frames                  | ![](/screenshots/question_occ.gif?raw=true) Animation shows fully rotating question mark                  |
 | Quit To OS menu label        | ![](/screenshots/quitto_cc.png) Quit to DOS                                                         | ![](/screenshots/quitto_occ.png) Quit to OS depending on build                                            |
+| Restarting levels            | Menu > Quit Current Game > Main Level, re-enter level                                               | Menu > Restart                                                                                            |
 
 ## Compiling OCC
 
