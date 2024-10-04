@@ -310,14 +310,14 @@ GameState::GameState(Game& game, SpriteManager& sprite_manager, Surface& game_su
         L"OpenCrystalCaves Game Menu",
         L"--------------------------",
         L"     Instructions",
+        L"     Restart",
         L"     Options",
-        L"     Save Game",
         L"     Quit Game",
       },
       {
         {2, makeInstructionsPanels(exe_data)},
-        {3, {PanelType::PANEL_TYPE_DISABLED}},  // TODO: options
-        {4, {PanelType::PANEL_TYPE_DISABLED}},  // TODO: save game
+        {3, {PanelType::PANEL_TYPE_RESTART}},
+        {4, {PanelType::PANEL_TYPE_DISABLED}},  // TODO: options
         {5,
          {{
             L"Quit to:",
@@ -435,6 +435,10 @@ void GameState::update(const Input& input)
     {
       switch (panel_current_->get_type())
       {
+        case PanelType::PANEL_TYPE_RESTART:
+          finish();
+          reset();
+          break;
         case PanelType::PANEL_TYPE_QUIT_TO_OS:
           panel_next_ = panel_current_;
           panel_current_ = nullptr;

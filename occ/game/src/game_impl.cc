@@ -25,6 +25,7 @@ bool GameImpl::init(const ExeData& exe_data, const LevelId level)
     return false;
   }
 
+  player_ = Player();
   player_.position = level_->player_spawn;
   entering_level = level;
 
