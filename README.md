@@ -39,14 +39,15 @@ OCC aims to be a better, modern remake of Crystal Caves while preserving the sam
 | ---------------------------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
 | BBS menu item                | ![](/screenshots/bbs_cc.png) "Call our BBS" menu item which shows BBS phone numbers                 | ![](/screenshots/bbs_occ.png) "Visit our Website" which opens the browser to the OCC game page            |
 | Earth and moon orbits        | ![](/screenshots/earthmoon_cc.gif?raw=true) Earth and Moon move at constant speed                   | ![](/screenshots/earthmoon_occ.gif?raw=true) Earth and Moon move in a circular arc                        |
+| Enemy and hazard detection   | ![](/screenshots/web_cc.gif?raw=true) Detection can go through walls                                | ![](/screenshots/web_occ.gif?raw=true) Detection is blocked by walls                                      |
 | Head bump momentum           | ![](/screenshots/headbump_cc.gif?raw=true) Horizontal momentum is lost when player bumps their head | ![](/screenshots/headbump_occ.gif?raw=true) Horizontal momentum is preserved when player bumps their head |
 | Instructions                 | ![](/screenshots/instructions_cc.png) Sequential, text-only instructions                            | ![](/screenshots/instructions_occ.png) Added inline icons showing what game objects look like             |
-| Moving platform animation    | ![](/screenshots/movingplatform_cc.gif?raw=true) Animation is the same regardless of direction      | ![](/screenshots/movingplatform_occ.gif?raw=true) Animation reverses so that monitor follows background   |
 | Laser position               | ![](/screenshots/laser_cc.gif?raw=true) Laser is fired slightly below the muzzle                    | ![](/screenshots/laser_occ.gif?raw=true) Laser is aligned with the muzzle                                 |
-| Transitions                  | ![](/screenshots/transition_cc.gif?raw=true) Fade by palette color                                  | ![](/screenshots/transition_occ.gif?raw=true) Fade to black                                               |
+| Moving platform animation    | ![](/screenshots/movingplatform_cc.gif?raw=true) Animation is the same regardless of direction      | ![](/screenshots/movingplatform_occ.gif?raw=true) Animation reverses so that monitor follows background   |
 | Question mark spin animation | ![](/screenshots/question_cc.gif?raw=true) Animation repeats and skips some frames                  | ![](/screenshots/question_occ.gif?raw=true) Animation shows fully rotating question mark                  |
 | Quit To OS menu label        | ![](/screenshots/quitto_cc.png) Quit to DOS                                                         | ![](/screenshots/quitto_occ.png) Quit to OS depending on build                                            |
 | Restarting levels            | Menu > Quit Current Game > Main Level, re-enter level                                               | Menu > Restart                                                                                            |
+| Transitions                  | ![](/screenshots/transition_cc.gif?raw=true) Fade by palette color                                  | ![](/screenshots/transition_occ.gif?raw=true) Fade to black                                               |
 
 ## Compiling OCC
 
