@@ -104,3 +104,21 @@ std::vector<geometry::Rectangle> Actor::create_detection_rects(const int dx, con
   }
   return rects;
 }
+
+bool Lever::interact(Level& level)
+{
+  if (!level.lever_on.test(static_cast<size_t>(color_)))
+  {
+    level.lever_on.set(static_cast<size_t>(color_));
+    // TODO: play on sound
+    return true;
+  }
+  return false;
+}
+
+std::vector<std::pair<geometry::Position, Sprite>> Lever::get_sprites(const Level& level) const
+{
+  const int sprite = static_cast<int>(Sprite::SPRITE_LEVER_R_OFF) + level.lever_on.test(static_cast<size_t>(color_)) +
+    2 * static_cast<int>(static_cast<size_t>(color_));
+  return {{position, static_cast<Sprite>(sprite)}};
+}

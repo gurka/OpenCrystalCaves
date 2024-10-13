@@ -36,7 +36,7 @@ void Bigfoot::update(const geometry::Rectangle& player_rect, Level& level)
   }
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> Bigfoot::get_sprites() const
+std::vector<std::pair<geometry::Position, Sprite>> Bigfoot::get_sprites([[maybe_unused]] const Level& level) const
 {
   Sprite s = Sprite::SPRITE_BIGFOOT_HEAD_R_1;
   if (left_)
@@ -73,7 +73,7 @@ void Hopper::update([[maybe_unused]] const geometry::Rectangle& player_rect, Lev
   next_reverse_--;
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> Hopper::get_sprites() const
+std::vector<std::pair<geometry::Position, Sprite>> Hopper::get_sprites([[maybe_unused]] const Level& level) const
 {
   return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_HOPPER_1) + frame_))};
 }
@@ -88,7 +88,7 @@ void Slime::update([[maybe_unused]] const geometry::Rectangle& player_rect, [[ma
   // TODO: move, pause
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> Slime::get_sprites() const
+std::vector<std::pair<geometry::Position, Sprite>> Slime::get_sprites([[maybe_unused]] const Level& level) const
 {
   Sprite s = Sprite::SPRITE_SLIME_R_1;
   if (dx_ == 1)
@@ -140,7 +140,7 @@ void Snake::update([[maybe_unused]] const geometry::Rectangle& player_rect, Leve
   }
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> Snake::get_sprites() const
+std::vector<std::pair<geometry::Position, Sprite>> Snake::get_sprites([[maybe_unused]] const Level& level) const
 {
   const auto s = paused_ ? Sprite::SPRITE_SNAKE_PAUSE_1 : (left_ ? Sprite::SPRITE_SNAKE_WALK_L_1 : Sprite::SPRITE_SNAKE_WALK_R_1);
   const int frame = frame_ % (paused_ ? 7 : 9);
@@ -176,7 +176,7 @@ void Spider::update([[maybe_unused]] const geometry::Rectangle& player_rect, [[m
   }
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> Spider::get_sprites() const
+std::vector<std::pair<geometry::Position, Sprite>> Spider::get_sprites([[maybe_unused]] const Level& level) const
 {
   return {std::make_pair(position,
                          static_cast<Sprite>(static_cast<int>(up_ ? Sprite::SPRITE_SPIDER_UP_1 : Sprite::SPRITE_SPIDER_DOWN_1) + frame_))};

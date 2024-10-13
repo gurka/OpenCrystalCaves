@@ -8,7 +8,7 @@ PlayerInput input_to_player_input(const Input& input)
   pi.up = input.up.down;
   pi.down = input.down.down;
   pi.jump = input.z.down;
-  pi.shoot = input.x.down;
+  pi.shoot = input.x.pressed();
   pi.left_pressed = input.left.pressed();
   pi.right_pressed = input.right.pressed();
   pi.up_pressed = input.up.pressed();

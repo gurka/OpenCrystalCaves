@@ -12,7 +12,7 @@ void AirTank::update([[maybe_unused]] const geometry::Rectangle& player_rect, [[
   }
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> AirTank::get_sprites() const
+std::vector<std::pair<geometry::Position, Sprite>> AirTank::get_sprites([[maybe_unused]] const Level& level) const
 {
   return {std::make_pair(
     position, top_ ? static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_AIR_TANK_TOP_1) + frame_) : Sprite::SPRITE_AIR_TANK_BOTTOM)};

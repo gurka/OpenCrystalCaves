@@ -680,13 +680,11 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             break;
           case -94:
             // Blue lever
-            // TODO: lever object
-            sprite = static_cast<int>(Sprite::SPRITE_LEVER_B_OFF);
+            level->switches.emplace_back(new Lever(geometry::Position{x * 16, y * 16}, LeverColor::LEVER_COLOR_B));
             break;
           case -95:
             // Green lever
-            // TODO: lever object
-            sprite = static_cast<int>(Sprite::SPRITE_LEVER_G_OFF);
+            level->switches.emplace_back(new Lever(geometry::Position{x * 16, y * 16}, LeverColor::LEVER_COLOR_G));
             break;
           case -113:
             if (tile_ids[i + 1] == 'n')

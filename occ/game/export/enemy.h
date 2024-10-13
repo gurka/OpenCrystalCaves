@@ -63,7 +63,7 @@ class Bigfoot : public Enemy
   Bigfoot(geometry::Position position) : Enemy(position - geometry::Position(0, 16), geometry::Size(16, 32), 5, 5000) {}
 
   virtual void update(const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
   virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override
   {
     return create_detection_rects(left_ ? -1 : 1, 0, level);
@@ -91,7 +91,7 @@ class Hopper : public Enemy
   Hopper(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 1, 100) {}
 
   virtual void update(const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
 
  private:
   bool left_ = false;
@@ -115,7 +115,7 @@ class Slime : public Enemy
   Slime(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 1, 100) {}
 
   virtual void update(const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
 
  private:
   int dx_ = 1;
@@ -143,7 +143,7 @@ class Snake : public Enemy
   Snake(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 2, 100) {}
 
   virtual void update(const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
   virtual void on_death(Level& level) override;
 
  private:
@@ -173,7 +173,7 @@ class Spider : public Enemy
   Spider(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 1, 100) {}
 
   virtual void update(const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
   virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override
   {
     return create_detection_rects(0, 1, level);

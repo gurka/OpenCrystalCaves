@@ -54,6 +54,7 @@ void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
   update_missile();
   update_enemies();
   update_hazards();
+  update_switches();
 }
 
 int GameImpl::get_bg_sprite(const int x, const int y) const
@@ -238,8 +239,24 @@ void GameImpl::update_player(const PlayerInput& player_input)
     }
   }
 
-  // Check shooting
-  player_.shooting = player_input.shoot;
+  // Check shooting/interacting
+  bool interacted = false;
+  if (player_input.shoot)
+  {
+    const auto rect = geometry::Rectangle(player_.position, player_.size);
+    for (auto&& s : level_->switches)
+    {
+      if (geometry::isColliding(rect, geometry::Rectangle(s->position, s->size)) && s->interact(*level_))
+      {
+        interacted = true;
+        break;
+      }
+    }
+  }
+  if (!interacted)
+  {
+    player_.shooting = player_input.shoot;
+  }
 
   /**
    * 2. Update player velocity based on player information
@@ -539,7 +556,7 @@ void GameImpl::update_enemies()
     }
     else
     {
-      for (const auto& sprite_pos : e->get_sprites())
+      for (const auto& sprite_pos : e->get_sprites(*level_))
       {
         objects_.emplace_back(sprite_pos.first, static_cast<int>(sprite_pos.second), 1, false);
       }
@@ -562,7 +579,7 @@ void GameImpl::update_hazards()
     }
     else
     {
-      for (const auto& sprite_pos : h->get_sprites())
+      for (const auto& sprite_pos : h->get_sprites(*level_))
       {
         objects_.emplace_back(sprite_pos.first, static_cast<int>(sprite_pos.second), 1, false);
       }
@@ -571,11 +588,23 @@ void GameImpl::update_hazards()
   }
 }
 
+void GameImpl::update_switches()
+{
+  for (auto&& s : level_->switches)
+  {
+    // TODO: switches don't need to be updated, just added to objects for drawing
+
+    for (const auto& sprite_pos : s->get_sprites(*level_))
+    {
+      objects_.emplace_back(sprite_pos.first, static_cast<int>(sprite_pos.second), 1, false);
+    }
+  }
+}
+
 /**
  * Checks if given position and size collides with any enemy.
  *
- * If is colliding with an enemy the index in enemies to that enemy is returned
- * otherwise -1 is returned.
+ * Returns the first colliding enemy, or null if none found.
  */
 Enemy* GameImpl::collides_enemy(const geometry::Position& position, const geometry::Size& size)
 {

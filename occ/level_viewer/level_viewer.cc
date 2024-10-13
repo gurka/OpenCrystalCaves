@@ -104,14 +104,21 @@ int main(int argc, char* argv[])
         sprite_manager.render_tile(sprite_id, {x * SPRITE_W, y * SPRITE_H});
         for (const auto& enemy : level->enemies)
         {
-          for (const auto& sprite_pos : enemy->get_sprites())
+          for (const auto& sprite_pos : enemy->get_sprites(*level))
           {
             sprite_manager.render_tile(static_cast<int>(sprite_pos.second), sprite_pos.first);
           }
         }
         for (const auto& hazard : level->hazards)
         {
-          for (const auto& sprite_pos : hazard->get_sprites())
+          for (const auto& sprite_pos : hazard->get_sprites(*level))
+          {
+            sprite_manager.render_tile(static_cast<int>(sprite_pos.second), sprite_pos.first);
+          }
+        }
+        for (const auto& s : level->switches)
+        {
+          for (const auto& sprite_pos : s->get_sprites(*level))
           {
             sprite_manager.render_tile(static_cast<int>(sprite_pos.second), sprite_pos.first);
           }
