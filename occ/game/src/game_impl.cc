@@ -580,11 +580,11 @@ void GameImpl::update_hazards()
 Enemy* GameImpl::collides_enemy(const geometry::Position& position, const geometry::Size& size)
 {
   const auto rect = geometry::Rectangle(position, size);
-  for (auto i = 0u; i < level_->enemies.size(); i++)
+  for (auto&& enemy : level_->enemies)
   {
-    if (geometry::isColliding(rect, geometry::Rectangle(level_->enemies[i]->position, 16, 16)))
+    if (geometry::isColliding(rect, geometry::Rectangle(enemy->position, enemy->size)))
     {
-      return level_->enemies[i].get();
+      return enemy.get();
     }
   }
   return nullptr;
