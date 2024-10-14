@@ -449,16 +449,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                 sprite = static_cast<int>(Sprite::SPRITE_EXIT_BOTTOM_LEFT_1);
                 break;
               case -91:
-                // Bottom of blue door
-                // TODO: door object
-                sprite = static_cast<int>(Sprite::SPRITE_DOOR_CLOSED_B_2);
-                flags |= TILE_SOLID;
+                // Bottom of blue door; skip as we should have added it using the top
                 break;
               case -92:
-                // Bottom of green door
-                // TODO: door object
-                sprite = static_cast<int>(Sprite::SPRITE_DOOR_CLOSED_G_2);
-                flags |= TILE_SOLID;
+                // Bottom of green door; skip as we should have added it using the top
                 break;
               default:
                 // Check tile above-left
@@ -668,23 +662,19 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             break;
           case -91:
             // Top of blue door
-            // TODO: door object
-            sprite = static_cast<int>(Sprite::SPRITE_DOOR_CLOSED_B_1);
-            flags |= TILE_SOLID;
+            level->actors.emplace_back(new Door(geometry::Position{x * 16, y * 16}, LeverColor::LEVER_COLOR_B));
             break;
           case -92:
             // Top of green door
-            // TODO: door object
-            sprite = static_cast<int>(Sprite::SPRITE_DOOR_CLOSED_G_1);
-            flags |= TILE_SOLID;
+            level->actors.emplace_back(new Door(geometry::Position{x * 16, y * 16}, LeverColor::LEVER_COLOR_G));
             break;
           case -94:
             // Blue lever
-            level->switches.emplace_back(new Lever(geometry::Position{x * 16, y * 16}, LeverColor::LEVER_COLOR_B));
+            level->actors.emplace_back(new Lever(geometry::Position{x * 16, y * 16}, LeverColor::LEVER_COLOR_B));
             break;
           case -95:
             // Green lever
-            level->switches.emplace_back(new Lever(geometry::Position{x * 16, y * 16}, LeverColor::LEVER_COLOR_G));
+            level->actors.emplace_back(new Lever(geometry::Position{x * 16, y * 16}, LeverColor::LEVER_COLOR_G));
             break;
           case -113:
             if (tile_ids[i + 1] == 'n')

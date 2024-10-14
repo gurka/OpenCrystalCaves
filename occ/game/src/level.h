@@ -34,7 +34,7 @@ struct Level
 
   std::vector<std::unique_ptr<Enemy>> enemies;
   std::vector<std::unique_ptr<Hazard>> hazards;
-  std::vector<std::unique_ptr<Actor>> switches;
+  std::vector<std::unique_ptr<Actor>> actors;
   std::vector<MovingPlatform> moving_platforms;
   std::vector<Entrance> entrances;
   bool has_earth = false;

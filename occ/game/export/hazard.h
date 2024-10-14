@@ -94,7 +94,7 @@ class LaserBeam : public Hazard
   LaserBeam(geometry::Position position, bool left, Laser& parent) : Hazard(position), left_(left), parent_(parent) {}
 
   virtual void update(const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
   {
     return {std::make_pair(position, frame_ == 0 ? Sprite::SPRITE_LASER_BEAM_1 : Sprite::SPRITE_LASER_BEAM_2)};
   }
@@ -124,7 +124,7 @@ class Thorn : public Hazard
   Thorn(geometry::Position position) : Hazard(position) {}
 
   virtual void update(const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
   {
     return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_THORN_1) + frame_))};
   }
@@ -158,7 +158,7 @@ class SpiderWeb : public Hazard
   SpiderWeb(geometry::Position position, Spider& parent) : Hazard(position), parent_(parent) {}
 
   virtual void update(const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
   {
     return {std::make_pair(position, Sprite::SPRITE_SPIDER_WEB)};
   }

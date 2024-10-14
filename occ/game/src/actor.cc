@@ -118,7 +118,34 @@ bool Lever::interact(Level& level)
 
 std::vector<std::pair<geometry::Position, Sprite>> Lever::get_sprites(const Level& level) const
 {
-  const int sprite = static_cast<int>(Sprite::SPRITE_LEVER_R_OFF) + level.lever_on.test(static_cast<size_t>(color_)) +
-    2 * static_cast<int>(static_cast<size_t>(color_));
+  const int sprite =
+    static_cast<int>(Sprite::SPRITE_LEVER_R_OFF) + level.lever_on.test(static_cast<size_t>(color_)) + 2 * static_cast<int>(color_);
   return {{position, static_cast<Sprite>(sprite)}};
+}
+
+bool Door::is_solid(const Level& level) const
+{
+  return !level.lever_on.test(static_cast<size_t>(color_));
+}
+
+std::vector<std::pair<geometry::Position, Sprite>> Door::get_sprites(const Level& level) const
+{
+  if (level.lever_on.test(static_cast<size_t>(color_)))
+  {
+    // Open
+    const int sprite = static_cast<int>(Sprite::SPRITE_DOOR_OPEN_R_1) + 2 * static_cast<int>(color_);
+    return {
+      {position, static_cast<Sprite>(sprite)},
+      {position + geometry::Position(0, 16), static_cast<Sprite>(sprite + 1)},
+    };
+  }
+  else
+  {
+    // Off
+    const int sprite = static_cast<int>(Sprite::SPRITE_DOOR_CLOSED_R_1) + static_cast<int>(color_);
+    return {
+      {position, static_cast<Sprite>(sprite)},
+      {position + geometry::Position(0, 16), static_cast<Sprite>(sprite + 4)},
+    };
+  }
 }

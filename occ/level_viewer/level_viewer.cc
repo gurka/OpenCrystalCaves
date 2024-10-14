@@ -116,9 +116,9 @@ int main(int argc, char* argv[])
             sprite_manager.render_tile(static_cast<int>(sprite_pos.second), sprite_pos.first);
           }
         }
-        for (const auto& s : level->switches)
+        for (const auto& a : level->actors)
         {
-          for (const auto& sprite_pos : s->get_sprites(*level))
+          for (const auto& sprite_pos : a->get_sprites(*level))
           {
             sprite_manager.render_tile(static_cast<int>(sprite_pos.second), sprite_pos.first);
           }

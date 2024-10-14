@@ -49,5 +49,12 @@ bool Level::collides_solid(const geometry::Position& position, const geometry::S
       return true;
     }
   }
+  for (const auto& a : actors)
+  {
+    if (a->is_solid(*this) && geometry::isColliding(geometry::Rectangle(a->position, a->size), {position, size}))
+    {
+      return true;
+    }
+  }
   return false;
 }

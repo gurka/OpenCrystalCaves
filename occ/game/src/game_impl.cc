@@ -54,7 +54,7 @@ void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
   update_missile();
   update_enemies();
   update_hazards();
-  update_switches();
+  update_actors();
 }
 
 int GameImpl::get_bg_sprite(const int x, const int y) const
@@ -244,9 +244,9 @@ void GameImpl::update_player(const PlayerInput& player_input)
   if (player_input.shoot)
   {
     const auto rect = geometry::Rectangle(player_.position, player_.size);
-    for (auto&& s : level_->switches)
+    for (auto&& a : level_->actors)
     {
-      if (geometry::isColliding(rect, geometry::Rectangle(s->position, s->size)) && s->interact(*level_))
+      if (geometry::isColliding(rect, geometry::Rectangle(a->position, a->size)) && a->interact(*level_))
       {
         interacted = true;
         break;
@@ -588,13 +588,12 @@ void GameImpl::update_hazards()
   }
 }
 
-void GameImpl::update_switches()
+void GameImpl::update_actors()
 {
-  for (auto&& s : level_->switches)
+  for (auto&& a : level_->actors)
   {
-    // TODO: switches don't need to be updated, just added to objects for drawing
-
-    for (const auto& sprite_pos : s->get_sprites(*level_))
+    a->update({player_.position, player_.size}, *level_);
+    for (const auto& sprite_pos : a->get_sprites(*level_))
     {
       objects_.emplace_back(sprite_pos.first, static_cast<int>(sprite_pos.second), 1, false);
     }
