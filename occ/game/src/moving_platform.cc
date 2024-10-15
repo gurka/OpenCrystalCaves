@@ -2,18 +2,18 @@
 
 #include "level.h"
 
-MovingPlatform::MovingPlatform(geometry::Position position, const bool horizontal, const bool moving)
+MovingPlatform::MovingPlatform(geometry::Position position, const bool horizontal, const bool controlled)
   : position(position),
-    moving(moving),
     sprite_id(static_cast<int>(horizontal ? Sprite::SPRITE_PLATFORM_H_1 : Sprite::SPRITE_PLATFORM_V_1)),
     num_sprites(4),
-    velocity(horizontal ? Vector<int>(1, 0) * 2 : Vector<int>(0, 1) * 2)
+    velocity(horizontal ? Vector<int>(1, 0) * 2 : Vector<int>(0, 1) * 2),
+    controlled_(controlled)
 {
 }
 
 void MovingPlatform::update(const Level& level)
 {
-  if (moving)
+  if (is_moving(level))
   {
     // Move platform
     const auto new_platform_pos = collide_position() + velocity;
@@ -25,4 +25,15 @@ void MovingPlatform::update(const Level& level)
     }
     position += velocity;
   }
+}
+
+
+Vector<int> MovingPlatform::get_velocity(const Level& level) const
+{
+  return is_moving(level) ? velocity : Vector<int>(0, 0);
+}
+
+bool MovingPlatform::is_moving(const Level& level) const
+{
+  return !controlled_ || level.switch_on;
 }

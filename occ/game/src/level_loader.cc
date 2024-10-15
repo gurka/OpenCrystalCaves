@@ -398,7 +398,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             level->enemies.emplace_back(new Slime(geometry::Position{x * 16, y * 16}));
             break;
           case 'H':
-            level->moving_platforms.push_back({geometry::Position{x * 16, y * 16}, true, true});
+            level->moving_platforms.push_back({geometry::Position{x * 16, y * 16}, true, false});
             break;
           case 'I':
             // Thorn
@@ -484,12 +484,11 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             mode = TileMode::EJECTA;
             break;
           case 'v':
-            // Vertical switch (off)
-            // TODO: switches
-            sprite = static_cast<int>(Sprite::SPRITE_SWITCH_OFF);
+            // Horizontal toggle switch
+            level->actors.emplace_back(new Switch(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_SWITCH_OFF));
             break;
           case 'V':
-            level->moving_platforms.push_back({geometry::Position{x * 16, y * 16}, false, true});
+            level->moving_platforms.push_back({geometry::Position{x * 16, y * 16}, false, false});
             break;
           case 'w':
             level->hazards.emplace_back(new Laser(geometry::Position{x * 16, y * 16}, false));
@@ -623,7 +622,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             break;
           case -41:
             // Stopped vertical moving platform
-            level->moving_platforms.push_back({geometry::Position{x * 16, y * 16}, false, false});
+            level->moving_platforms.push_back({geometry::Position{x * 16, y * 16}, false, true});
             break;
           case -43:
             sprite = static_cast<int>(Sprite::SPRITE_TORCH_1);

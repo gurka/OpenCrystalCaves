@@ -112,3 +112,31 @@ class Door : public Actor
  private:
   LeverColor color_;
 };
+
+class Switch : public Actor
+{
+  // ⬛⬛⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬛⬛
+  // ⬛⬜⚪🚨🚨⚪⚪🚨🚨⚪⚪🚨🚨⚪🪦⬛
+  // ⬛⬜🚨⚪⚪🚨⚪🚨⚪⚪⚪🚨⚪⚪🪦⬛
+  // ⬛⬜🚨⚪⚪🚨⚪🚨🚨⚪⚪🚨🚨⚪🪦⬛
+  // ⬛⬜⚪🚨🚨⚪⚪🚨⚪⚪⚪🚨⚪⚪🪦⬛
+  // ⬛⬜⚪⚪🇪🇺⚪⚪⚪⚪⚪⚪⚪⚪⚪🪦⬛
+  // ⬛⬜⚪🟦🟦🇪🇺⬛⬛⬛⬛⬛⬛⬛⚪🪦⬛
+  // ⬛⬜⚪🟦🟦🇪🇺⬛⬛⬛⬛⬛⬛⬛⚪🪦⬛
+  // ⬛⬜⚪⚪🇪🇺⚪⚪⚪⚪⚪⚪⚪⚪⚪🪦⬛
+  // ⬛⬜⚪⚪⬛⬛⚪⚪⚪⬛⚪⚪⬛⚪🪦⬛
+  // ⬛⬜⚪⬛⚪⚪⬛⚪⚪⬛⬛⚪⬛⚪🪦⬛
+  // ⬛⬜⚪⬛⚪⚪⬛⚪⚪⬛⚪⬛⬛⚪🪦⬛
+  // ⬛⬜⚪⚪⬛⬛⚪⚪⚪⬛⚪⚪⬛⚪🪦⬛
+  // ⬛⬛🪦🪦🪦🪦🪦🪦🪦🪦🪦🪦🪦🪦⬛⬛
+  // Switches that turn things off/on (e.g. moving platforms)
+ public:
+  Switch(geometry::Position position, Sprite sprite) : Actor(position, geometry::Size(16, 16)), sprite_(sprite) {}
+
+  virtual bool interact(Level& level) override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual void update([[maybe_unused]] const geometry::Rectangle& player_rect, [[maybe_unused]] Level& level) override {}
+
+ private:
+  Sprite sprite_;
+};

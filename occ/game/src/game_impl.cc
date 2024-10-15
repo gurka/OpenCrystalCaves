@@ -49,12 +49,12 @@ void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
   // Update the level (e.g. moving platforms and other objects)
   // TODO: don't update enemies off screen
   update_level();
+  update_actors();
   update_player(player_input);
   update_items();
   update_missile();
   update_enemies();
   update_hazards();
-  update_actors();
 }
 
 int GameImpl::get_bg_sprite(const int x, const int y) const
@@ -104,7 +104,7 @@ void GameImpl::update_level()
     if (player_on_platform)
     {
       // Only move player if not colliding with any static objects
-      const auto new_player_pos = player_.position + platform.get_velocity();
+      const auto new_player_pos = player_.position + platform.get_velocity(*level_);
       if (!level_->collides_solid(new_player_pos, player_.size))
       {
         player_.position = new_player_pos;
