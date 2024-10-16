@@ -630,8 +630,8 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             flags |= TILE_ANIMATED;
             break;
           case -56:
-            // TODO: not sure what this is - slime barrier?
-            sprite = static_cast<int>(Sprite::SPRITE_100);
+            // Slime barrier
+            flags |= TILE_BLOCKS_SLIME;
             break;
           case -57:
             sprite = static_cast<int>(Sprite::SPRITE_SIGN_UP);
@@ -702,7 +702,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
         }
         break;
     }
-    if (sprite == -1)
+    if (sprite == -1 && flags == 0)
     {
       tile = Tile::INVALID;
     }

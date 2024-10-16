@@ -86,7 +86,7 @@ void Slime::update([[maybe_unused]] const geometry::Rectangle& player_rect, Leve
     frame_ = 0;
   }
   const auto d = geometry::Position(dx_, dy_) * 4;
-  if (level.collides_solid(position + d, size))
+  if (level.collides_solid(position + d, size, true))
   {
     // Randomly change direction
     switch (misc::random<int>(0, 4))

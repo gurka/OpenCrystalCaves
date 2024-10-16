@@ -299,6 +299,13 @@ void GameRenderer::render_tiles(bool in_front) const
     {
       const auto& tile = game_->get_tile(tile_x, tile_y);
 
+      if (debug_ && !tile.is_solid() && tile.is_solid_for_slime())
+      {
+        const geometry::Rectangle dest_rect{geometry::Position(tile_x * SPRITE_W, tile_y * SPRITE_H) - game_camera_.position,
+                                            geometry::Size(SPRITE_W, SPRITE_H)};
+        window_.render_rectangle(dest_rect, {0, 128, 0});
+      }
+
       if (!tile.valid())
       {
         continue;

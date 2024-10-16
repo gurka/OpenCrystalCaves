@@ -32,7 +32,7 @@ void Level::remove_item(const int x, const int y)
   items[(y * width) + x].invalidate();
 }
 
-bool Level::collides_solid(const geometry::Position& position, const geometry::Size& size) const
+bool Level::collides_solid(const geometry::Position& position, const geometry::Size& size, const bool is_slime) const
 {
   // Note: this function only works with size x and y <= 16
   // With size 16x16 the object can cover at maximum 4 tiles
@@ -44,11 +44,13 @@ bool Level::collides_solid(const geometry::Position& position, const geometry::S
     geometry::Position((position.x() + size.x() - 1) / 16, (position.y() + size.y() - 1) / 16)};
   for (const auto& p : positions)
   {
-    if (get_tile(p.x(), p.y()).is_solid())
+    const auto& tile = get_tile(p.x(), p.y());
+    if (is_slime ? tile.is_solid_for_slime() : tile.is_solid())
     {
       return true;
     }
   }
+  // Check colliding solid actors (closed doors)
   for (const auto& a : actors)
   {
     if (a->is_solid(*this) && geometry::isColliding(geometry::Rectangle(a->position, a->size), {position, size}))
