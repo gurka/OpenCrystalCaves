@@ -78,14 +78,43 @@ std::vector<std::pair<geometry::Position, Sprite>> Hopper::get_sprites([[maybe_u
   return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_HOPPER_1) + frame_))};
 }
 
-void Slime::update([[maybe_unused]] const geometry::Rectangle& player_rect, [[maybe_unused]] Level& level)
+void Slime::update([[maybe_unused]] const geometry::Rectangle& player_rect, Level& level)
 {
   frame_++;
   if (frame_ == 4)
   {
     frame_ = 0;
   }
-  // TODO: move, pause
+  const auto d = geometry::Position(dx_, dy_) * 4;
+  if (level.collides_solid(position + d, size))
+  {
+    // Randomly change direction
+    switch (misc::random<int>(0, 4))
+    {
+      case 0:
+        dx_ = 1;
+        dy_ = 0;
+        break;
+      case 1:
+        dx_ = -1;
+        dy_ = 0;
+        break;
+      case 2:
+        dx_ = 0;
+        dy_ = 1;
+        break;
+      case 3:
+        dx_ = 0;
+        dy_ = -1;
+        break;
+      default:
+        break;
+    }
+  }
+  else
+  {
+    position += d;
+  }
 }
 
 std::vector<std::pair<geometry::Position, Sprite>> Slime::get_sprites([[maybe_unused]] const Level& level) const
@@ -101,11 +130,11 @@ std::vector<std::pair<geometry::Position, Sprite>> Slime::get_sprites([[maybe_un
   }
   else if (dy_ == 1)
   {
-    s = Sprite::SPRITE_SLIME_U_1;
+    s = Sprite::SPRITE_SLIME_D_1;
   }
   else
   {
-    s = Sprite::SPRITE_SLIME_D_1;
+    s = Sprite::SPRITE_SLIME_U_1;
   }
   return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(s) + frame_))};
 }
