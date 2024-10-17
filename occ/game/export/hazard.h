@@ -130,7 +130,7 @@ class Thorn : public Hazard
   }
   virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override
   {
-    return create_detection_rects(0, -1, level);
+    return create_detection_rects(0, -1, level, true);
   }
 
  private:

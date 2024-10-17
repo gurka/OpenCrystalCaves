@@ -2,7 +2,10 @@
 
 #include "level.h"
 
-std::vector<geometry::Rectangle> Actor::create_detection_rects(const int dx, const int dy, const Level& level) const
+std::vector<geometry::Rectangle> Actor::create_detection_rects(const int dx,
+                                                               const int dy,
+                                                               const Level& level,
+                                                               const bool include_self) const
 {
   // Create rectangles originating from this actor extending toward a cardinal direction,
   // until there is a solid collision.
@@ -14,7 +17,7 @@ std::vector<geometry::Rectangle> Actor::create_detection_rects(const int dx, con
     for (int remain = size.y(); remain > 0; remain -= 16)
     {
       const int h = std::min(remain, 16);
-      geometry::Rectangle r{position.x() + 16, y, 0, h};
+      geometry::Rectangle r{position.x() + (include_self ? 0 : 16), y, 0, h};
       y += h;
       for (;;)
       {
@@ -38,7 +41,7 @@ std::vector<geometry::Rectangle> Actor::create_detection_rects(const int dx, con
     for (int remain = size.y(); remain > 0; remain -= 16)
     {
       const int h = std::min(remain, 16);
-      geometry::Rectangle r{position.x(), y, 0, h};
+      geometry::Rectangle r{position.x() + (include_self ? 16 : 0), y, 0, h};
       y += h;
       for (;;)
       {
@@ -62,7 +65,7 @@ std::vector<geometry::Rectangle> Actor::create_detection_rects(const int dx, con
     for (int remain = size.x(); remain > 0; remain -= 16)
     {
       const int w = std::min(remain, 16);
-      geometry::Rectangle r{x, position.y() + 16, w, 0};
+      geometry::Rectangle r{x, position.y() + (include_self ? 0 : 16), w, 0};
       x += w;
       for (;;)
       {
@@ -85,7 +88,7 @@ std::vector<geometry::Rectangle> Actor::create_detection_rects(const int dx, con
     for (int remain = size.x(); remain > 0; remain -= 16)
     {
       const int w = std::min(remain, 16);
-      geometry::Rectangle r{x, position.y(), w, 0};
+      geometry::Rectangle r{x, position.y() + (include_self ? 16 : 0), w, 0};
       x += w;
       for (;;)
       {

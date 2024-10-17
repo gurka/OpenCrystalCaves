@@ -34,7 +34,10 @@ class Actor
   geometry::Size size;
 
  protected:
-  std::vector<geometry::Rectangle> create_detection_rects(const int dx, const int dy, const Level& level) const;
+  std::vector<geometry::Rectangle> create_detection_rects(const int dx,
+                                                          const int dy,
+                                                          const Level& level,
+                                                          const bool include_self = false) const;
 };
 
 class Lever : public Actor
