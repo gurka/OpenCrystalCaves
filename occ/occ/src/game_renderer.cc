@@ -74,8 +74,8 @@ void GameRenderer::render_game() const
   window_.fill_rect(geometry::Rectangle(0, 0, CAMERA_SIZE), {33u, 33u, 33u});
   render_background();
   render_tiles(false);
-  render_player();
   render_objects();
+  render_player();
   render_tiles(true);
   render_items();
   render_statusbar();
@@ -182,6 +182,7 @@ void GameRenderer::render_background() const
   }
 }
 
+// TODO: refactor to player add object
 void GameRenderer::render_player() const
 {
   // Player sprite ids
