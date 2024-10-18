@@ -2,12 +2,14 @@
 
 #include <cstdio>
 #include <fstream>
-#include <unordered_map>
+#include <unordered_set>
 #include <utility>
 
 #include "game.h"
 #include "level.h"
 #include "logger.h"
+
+static const std::unordered_set<LevelId> completedLevels{LevelId::LEVEL_4};
 
 namespace LevelLoader
 {
@@ -445,8 +447,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                 break;
               case 'X':
                 // Bottom-left of exit
-                // TODO: exit
-                sprite = static_cast<int>(Sprite::SPRITE_EXIT_BOTTOM_LEFT_1);
+                // Ignore - we've already added an exit
                 break;
               case -91:
                 // Bottom of blue door; skip as we should have added it using the top
@@ -460,7 +461,6 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                 {
                   case 'X':
                     // Bottom-right of exit
-                    // TODO: exit
                     sprite = static_cast<int>(Sprite::SPRITE_EXIT_BOTTOM_RIGHT_1);
                     flags |= TILE_ANIMATED;
                     sprite_count = 4;
@@ -495,16 +495,19 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             break;
           case 'x':
             // TODO: remember completion state
-            // Everything is under construction...
-            sprite = static_cast<int>(Sprite::SPRITE_CONES);
-            flags |= TILE_RENDER_IN_FRONT;
+            // Show levels under construction with cones
+            // TODO: C++20 use contains
+            if (completedLevels.find(static_cast<LevelId>(entrance_level)) == completedLevels.end())
+            {
+              sprite = static_cast<int>(Sprite::SPRITE_CONES);
+              flags |= TILE_RENDER_IN_FRONT;
+            }
             level->entrances.push_back({geometry::Position{x * 16, y * 16}, entrance_level, EntranceState::CLOSED});
             entrance_level++;
             break;
           case 'X':
             // Xn = exit
-            // TODO: exit
-            sprite = static_cast<int>(Sprite::SPRITE_EXIT_TOP_LEFT_1);
+            level->exit = std::make_unique<Exit>(geometry::Position{x * 16, y * 16});
             mode = TileMode::EXIT;
             break;
           case 'Y':

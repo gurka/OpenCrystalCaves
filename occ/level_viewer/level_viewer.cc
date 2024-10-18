@@ -131,6 +131,13 @@ int main(int argc, char* argv[])
         {
           sprite_manager.render_tile(entrance.get_sprite(), entrance.position);
         }
+        if (level->exit)
+        {
+          for (const auto& sprite_pos : level->exit->get_sprites())
+          {
+            sprite_manager.render_tile(static_cast<int>(sprite_pos.second), sprite_pos.first);
+          }
+        }
         sprite_manager.render_tile(static_cast<int>(Sprite::SPRITE_STANDING_RIGHT), level->player_spawn);
         const auto& item = level->get_item(x, y);
         if (item.valid())

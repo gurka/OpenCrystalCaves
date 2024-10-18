@@ -5,6 +5,7 @@
 
 #include "enemy.h"
 #include "entrance.h"
+#include "exit.h"
 #include "geometry.h"
 #include "hazard.h"
 #include "item.h"
@@ -37,6 +38,7 @@ struct Level
   std::vector<std::unique_ptr<Actor>> actors;
   std::vector<MovingPlatform> moving_platforms;
   std::vector<Entrance> entrances;
+  std::unique_ptr<Exit> exit;
   bool has_earth = false;
   bool has_moon = false;
   bool switch_on = false;

@@ -133,6 +133,25 @@ void GameImpl::update_level()
     entrance.update();
     objects_.emplace_back(entrance.position, entrance.get_sprite(), 1, false);
   }
+
+  // Add exit
+  if (level_->exit)
+  {
+    if (!level_->exit->open)
+    {
+      level_->exit->open = geometry::isColliding({player_.position, player_.size}, {level_->exit->position, 16, 32});
+      if (level_->exit->open)
+      {
+        // TODO: play sound
+        entering_level = static_cast<LevelId>(LevelId::MAIN_LEVEL);
+      }
+    }
+    level_->exit->update();
+    for (const auto& sprite_pos : level_->exit->get_sprites())
+    {
+      objects_.emplace_back(sprite_pos.first, static_cast<int>(sprite_pos.second), 1, false);
+    }
+  }
 }
 
 void GameImpl::update_player(const PlayerInput& player_input)
